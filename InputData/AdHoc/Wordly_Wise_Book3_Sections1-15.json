@@ -1,0 +1,1587 @@
+{
+  "book": "Wordly Wise 3000",
+  "level": "Book 3",
+  "sections": [
+    {
+      "section": 1,
+      "entries": [
+        {
+          "word": "cylinder",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "An object in the shape of a tube or pipe. It may be solid or hollow."
+        },
+        {
+          "word": "examine",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To look at closely."
+        },
+        {
+          "word": "fatal",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Causing death."
+        },
+        {
+          "word": "feature",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "An important or special part of something."
+        },
+        {
+          "word": "feature",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "Any part of the face."
+        },
+        {
+          "word": "grasp",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To take hold of something tightly with the hands."
+        },
+        {
+          "word": "grasp",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To understand something."
+        },
+        {
+          "word": "jet",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A stream of liquid or gas that is forced at high speed through a small opening."
+        },
+        {
+          "word": "jet",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "An airplane that is powered by a jet engine."
+        },
+        {
+          "word": "marine",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Having to do with the ocean or with ships and boats."
+        },
+        {
+          "word": "scar",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A mark on the skin that is left after a cut or other wound has healed."
+        },
+        {
+          "word": "tentacle",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A long, thin part that grows out from the head of some sea animals, used to hold things or move from place to place."
+        },
+        {
+          "word": "vessel",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A ship or large boat."
+        },
+        {
+          "word": "vessel",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "Anything hollow that can be used to hold liquids."
+        }
+      ]
+    },
+    {
+      "section": 2,
+      "entries": [
+        {
+          "word": "attract",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To bring or draw closer."
+        },
+        {
+          "word": "attractive",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Pleasing to the eye or mind."
+        },
+        {
+          "word": "attraction",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Something that draws attention."
+        },
+        {
+          "word": "crew",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A group of people working together, especially one that runs an airplane or large vessel."
+        },
+        {
+          "word": "dangle",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To hang loosely."
+        },
+        {
+          "word": "drift",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A pile of sand or snow created by moving air or water."
+        },
+        {
+          "word": "drift",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To be carried along by moving air or water."
+        },
+        {
+          "word": "event",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Something that happens, especially something important."
+        },
+        {
+          "word": "launch",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "An open motorboat that is used for short distances."
+        },
+        {
+          "word": "launch",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To put a boat or vessel in the water."
+        },
+        {
+          "word": "launch",
+          "sense": 3,
+          "part_of_speech": "verb",
+          "definition": "To get something started."
+        },
+        {
+          "word": "opposite",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Very different from."
+        },
+        {
+          "word": "opposite",
+          "sense": 2,
+          "part_of_speech": "adjective",
+          "definition": "Facing or moving away from each other."
+        },
+        {
+          "word": "reverse",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To go backward or in the direction one just came from."
+        },
+        {
+          "word": "reverse",
+          "sense": 2,
+          "part_of_speech": "adjective",
+          "definition": "Back to front."
+        },
+        {
+          "word": "signal",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "An object, action, or sound that gives a message or a warning."
+        },
+        {
+          "word": "signal",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To do something that gives a message or warning."
+        },
+        {
+          "word": "steer",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A young bull."
+        },
+        {
+          "word": "steer",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To guide the direction of."
+        }
+      ]
+    },
+    {
+      "section": 3,
+      "entries": [
+        {
+          "word": "ambition",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A strong wish to be good at something or to have something."
+        },
+        {
+          "word": "auction",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A public sale. Each item is sold to the person who offers the most money."
+        },
+        {
+          "word": "coast",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "The land beside the sea."
+        },
+        {
+          "word": "coast",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To move without power or effort."
+        },
+        {
+          "word": "current",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A flow of air, water, or electricity."
+        },
+        {
+          "word": "current",
+          "sense": 2,
+          "part_of_speech": "adjective",
+          "definition": "Of the present time."
+        },
+        {
+          "word": "frail",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Weak; not very strong."
+        },
+        {
+          "word": "intelligent",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Able to learn, think, and understand quickly and easily."
+        },
+        {
+          "word": "novel",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A long story about people and events that are imagined by the author."
+        },
+        {
+          "word": "novel",
+          "sense": 2,
+          "part_of_speech": "adjective",
+          "definition": "New and different."
+        },
+        {
+          "word": "resident",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A person who lives in a certain place."
+        },
+        {
+          "word": "starve",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To be very hungry or to suffer because of not eating any food."
+        },
+        {
+          "word": "volunteer",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A person who offers to do a job, usually without pay."
+        },
+        {
+          "word": "volunteer",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To choose to do something or to give help."
+        }
+      ]
+    },
+    {
+      "section": 4,
+      "entries": [
+        {
+          "word": "average",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "The usual amount or kind of something."
+        },
+        {
+          "word": "average",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "The result of adding a set of numbers and dividing the total by the number in the set."
+        },
+        {
+          "word": "average",
+          "sense": 3,
+          "part_of_speech": "adjective",
+          "definition": "Not special or unusual; ordinary."
+        },
+        {
+          "word": "border",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A dividing line between two states or countries."
+        },
+        {
+          "word": "border",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "The edge of something."
+        },
+        {
+          "word": "border",
+          "sense": 3,
+          "part_of_speech": "verb",
+          "definition": "To be next to."
+        },
+        {
+          "word": "cocoon",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "The silky case that a caterpillar makes to protect itself before it becomes a moth."
+        },
+        {
+          "word": "flutter",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To wave or flap quickly."
+        },
+        {
+          "word": "moisture",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A small amount of liquid, often in the form of small drops."
+        },
+        {
+          "word": "moist",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Damp or slightly wet."
+        },
+        {
+          "word": "nectar",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A sweet liquid produced by many flowering plants; used by bees to make honey."
+        },
+        {
+          "word": "process",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A number of steps that one takes in order to do or make something."
+        },
+        {
+          "word": "span",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "The distance or a section between two objects or supports."
+        },
+        {
+          "word": "span",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A period or length of time."
+        },
+        {
+          "word": "span",
+          "sense": 3,
+          "part_of_speech": "verb",
+          "definition": "To stretch from one side to the other."
+        },
+        {
+          "word": "suitable",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Fit or right for some purpose or event."
+        },
+        {
+          "word": "timber",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Wooded areas with trees that can be used for wood products."
+        },
+        {
+          "word": "timber",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "Tree trunks that can be cut into planks or boards."
+        }
+      ]
+    },
+    {
+      "section": 5,
+      "entries": [
+        {
+          "word": "amaze",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To surprise or cause wonder."
+        },
+        {
+          "word": "amazing",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Causing wonder or surprise."
+        },
+        {
+          "word": "arctic",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Very cold."
+        },
+        {
+          "word": "arctic",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "The area around the North Pole."
+        },
+        {
+          "word": "court",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "An open, flat area marked off for a game or sport."
+        },
+        {
+          "word": "court",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "The home of a king, queen, or other royal person."
+        },
+        {
+          "word": "court",
+          "sense": 3,
+          "part_of_speech": "noun",
+          "definition": "The place where a judge holds trials and decides matters of law."
+        },
+        {
+          "word": "elect",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To choose by voting for."
+        },
+        {
+          "word": "elect",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To make a choice."
+        },
+        {
+          "word": "interval",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A period of time between events."
+        },
+        {
+          "word": "interval",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A space between two things."
+        },
+        {
+          "word": "league",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A group of people that works together for a common purpose."
+        },
+        {
+          "word": "league",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A group of sports teams that play each other to see which is best."
+        },
+        {
+          "word": "limit",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A line or point beyond which one may not go."
+        },
+        {
+          "word": "limit",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To keep from going beyond a certain point."
+        },
+        {
+          "word": "milestone",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A stone marker that gives the distance in miles to another point."
+        },
+        {
+          "word": "milestone",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "An important event."
+        },
+        {
+          "word": "recreation",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Anything a person does to relax or have fun; play."
+        },
+        {
+          "word": "tackle",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To grab or get in the way of a player in a game to stop the player or take the ball away."
+        },
+        {
+          "word": "tackle",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To do or try to do something."
+        },
+        {
+          "word": "tackle",
+          "sense": 3,
+          "part_of_speech": "noun",
+          "definition": "The tools needed for some activity or sport."
+        }
+      ]
+    },
+    {
+      "section": 6,
+      "entries": [
+        {
+          "word": "chasm",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A deep crack or opening in the earth."
+        },
+        {
+          "word": "continent",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "One of the seven great land areas of the world."
+        },
+        {
+          "word": "credit",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Honor or praise; a way of expressing thanks."
+        },
+        {
+          "word": "credit",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A way of buying things and paying for them later."
+        },
+        {
+          "word": "enable",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To make possible; to give the means to bring about."
+        },
+        {
+          "word": "foul",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Having an unpleasant taste or smell."
+        },
+        {
+          "word": "foul",
+          "sense": 2,
+          "part_of_speech": "adjective",
+          "definition": "Stormy, with strong winds and heavy rain."
+        },
+        {
+          "word": "foul",
+          "sense": 3,
+          "part_of_speech": "noun",
+          "definition": "In sports, a move or play that is against the rules."
+        },
+        {
+          "word": "gust",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A sudden increase in the strength of the wind."
+        },
+        {
+          "word": "ordeal",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "An unpleasant, painful, or difficult experience or test."
+        },
+        {
+          "word": "plateau",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A broad, flat area of high ground."
+        },
+        {
+          "word": "rig",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To make or do something by using whatever is nearby."
+        },
+        {
+          "word": "rig",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To set up sails on a boat."
+        },
+        {
+          "word": "rig",
+          "sense": 3,
+          "part_of_speech": "noun",
+          "definition": "A machine or construction used for a special purpose."
+        },
+        {
+          "word": "schedule",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A plan that gives expected times for different things to happen."
+        },
+        {
+          "word": "schedule",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A list of times when trains, buses, and airplanes arrive and leave."
+        }
+      ]
+    },
+    {
+      "section": 7,
+      "entries": [
+        {
+          "word": "act",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Something that is done."
+        },
+        {
+          "word": "act",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A show that is put on."
+        },
+        {
+          "word": "act",
+          "sense": 3,
+          "part_of_speech": "noun",
+          "definition": "One of the main parts of a play."
+        },
+        {
+          "word": "act",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To do something."
+        },
+        {
+          "word": "act",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To play a part in a play, a movie, or on television."
+        },
+        {
+          "word": "additional",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Added or extra."
+        },
+        {
+          "word": "advice",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Ideas or suggestions offered to help someone with a problem or situation."
+        },
+        {
+          "word": "crumple",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To crush together; to bend or press into creases or wrinkles."
+        },
+        {
+          "word": "fan",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Something that causes air to move in order to cool whatever it blows on."
+        },
+        {
+          "word": "fan",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "Someone who closely follows a group, team, or person."
+        },
+        {
+          "word": "fan",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To move air with an open fan or something similar."
+        },
+        {
+          "word": "fan",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To spread in the shape of an opened fan."
+        },
+        {
+          "word": "memorize",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To fix in one’s memory exactly; to learn by heart."
+        },
+        {
+          "word": "mystify",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To confuse or puzzle someone."
+        },
+        {
+          "word": "pause",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To stop for a short time before going on."
+        },
+        {
+          "word": "pause",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A short break or rest from what has been going on."
+        },
+        {
+          "word": "transparent",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Allowing light to pass through freely so that one can see clearly."
+        },
+        {
+          "word": "vanish",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To go out of sight; to disappear."
+        }
+      ]
+    },
+    {
+      "section": 8,
+      "entries": [
+        {
+          "word": "contain",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To hold; to have within itself."
+        },
+        {
+          "word": "container",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A jar, box, or other object used for holding something."
+        },
+        {
+          "word": "digest",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To change food that has been eaten into simpler forms that the body can use."
+        },
+        {
+          "word": "finicky",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Hard to please; fussy."
+        },
+        {
+          "word": "habit",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Something that a person does so often that it is done without thinking."
+        },
+        {
+          "word": "habit",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A special kind of clothing worn by certain groups."
+        },
+        {
+          "word": "hinge",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A joint on a lid or door that allows it to swing open or shut."
+        },
+        {
+          "word": "marsh",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A low-lying area, often covered with tall grasses, where the ground is soft and wet."
+        },
+        {
+          "word": "marshy",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Soft and moist underfoot."
+        },
+        {
+          "word": "nursery",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A room or other place set aside for the use of babies and small children."
+        },
+        {
+          "word": "nursery",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A place where plants are grown for sale."
+        },
+        {
+          "word": "rely",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To count on; to look to for support."
+        },
+        {
+          "word": "reliable",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Trustworthy; not likely to fail."
+        },
+        {
+          "word": "spine",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "The backbone."
+        },
+        {
+          "word": "spine",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A thin, sharp, stiff part that sticks out on certain plants and animals."
+        },
+        {
+          "word": "thrive",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To do well; to grow strong and healthy."
+        }
+      ]
+    },
+    {
+      "section": 9,
+      "entries": [
+        {
+          "word": "attitude",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A way of thinking or feeling about certain things."
+        },
+        {
+          "word": "confess",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To say or admit that one has done something wrong."
+        },
+        {
+          "word": "defend",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To keep from being attacked; to protect."
+        },
+        {
+          "word": "defend",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To speak for; to argue in favor of."
+        },
+        {
+          "word": "gradual",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Happening slowly; taking place little by little."
+        },
+        {
+          "word": "hint",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Information given to help someone answer a question; a clue."
+        },
+        {
+          "word": "hint",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To suggest something without saying directly what one means."
+        },
+        {
+          "word": "individual",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A single person, apart from others in a group."
+        },
+        {
+          "word": "individual",
+          "sense": 2,
+          "part_of_speech": "adjective",
+          "definition": "Meant for just one."
+        },
+        {
+          "word": "malice",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "The wish to hurt others on purpose."
+        },
+        {
+          "word": "malicious",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Done with a wish to harm or cause pain."
+        },
+        {
+          "word": "misery",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A feeling of great unhappiness."
+        },
+        {
+          "word": "miserable",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Very unhappy or unpleasant."
+        },
+        {
+          "word": "miserable",
+          "sense": 2,
+          "part_of_speech": "adjective",
+          "definition": "Very bad; of poor quality."
+        },
+        {
+          "word": "solution",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "The answer to a problem or puzzle."
+        },
+        {
+          "word": "solution",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A mixture formed when a liquid and some other materials are mixed together."
+        },
+        {
+          "word": "survey",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To look over; to examine."
+        },
+        {
+          "word": "survey",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A study designed to gather information about a subject."
+        }
+      ]
+    },
+    {
+      "section": 10,
+      "entries": [
+        {
+          "word": "cable",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A thick steel rope made of strands of wire twisted together."
+        },
+        {
+          "word": "cable",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A bundle of wires covered by rubber or plastic along which an electric current can pass."
+        },
+        {
+          "word": "cathedral",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A large and important church."
+        },
+        {
+          "word": "convey",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To carry or move from one place to another."
+        },
+        {
+          "word": "convey",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To make an idea or feeling known."
+        },
+        {
+          "word": "device",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Something made or invented for a particular use."
+        },
+        {
+          "word": "freight",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Goods carried from place to place, as by plane, boat, truck, or train."
+        },
+        {
+          "word": "landmark",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A building or natural feature that is easy to see and can be used as a guide."
+        },
+        {
+          "word": "landmark",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "An important event."
+        },
+        {
+          "word": "method",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A way of doing something."
+        },
+        {
+          "word": "rod",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A thin, straight piece of wood, metal, or other material."
+        }
+      ]
+    },
+    {
+      "section": 11,
+      "entries": [
+        {
+          "word": "diagram",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A plan or drawing that shows how something works or how different parts fit together."
+        },
+        {
+          "word": "frustrate",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To keep from carrying out a plan or reaching a goal."
+        },
+        {
+          "word": "frustrating",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Causing one to be upset or discouraged."
+        },
+        {
+          "word": "graduate",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A person who has finished a course of study."
+        },
+        {
+          "word": "graduate",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To finish a course of study and receive a diploma."
+        },
+        {
+          "word": "prank",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A playful trick or joke."
+        },
+        {
+          "word": "primary",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "First in importance."
+        },
+        {
+          "word": "primary",
+          "sense": 2,
+          "part_of_speech": "adjective",
+          "definition": "First in order."
+        },
+        {
+          "word": "risk",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To take a chance on being hurt or losing something."
+        },
+        {
+          "word": "risk",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "The chance of getting hurt or suffering loss or failure."
+        },
+        {
+          "word": "risky",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Likely to cause harm or damage; dangerous."
+        },
+        {
+          "word": "stress",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To pay special attention to."
+        },
+        {
+          "word": "stress",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A strain or pressure put on a person or thing."
+        },
+        {
+          "word": "stress",
+          "sense": 3,
+          "part_of_speech": "noun",
+          "definition": "Special force put on a word or part of a word."
+        },
+        {
+          "word": "urge",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To speak strongly for something; to argue in favor of something."
+        },
+        {
+          "word": "urge",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A strong feeling of wanting to do something; a strong wish."
+        },
+        {
+          "word": "vacant",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Having nothing or no one in it; not filled; empty."
+        },
+        {
+          "word": "vigorous",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Demanding strength or energy; very active."
+        }
+      ]
+    },
+    {
+      "section": 12,
+      "entries": [
+        {
+          "word": "adopt",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To take into one’s home and to raise a child as part of one’s family."
+        },
+        {
+          "word": "adopt",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To take up and make one’s own."
+        },
+        {
+          "word": "arouse",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To awaken from sleep."
+        },
+        {
+          "word": "arouse",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To excite or bring about."
+        },
+        {
+          "word": "arrange",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To put in a certain order."
+        },
+        {
+          "word": "arrange",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To plan or prepare."
+        },
+        {
+          "word": "cell",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A small room with little or no furniture, especially one used for prisoners."
+        },
+        {
+          "word": "cell",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A tiny unit of living matter."
+        },
+        {
+          "word": "cell",
+          "sense": 3,
+          "part_of_speech": "noun",
+          "definition": "A small enclosed space grouped with others."
+        },
+        {
+          "word": "infection",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A disease caused by germs."
+        },
+        {
+          "word": "influence",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "The power to cause change or bring about certain results."
+        },
+        {
+          "word": "influence",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "Someone or something that can cause change."
+        },
+        {
+          "word": "influence",
+          "sense": 3,
+          "part_of_speech": "verb",
+          "definition": "To cause change or bring about certain results."
+        },
+        {
+          "word": "injure",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To do harm to; to hurt or damage."
+        },
+        {
+          "word": "injury",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Harm or damage."
+        },
+        {
+          "word": "pattern",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "The way in which shapes, objects, or colors are placed in relation to each other."
+        },
+        {
+          "word": "pattern",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A plan or diagram that is used as a guide for making things."
+        },
+        {
+          "word": "series",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A number of similar things laid out or happening in a certain order."
+        },
+        {
+          "word": "vision",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Eyesight; the sense of sight."
+        },
+        {
+          "word": "vision",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "Something imagined or hoped for; a dream of what might be."
+        }
+      ]
+    },
+    {
+      "section": 13,
+      "entries": [
+        {
+          "word": "calendar",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A chart or diagram showing the days, weeks, and months of the year in order."
+        },
+        {
+          "word": "carnival",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A fair or show with food stalls, parades, rides, and other ways to have fun."
+        },
+        {
+          "word": "experience",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Knowledge or skill that comes from having done certain things."
+        },
+        {
+          "word": "experience",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "Something that happens to a person; an event in one’s life."
+        },
+        {
+          "word": "experience",
+          "sense": 3,
+          "part_of_speech": "verb",
+          "definition": "To have happen to; to go through something."
+        },
+        {
+          "word": "govern",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To be in charge of; to control or rule."
+        },
+        {
+          "word": "gulf",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A large area of a sea or ocean that is partly enclosed by land."
+        },
+        {
+          "word": "gulf",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A great distance between."
+        },
+        {
+          "word": "haste",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Speed in acting or moving."
+        },
+        {
+          "word": "hasty",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Done or made quickly without careful thought."
+        },
+        {
+          "word": "nation",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A place with borders and its own leaders; a single country."
+        },
+        {
+          "word": "nation",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "The people of a single country."
+        },
+        {
+          "word": "national",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Of or belonging to the people of a single country."
+        },
+        {
+          "word": "scatter",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To throw here and there; to spread about."
+        },
+        {
+          "word": "scatter",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To move quickly in different directions."
+        },
+        {
+          "word": "surrender",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To give in or give up; to accept defeat."
+        },
+        {
+          "word": "thrill",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A feeling of joy or excitement."
+        },
+        {
+          "word": "thrill",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To feel or cause to feel joy or excitement."
+        }
+      ]
+    },
+    {
+      "section": 14,
+      "entries": [
+        {
+          "word": "bold",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Showing little or no fear; ready to take risks."
+        },
+        {
+          "word": "cunning",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Clever at tricking others; sly."
+        },
+        {
+          "word": "cunning",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "Cleverness at tricking or fooling others."
+        },
+        {
+          "word": "deed",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Something done; an act."
+        },
+        {
+          "word": "deed",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A paper that shows who owns a certain building or piece of land."
+        },
+        {
+          "word": "doze",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To sleep lightly; to nap."
+        },
+        {
+          "word": "jagged",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Having sharp points and edges; rough."
+        },
+        {
+          "word": "positive",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Certain; sure."
+        },
+        {
+          "word": "positive",
+          "sense": 2,
+          "part_of_speech": "adjective",
+          "definition": "Trying to make things better; useful."
+        },
+        {
+          "word": "respect",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To look up to; to have a high opinion of."
+        },
+        {
+          "word": "respect",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A good opinion of the worth or value of something."
+        },
+        {
+          "word": "responsible",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Being the cause of something."
+        },
+        {
+          "word": "responsible",
+          "sense": 2,
+          "part_of_speech": "adjective",
+          "definition": "Trustworthy; reliable."
+        },
+        {
+          "word": "smuggle",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To carry in or bring out in a secret way."
+        },
+        {
+          "word": "version",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A story or account of something that may differ from other accounts of the same event."
+        }
+      ]
+    },
+    {
+      "section": 15,
+      "entries": [
+        {
+          "word": "division",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "The act of dividing."
+        },
+        {
+          "word": "division",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "One of the parts after something has been divided."
+        },
+        {
+          "word": "division",
+          "sense": 3,
+          "part_of_speech": "noun",
+          "definition": "Something that divides or keeps apart."
+        },
+        {
+          "word": "mental",
+          "sense": 1,
+          "part_of_speech": "adjective",
+          "definition": "Having to do with the mind."
+        },
+        {
+          "word": "outcome",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "The way something ends; the final result."
+        },
+        {
+          "word": "pastime",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "Something done to pass the time pleasantly; a hobby or form of recreation."
+        },
+        {
+          "word": "promote",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To raise to a higher rank or position."
+        },
+        {
+          "word": "promote",
+          "sense": 2,
+          "part_of_speech": "verb",
+          "definition": "To encourage or support; to help bring about."
+        },
+        {
+          "word": "rate",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To place in a certain class or at a certain level."
+        },
+        {
+          "word": "rate",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A measurement of one thing compared to something else or to what has happened before."
+        },
+        {
+          "word": "regret",
+          "sense": 1,
+          "part_of_speech": "verb",
+          "definition": "To feel sorry for something."
+        },
+        {
+          "word": "regret",
+          "sense": 2,
+          "part_of_speech": "noun",
+          "definition": "A feeling of sadness or of being sorry."
+        },
+        {
+          "word": "talent",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A skill for doing something well that comes naturally."
+        },
+        {
+          "word": "theory",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "An idea or opinion that is used to explain or connect certain facts."
+        },
+        {
+          "word": "tournament",
+          "sense": 1,
+          "part_of_speech": "noun",
+          "definition": "A series of contests in which individuals or teams play against each other to find a winner."
+        }
+      ]
+    }
+  ]
+}
