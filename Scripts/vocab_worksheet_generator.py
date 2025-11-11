@@ -33,6 +33,7 @@ By default the look/feel matches your most recent Section 6 worksheet:
 import argparse
 import json
 import os
+import random
 import sys
 from collections import Counter, defaultdict
 
@@ -283,9 +284,11 @@ def build_section(c, section_title, seed, section):
     #         print(f"Error: entry {i} missing required keys {required}.", file=sys.stderr)
     #         sys.exit(1)
     
+    rng = random.Random(seed)
+    shuffled_entries = rng.sample(entries, k=len(entries)) 
     
     questions = []
-    for e in entries:
+    for e in shuffled_entries:
         word = normalize_ascii(e["word"])
         definition = normalize_ascii(e["definition"])
         pos = normalize_ascii(e["part_of_speech"])

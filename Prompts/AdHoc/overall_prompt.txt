@@ -1,0 +1,9 @@
+Goal
+The goal of this project is to teach vocabulary words.  Input json data will contain a set of vocabulary words, and each word has one or more definitions.  Create high quality fun sentences, each of which is missing a word and has a triple pound (###) space in its place. There will always be exactly one vocabulary word, per section, that fits into the missing space. The structure of the sentences should be such that one and only one definition of one of the vocabulary words, per section, would make sense to fill in for the missing space in the sentence. The purpose of these sentences is to be an exercise to learn all of the definitions for the vocabulary words in each section.  The sentences should use a fourth grade reading level.
+
+The output should be a json data structure with the same format as the input, except that for each definition entry, add a "sentence" entry that contains the sentence produced according to the instructions above for that definition.
+
+The input is divided into sections. Treat each section as an entirely separate project. For each section, create a fun short subtitle that uses a few of the words and definitions from that section.  Add a "subtitle" field per section that contains this subtitle.
+
+The sentences for each definition should be in the context of a theme. Here is the theme:
+
