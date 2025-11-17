@@ -1,12 +1,16 @@
 {
-  reading_level: {"system": "fp", "level": "P"},
-  words: [
+  "type": "build_request",
+  "source_dataset": "wordly_wise_3000",
+  "reading_level": {"system": "fp", "level": "P"},
+  "model": "gpt5.1-nano",
+  "seeds": [1],
+  "data": [
     {
       "word": "fatal",
       "part_of_speech": "adjective",
       "definition": "Causing death.",
       "def_num": 1,
-      "_key": "wordly_wise_3000|fatal|Causing death.|1|gpt5.1-nano",
+      "_key": "wordly_wise_3000|fp-P|gpt5.1-nano|kpop_demon_hunters|1|fatal|adjective|Causing death.",
       "key": "1d7621dace87f356",
     }
   ]

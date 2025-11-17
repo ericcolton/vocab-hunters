@@ -1,4 +1,5 @@
 {
+    "type": "check_cache",
     "title": "Avery's KPop Vocab - Section {section}",
     "footer": "Page {current_page} of {total_pages}",
     "seeds": [1],
