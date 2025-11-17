@@ -1,10 +1,11 @@
 {
     "title": "Avery's KPop Vocab - Section {section}",
-    "footer": "Page current_page} of {total_pages}",
+    "footer": "Page {current_page} of {total_pages}",
     "seeds": [1],
     "reading_level": {"system": "fp", "level": "P"},
+    "model": "gpt5.1-nano",
     "theme": "kpop_demon_hunters",
     "source_dataset": "wordly_wise_3000",
-    "selected_words": null,
-    "selected_sections": null
+    "selected_sections": null,
+    "selected_words": null
 }

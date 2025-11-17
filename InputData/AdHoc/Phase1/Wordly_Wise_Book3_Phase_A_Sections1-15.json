@@ -1,5 +1,7 @@
 {
-  "input_title": "Wordly Wise 3000",
+  "title": "Wordly Wise 3000",
+  "dataset_title": "wordly_wise_3000",
+  "dataset_type": "vocabulary",
   "sections": [
     {
       "section": 1,
