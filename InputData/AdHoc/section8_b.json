@@ -1,0 +1,127 @@
+{
+"seed": 106,
+"theme": "The setting is the world of the book series \"Wings of Fire\", specifically Book 4: *The Dark Secret*. The story follows Starflight and the NightWings in their hidden volcano home, the captured RainWings, and the mysteries of the Night Kingdom. Dragonets like Starflight, Sunny, Fatespeaker, Glory, and others may sometimes be mentioned, as well as places like the NightWing fortress, the rainforest, and Jade Mountain. These characters and places do not need to appear in every sentence.\n\n",
+"input_title": "Wordly Wise 3000",
+"title": "Avery's WoF Vocab - Section {section}",
+"sections": [
+{
+"section": 8,
+"subtitle": "NightWing habits, marshy trails, and spines that thrive in the dark",
+"entries": [
+{
+"word": "contain",
+"part_of_speech": "verb",
+"definition": "To hold; to have within itself.",
+"def_num": 1,
+"sentence": "The deep cave could ### all the captured RainWings at once."
+},
+{
+"word": "container",
+"part_of_speech": "noun",
+"definition": "A jar, box, or other object used for holding something.",
+"def_num": 1,
+"sentence": "Starflight kept his favorite scrolls in a small ### by his nest."
+},
+{
+"word": "digest",
+"part_of_speech": "verb",
+"definition": "To change food that has been eaten into simpler forms that the body can use.",
+"def_num": 1,
+"sentence": "After a huge bat dinner, Starflight needed time to ### his meal."
+},
+{
+"word": "finicky",
+"part_of_speech": "adjective",
+"definition": "Hard to please; fussy.",
+"def_num": 1,
+"sentence": "The ### NightWing queen refused any perch that was not perfect."
+},
+{
+"word": "habit",
+"part_of_speech": "noun",
+"definition": "Something that a person does so often that it is done without thinking.",
+"def_num": 1,
+"sentence": "Sunny had a ### of counting the stars before she fell asleep."
+},
+{
+"word": "habit",
+"part_of_speech": "noun",
+"definition": "A special kind of clothing worn by certain groups.",
+"def_num": 2,
+"sentence": "The palace guards wore a dark ### that marked them as NightWings."
+},
+{
+"word": "hinge",
+"part_of_speech": "noun",
+"definition": "A joint on a lid or door that allows it to swing open or shut.",
+"def_num": 1,
+"sentence": "The stone door creaked on its metal ### inside the volcano."
+},
+{
+"word": "marsh",
+"part_of_speech": "noun",
+"definition": "A low-lying area, often covered with tall grasses, where the ground is soft and wet.",
+"def_num": 1,
+"sentence": "The dragonets crossed a sticky ### on their way to the rainforest."
+},
+{
+"word": "marshy",
+"part_of_speech": "adjective",
+"definition": "Soft and moist underfoot.",
+"def_num": 1,
+"sentence": "The ### ground squished under Sunny's feet near the swampy pool."
+},
+{
+"word": "nursery",
+"part_of_speech": "noun",
+"definition": "A room or other place set aside for the use of babies and small children.",
+"def_num": 1,
+"sentence": "The NightWing dragonets napped together in a warm cliffside ###."
+},
+{
+"word": "nursery",
+"part_of_speech": "noun",
+"definition": "A place where plants are grown for sale.",
+"def_num": 2,
+"sentence": "In the forest ###, RainWings grew bright fruit trees for the tribe."
+},
+{
+"word": "rely",
+"part_of_speech": "verb",
+"definition": "To count on; to look to for support.",
+"def_num": 1,
+"sentence": "Starflight learned he could ### on Fatespeaker to cheer him up."
+},
+{
+"word": "reliable",
+"part_of_speech": "adjective",
+"definition": "Trustworthy; not likely to fail.",
+"def_num": 1,
+"sentence": "Fatespeaker was a ### friend who never broke a promise."
+},
+{
+"word": "spine",
+"part_of_speech": "noun",
+"definition": "The backbone.",
+"def_num": 1,
+"sentence": "A cold shiver ran down Starflight's ### as the volcano rumbled."
+},
+{
+"word": "spine",
+"part_of_speech": "noun",
+"definition": "A thin, sharp, stiff part that sticks out on certain plants and animals.",
+"def_num": 2,
+"sentence": "Each dark cactus had a sharp ### that could prick a careless dragon."
+},
+{
+"word": "thrive",
+"part_of_speech": "verb",
+"definition": "To do well; to grow strong and healthy.",
+"def_num": 1,
+"sentence": "The tribes will ### if they share food instead of fighting."
+}
+]
+}
+]
+}
+
