@@ -5,10 +5,10 @@
       "footer": "Page {current_page} of {total_pages}",
       "section": 7
     },
-    "seed": 1,
+    "seed": 111,
     "reading_level": {"system": "fp", "level": "P"},
     "model": "gpt5.1-nano",
     "theme": "kpop_demon_hunters",
     "source_dataset": "wordly_wise_3000_book_3",
-    "section": 7
+    "section": 8
 }

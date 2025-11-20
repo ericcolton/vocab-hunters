@@ -1,0 +1,164 @@
+{
+  "type": "check_cache",
+  "source_dataset": "wordly_wise_3000_book_3",
+  "reading_level": {
+    "system": "fp",
+    "level": "P"
+  },
+  "theme": "kpop_demon_hunters",
+  "model": "gpt5.1-nano",
+  "seed": 1,
+  "doc_key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1",
+  "doc_checksum": "718126568e8fda16",
+  "metadata": {
+    "section": 7,
+    "header": "Avery's KPop Vocab - Section {section}",
+    "footer": "Page {current_page} of {total_pages}"
+  },
+  "data": [
+    {
+      "word": "act",
+      "part_of_speech": "noun",
+      "definition": "Something that is done.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|act|noun|Something that is done.",
+      "checksum": "d1db8045ca89ed39"
+    },
+    {
+      "word": "act",
+      "part_of_speech": "noun",
+      "definition": "A show that is put on.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|act|noun|A show that is put on.",
+      "checksum": "7db1faf549c05050"
+    },
+    {
+      "word": "act",
+      "part_of_speech": "noun",
+      "definition": "One of the main parts of a play.",
+      "def_num": 3,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|act|noun|One of the main parts of a play.",
+      "checksum": "a23327a3b5db517c"
+    },
+    {
+      "word": "act",
+      "part_of_speech": "verb",
+      "definition": "To do something.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|act|verb|To do something.",
+      "checksum": "07f6cd1abd539e76"
+    },
+    {
+      "word": "act",
+      "part_of_speech": "verb",
+      "definition": "To play a part in a play, a movie, or on television.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|act|verb|To play a part in a play, a movie, or on television.",
+      "checksum": "bb21977386d2baf6"
+    },
+    {
+      "word": "additional",
+      "part_of_speech": "adjective",
+      "definition": "Added or extra.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|additional|adjective|Added or extra.",
+      "checksum": "5aaf2f84c4790ebc"
+    },
+    {
+      "word": "advice",
+      "part_of_speech": "noun",
+      "definition": "Ideas or suggestions offered to help someone with a problem or situation.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|advice|noun|Ideas or suggestions offered to help someone with a problem or situation.",
+      "checksum": "45c1740903a05366"
+    },
+    {
+      "word": "crumple",
+      "part_of_speech": "verb",
+      "definition": "To crush together; to bend or press into creases or wrinkles.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|crumple|verb|To crush together; to bend or press into creases or wrinkles.",
+      "checksum": "a16f269038c01e9e"
+    },
+    {
+      "word": "fan",
+      "part_of_speech": "noun",
+      "definition": "Something that causes air to move in order to cool whatever it blows on.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|fan|noun|Something that causes air to move in order to cool whatever it blows on.",
+      "checksum": "f6102507feb4fc35"
+    },
+    {
+      "word": "fan",
+      "part_of_speech": "noun",
+      "definition": "Someone who closely follows a group, team, or person.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|fan|noun|Someone who closely follows a group, team, or person.",
+      "checksum": "15f29f4d8132dbf7"
+    },
+    {
+      "word": "fan",
+      "part_of_speech": "verb",
+      "definition": "To move air with an open fan or something similar.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|fan|verb|To move air with an open fan or something similar.",
+      "checksum": "48f37063a6deadd2"
+    },
+    {
+      "word": "fan",
+      "part_of_speech": "verb",
+      "definition": "To spread in the shape of an opened fan.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|fan|verb|To spread in the shape of an opened fan.",
+      "checksum": "5bab71c6394ac9f8"
+    },
+    {
+      "word": "memorize",
+      "part_of_speech": "verb",
+      "definition": "To fix in one’s memory exactly; to learn by heart.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|memorize|verb|To fix in one’s memory exactly; to learn by heart.",
+      "checksum": "6ce14151186452c3"
+    },
+    {
+      "word": "mystify",
+      "part_of_speech": "verb",
+      "definition": "To confuse or puzzle someone.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|mystify|verb|To confuse or puzzle someone.",
+      "checksum": "e81b9af80b1778a7"
+    },
+    {
+      "word": "pause",
+      "part_of_speech": "verb",
+      "definition": "To stop for a short time before going on.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|pause|verb|To stop for a short time before going on.",
+      "checksum": "630fdbde7cd081a5"
+    },
+    {
+      "word": "pause",
+      "part_of_speech": "noun",
+      "definition": "A short break or rest from what has been going on.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|pause|noun|A short break or rest from what has been going on.",
+      "checksum": "ffb1d140e00a8c41"
+    },
+    {
+      "word": "transparent",
+      "part_of_speech": "adjective",
+      "definition": "Allowing light to pass through freely so that one can see clearly.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|transparent|adjective|Allowing light to pass through freely so that one can see clearly.",
+      "checksum": "bb51fa1eb40f2ee1"
+    },
+    {
+      "word": "vanish",
+      "part_of_speech": "verb",
+      "definition": "To go out of sight; to disappear.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1|vanish|verb|To go out of sight; to disappear.",
+      "checksum": "1822da3faf112f45"
+    }
+  ]
+}

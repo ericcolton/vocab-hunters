@@ -1,0 +1,148 @@
+{
+  "type": "check_cache",
+  "source_dataset": "wordly_wise_3000_book_3",
+  "reading_level": {
+    "system": "fp",
+    "level": "P"
+  },
+  "theme": "kpop_demon_hunters",
+  "model": "gpt5.1-nano",
+  "seed": 111,
+  "doc_key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111",
+  "doc_checksum": "4beec3268e0eecc4",
+  "metadata": {
+    "section": 7,
+    "header": "Avery's KPop Vocab - Section {section}",
+    "footer": "Page {current_page} of {total_pages}"
+  },
+  "data": [
+    {
+      "word": "contain",
+      "part_of_speech": "verb",
+      "definition": "To hold; to have within itself.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|contain|verb|To hold; to have within itself.",
+      "checksum": "38ba6ab36fef2eaf"
+    },
+    {
+      "word": "container",
+      "part_of_speech": "noun",
+      "definition": "A jar, box, or other object used for holding something.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|container|noun|A jar, box, or other object used for holding something.",
+      "checksum": "c81af6027e785687"
+    },
+    {
+      "word": "digest",
+      "part_of_speech": "verb",
+      "definition": "To change food that has been eaten into simpler forms that the body can use.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|digest|verb|To change food that has been eaten into simpler forms that the body can use.",
+      "checksum": "4d4d4eb872ebda88"
+    },
+    {
+      "word": "finicky",
+      "part_of_speech": "adjective",
+      "definition": "Hard to please; fussy.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|finicky|adjective|Hard to please; fussy.",
+      "checksum": "63ecd14d1a7a6a68"
+    },
+    {
+      "word": "habit",
+      "part_of_speech": "noun",
+      "definition": "Something that a person does so often that it is done without thinking.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|habit|noun|Something that a person does so often that it is done without thinking.",
+      "checksum": "04b971ea70984156"
+    },
+    {
+      "word": "habit",
+      "part_of_speech": "noun",
+      "definition": "A special kind of clothing worn by certain groups.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|habit|noun|A special kind of clothing worn by certain groups.",
+      "checksum": "93cf5843bb2a43f4"
+    },
+    {
+      "word": "hinge",
+      "part_of_speech": "noun",
+      "definition": "A joint on a lid or door that allows it to swing open or shut.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|hinge|noun|A joint on a lid or door that allows it to swing open or shut.",
+      "checksum": "2b1c35bc21b8f69a"
+    },
+    {
+      "word": "marsh",
+      "part_of_speech": "noun",
+      "definition": "A low-lying area, often covered with tall grasses, where the ground is soft and wet.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|marsh|noun|A low-lying area, often covered with tall grasses, where the ground is soft and wet.",
+      "checksum": "fd229a2607e216dc"
+    },
+    {
+      "word": "marshy",
+      "part_of_speech": "adjective",
+      "definition": "Soft and moist underfoot.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|marshy|adjective|Soft and moist underfoot.",
+      "checksum": "fa848085e687a662"
+    },
+    {
+      "word": "nursery",
+      "part_of_speech": "noun",
+      "definition": "A room or other place set aside for the use of babies and small children.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|nursery|noun|A room or other place set aside for the use of babies and small children.",
+      "checksum": "9ec9159643231937"
+    },
+    {
+      "word": "nursery",
+      "part_of_speech": "noun",
+      "definition": "A place where plants are grown for sale.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|nursery|noun|A place where plants are grown for sale.",
+      "checksum": "1de5ec6acd3e24da"
+    },
+    {
+      "word": "rely",
+      "part_of_speech": "verb",
+      "definition": "To count on; to look to for support.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|rely|verb|To count on; to look to for support.",
+      "checksum": "d18e06038a469be8"
+    },
+    {
+      "word": "reliable",
+      "part_of_speech": "adjective",
+      "definition": "Trustworthy; not likely to fail.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|reliable|adjective|Trustworthy; not likely to fail.",
+      "checksum": "7f64c78206b28043"
+    },
+    {
+      "word": "spine",
+      "part_of_speech": "noun",
+      "definition": "The backbone.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|spine|noun|The backbone.",
+      "checksum": "6e37cfa225a609fb"
+    },
+    {
+      "word": "spine",
+      "part_of_speech": "noun",
+      "definition": "A thin, sharp, stiff part that sticks out on certain plants and animals.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|spine|noun|A thin, sharp, stiff part that sticks out on certain plants and animals.",
+      "checksum": "8a83b9bc2a301f59"
+    },
+    {
+      "word": "thrive",
+      "part_of_speech": "verb",
+      "definition": "To do well; to grow strong and healthy.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|111|thrive|verb|To do well; to grow strong and healthy.",
+      "checksum": "159766a21c093c3f"
+    }
+  ]
+}
