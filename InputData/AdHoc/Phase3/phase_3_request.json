@@ -6,7 +6,7 @@
     "level": "P"
   },
   "theme": "kpop_demon_hunters",
-  "model": "gpt5.1-nano",
+  "model": "gpt-5-nano",
   "seed": 1,
   "doc_key": "wordly_wise_3000_book_3|fp-P|gpt5.1-nano|kpop_demon_hunters|1",
   "doc_checksum": "718126568e8fda16",
