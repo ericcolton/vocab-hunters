@@ -1,0 +1,126 @@
+{
+"seed": 100,
+"title": "Avery's Home Alone Vocab - Sec {section}",
+"theme": "The setting is the world of the movie \"Home Alone 3.\" Main characters like Alex Pruitt, his family, Mrs. Hess, and the four spies may sometimes be mentioned. Scenes may take place in Alex's neighborhood, inside his house full of traps, or around the snowy Chicago streets. These characters and places do not need to appear in every sentence.\n\n",
+"input_title": "Wordly Wise 3000",
+"sections": [
+{
+"section": 8,
+"subtitle": "Squeaky hinges, sharp spines, and habits that outsmart burglars",
+"entries": [
+{
+"word": "contain",
+"part_of_speech": "verb",
+"definition": "To hold; to have within itself.",
+"def_num": 1,
+"sentence": "Alex built a wooden box to ### all his tiny spy gadgets."
+},
+{
+"word": "container",
+"part_of_speech": "noun",
+"definition": "A jar, box, or other object used for holding something.",
+"def_num": 1,
+"sentence": "Mrs. Hess kept her cookies in a tall ### on the counter."
+},
+{
+"word": "digest",
+"part_of_speech": "verb",
+"definition": "To change food that has been eaten into simpler forms that the body can use.",
+"def_num": 1,
+"sentence": "Alex needed time to ### his giant bowl of cheesy macaroni."
+},
+{
+"word": "finicky",
+"part_of_speech": "adjective",
+"definition": "Hard to please; fussy.",
+"def_num": 1,
+"sentence": "The ### parrot squawked unless its crackers were just right."
+},
+{
+"word": "habit",
+"part_of_speech": "noun",
+"definition": "Something that a person does so often that it is done without thinking.",
+"def_num": 1,
+"sentence": "Alex has a ### of checking every window lock before bed."
+},
+{
+"word": "habit",
+"part_of_speech": "noun",
+"definition": "A special kind of clothing worn by certain groups.",
+"def_num": 2,
+"sentence": "The airport workers wore a bright orange ### on the runway."
+},
+{
+"word": "hinge",
+"part_of_speech": "noun",
+"definition": "A joint on a lid or door that allows it to swing open or shut.",
+"def_num": 1,
+"sentence": "The loose ### squeaked when the back door slowly opened."
+},
+{
+"word": "marsh",
+"part_of_speech": "noun",
+"definition": "A low-lying area, often covered with tall grasses, where the ground is soft and wet.",
+"def_num": 1,
+"sentence": "The spies trudged past a frozen ### on the edge of town."
+},
+{
+"word": "marshy",
+"part_of_speech": "adjective",
+"definition": "Soft and moist underfoot.",
+"def_num": 1,
+"sentence": "The ground turned ### where melted snow soaked Alex's boots."
+},
+{
+"word": "nursery",
+"part_of_speech": "noun",
+"definition": "A room or other place set aside for the use of babies and small children.",
+"def_num": 1,
+"sentence": "The neighbor's ### was filled with rattles, blocks, and blankets."
+},
+{
+"word": "nursery",
+"part_of_speech": "noun",
+"definition": "A place where plants are grown for sale.",
+"def_num": 2,
+"sentence": "Mrs. Hess stopped at a plant ### to buy winter-proof flowers."
+},
+{
+"word": "rely",
+"part_of_speech": "verb",
+"definition": "To count on; to look to for support.",
+"def_num": 1,
+"sentence": "Alex knew he could ### on his mom to help in the end."
+},
+{
+"word": "reliable",
+"part_of_speech": "adjective",
+"definition": "Trustworthy; not likely to fail.",
+"def_num": 1,
+"sentence": "Mrs. Hess turned out to be a ### friend during the wild chase."
+},
+{
+"word": "spine",
+"part_of_speech": "noun",
+"definition": "The backbone.",
+"def_num": 1,
+"sentence": "A cold shiver ran down the spy's ### when the toy car moved."
+},
+{
+"word": "spine",
+"part_of_speech": "noun",
+"definition": "A thin, sharp, stiff part that sticks out on certain plants and animals.",
+"def_num": 2,
+"sentence": "Every cactus on the porch had a sharp ### that could poke you."
+},
+{
+"word": "thrive",
+"part_of_speech": "verb",
+"definition": "To do well; to grow strong and healthy.",
+"def_num": 1,
+"sentence": "The backyard plants ### in spring when the last snow finally melts."
+}
+]
+}
+]
+}
