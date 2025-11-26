@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -23,21 +24,50 @@ def build_reading_level_segment(reading_level):
     return str(reading_level)
 
 
-def parse_args(argv=None):
+def load_default_datastore():
+    """
+    If HOMEWORK_HERO_CONFIG_PATH is set, load JSON and return
+    config["source_datasets"] as the default datastore path.
+    """
+    config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
+    if not config_path:
+        return None
+
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        raise SystemExit(f"Failed to load HOMEWORK_HERO_CONFIG_PATH='{config_path}': {e}") from e
+
+    default = config.get("source_datasets")
+    if default is None:
+        raise SystemExit(
+            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'source_datasets'."
+        )
+    return default
+
+
+def parse_args(argv=None, default_datastore=None):
     parser = argparse.ArgumentParser(
         description="Look up cached payloads for a vocab request."
     )
     parser.add_argument(
         "-d",
         "--datastore",
-        required=True,
-        help="Root directory of the datastore.",
+        "--source-datasets",
+        default=default_datastore,
+        required=default_datastore is None,
+        help=(
+            "Root directory of the datastore. "
+            "Defaults to config['source_datasets'] when HOMEWORK_HERO_CONFIG_PATH is set."
+        ),
     )
     return parser.parse_args(argv)
 
 
 def main(argv=None):
-    args = parse_args(argv)
+    default_datastore = load_default_datastore()
+    args = parse_args(argv, default_datastore=default_datastore)
 
     # Read JSON request from stdin
     try:

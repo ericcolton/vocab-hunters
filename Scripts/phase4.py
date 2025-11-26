@@ -9,7 +9,40 @@ from typing import Any, Dict, Optional
 from openai import OpenAI
 
 
-def parse_args() -> argparse.Namespace:
+def load_default_paths() -> Dict[str, Optional[str]]:
+    """
+    Load defaults from HOMEWORK_HERO_CONFIG_PATH, if set.
+    Expected keys: "prompt_path" and "themes_dir".
+    """
+    config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
+    if not config_path:
+        return {"prompt_path": None, "themes_dir": None}
+
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(
+            f"Failed to load HOMEWORK_HERO_CONFIG_PATH='{config_path}': {exc}"
+        ) from exc
+
+    if "prompt_path" not in config:
+        raise SystemExit(
+            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'prompt_path'."
+        )
+    if "themes_dir" not in config:
+        raise SystemExit(
+            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'themes_dir'."
+        )
+
+    return {"prompt_path": config.get("prompt_path"), "themes_dir": config.get("themes_dir")}
+
+
+def parse_args(
+    argv=None,
+    default_prompt_path: Optional[str] = None,
+    default_themes_dir: Optional[str] = None,
+) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Read a phase_3-style request JSON from stdin, call the OpenAI API "
@@ -20,13 +53,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "-p",
         "--prompt-path",
-        required=True,
+        default=default_prompt_path,
+        required=default_prompt_path is None,
         help="Path to a text file containing the system prompt/instructions.",
     )
     parser.add_argument(
         "-t",
-        "--theme-dir",
+        "--themes-dir",
         required=False,
+        default=default_themes_dir,
         help=(
             "Optional directory containing theme JSON files. "
             'If the input JSON has a "theme" field, this script will look for '
@@ -34,7 +69,7 @@ def parse_args() -> argparse.Namespace:
             "the user input."
         ),
     )
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def read_stdin_json() -> Dict[str, Any]:
@@ -201,7 +236,11 @@ def append_response_json(request_json: Dict[str, Any], response_json: JsonOutput
     return request_json
 
 def main() -> None:
-    args = parse_args()
+    defaults = load_default_paths()
+    args = parse_args(
+        default_prompt_path=defaults["prompt_path"],
+        default_themes_dir=defaults["themes_dir"],
+    )
 
     # 1. Read request JSON from stdin.
     request_json = read_stdin_json()
@@ -210,7 +249,7 @@ def main() -> None:
     system_prompt = read_file_text(args.prompt_path)
 
     # 3. Optionally load theme content.
-    theme_content = load_theme_content(request_json, args.theme_dir)
+    theme_content = load_theme_content(request_json, args.themes_dir)
     
     # 4. Build the user input string.
     model_input = build_model_input(request_json, theme_content)
