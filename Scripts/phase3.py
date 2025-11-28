@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import os
 import hashlib
 import json
 import sys
@@ -10,11 +11,30 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Build phase 3 request JSON from a source dataset."
     )
+    # If HOMEWORK_HERO_CONFIG_PATH is set and points to a JSON file,
+    # parse it and use its `source_datasets` key as the default value.
+    default_source_datasets = None
+    config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
+    if config_path:
+        cfg_path = Path(config_path)
+        if not cfg_path.is_file():
+            raise SystemExit(f"HOMEWORK_HERO_CONFIG_PATH points to non-existent file: {cfg_path}")
+        try:
+            with cfg_path.open("r", encoding="utf-8") as cf:
+                cfg = json.load(cf)
+        except json.JSONDecodeError as exc:
+            raise SystemExit(f"Failed to parse JSON config at {cfg_path}: {exc}")
+        default_source_datasets = cfg.get("source_datasets")
+
     parser.add_argument(
         "-s",
-        "--source_dir",
-        required=True,
-        help="Directory containing source dataset JSON files.",
+        "--source-datasets",
+        required=(default_source_datasets is None),
+        default=default_source_datasets,
+        help=(
+            "Directory containing source dataset JSON files. "
+            "Default may be provided by HOMEWORK_HERO_CONFIG_PATH JSON key 'source_datasets'."
+        ),
     )
     return parser.parse_args()
 
@@ -159,7 +179,7 @@ def main():
     #         raise SystemExit(f"Missing required key in request: {key}")
 
     source_dataset = request["source_dataset"]
-    dataset = load_dataset(args.source_dir, source_dataset)
+    dataset = load_dataset(args.source_datasets, source_dataset)
 
     # Determine section number from request (metadata.section or section)
     section_number = request.get("section")

@@ -1,0 +1,7 @@
+{
+    "source_datasets": "/users/ericcolton/Documents/Development/AIWorkflows/homework-hero/InputData/source_datasets/vocabulary",
+    "prompt_path": "/users/ericcolton/Documents/Development/AIWorkflows/homework-hero/Prompts/AdHoc/prompt_optimized_20251124.txt",
+    "themes_dir": "/users/ericcolton/Documents/Development/AIWorkflows/homework-hero/Prompts/Themes/",
+    "responses_datastore": "/users/ericcolton/Documents/Development/AIWorkflows/homework-hero/Output/Response_Datastore",
+    "scripts": "/users/ericcolton/Documents/Development/AIWorkflows/homework-hero/Scripts/"
+}
