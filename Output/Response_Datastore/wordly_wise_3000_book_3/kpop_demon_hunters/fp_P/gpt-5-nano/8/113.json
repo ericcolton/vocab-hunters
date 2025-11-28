@@ -1,0 +1,199 @@
+{
+  "type": "check_cache",
+  "source_dataset": "wordly_wise_3000_book_3",
+  "reading_level": {
+    "system": "fp",
+    "level": "P"
+  },
+  "theme": "kpop_demon_hunters",
+  "model": "gpt-5-nano",
+  "seed": 113,
+  "doc_key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113",
+  "doc_checksum": "b118a055392528e5",
+  "metadata": {
+    "section": 7,
+    "header": "Avery's KPop Vocab - Section {section}",
+    "footer": "Page {current_page} of {total_pages}"
+  },
+  "data": [
+    {
+      "word": "contain",
+      "part_of_speech": "verb",
+      "definition": "To hold; to have within itself.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|contain|verb|To hold; to have within itself.",
+      "checksum": "f9b28cc299192be6",
+      "output": {
+        "sentence": "Rumi held the glowing box and whispered that it could ### the rare rune inside, keeping it safe for Huntrix."
+      }
+    },
+    {
+      "word": "container",
+      "part_of_speech": "noun",
+      "definition": "A jar, box, or other object used for holding something.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|container|noun|A jar, box, or other object used for holding something.",
+      "checksum": "805abeadc727c609",
+      "output": {
+        "sentence": "Mira opened a shiny ### to store the demon dust after the Huntrix concert."
+      }
+    },
+    {
+      "word": "digest",
+      "part_of_speech": "verb",
+      "definition": "To change food that has been eaten into simpler forms that the body can use.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|digest|verb|To change food that has been eaten into simpler forms that the body can use.",
+      "checksum": "b4c709d9ac013e56",
+      "output": {
+        "sentence": "In the demon hunter kitchen, Jinu explained how the body can ### food into energy."
+      }
+    },
+    {
+      "word": "finicky",
+      "part_of_speech": "adjective",
+      "definition": "Hard to please; fussy.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|finicky|adjective|Hard to please; fussy.",
+      "checksum": "2f12e163b5b16a95",
+      "output": {
+        "sentence": "Baby Saja is not ### about snacks; he votes for spicy star fruit during breaks."
+      }
+    },
+    {
+      "word": "habit",
+      "part_of_speech": "noun",
+      "definition": "Something that a person does so often that it is done without thinking.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|habit|noun|Something that a person does so often that it is done without thinking.",
+      "checksum": "c526fff396e14152",
+      "output": {
+        "sentence": "Mira's daily ### is to map the routes before every mission."
+      }
+    },
+    {
+      "word": "habit",
+      "part_of_speech": "noun",
+      "definition": "A special kind of clothing worn by certain groups.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|habit|noun|A special kind of clothing worn by certain groups.",
+      "checksum": "db885b89e599b662",
+      "output": {
+        "sentence": "The Saja Boys wore a flashy ### during practice."
+      }
+    },
+    {
+      "word": "hinge",
+      "part_of_speech": "noun",
+      "definition": "A joint on a lid or door that allows it to swing open or shut.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|hinge|noun|A joint on a lid or door that allows it to swing open or shut.",
+      "checksum": "c767da9dbb3083a2",
+      "output": {
+        "sentence": "Zoey watched the secret shrine door slide on a sturdy ###, then swung open to reveal a stage."
+      }
+    },
+    {
+      "word": "marsh",
+      "part_of_speech": "noun",
+      "definition": "A low-lying area, often covered with tall grasses, where the ground is soft and wet.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|marsh|noun|A low-lying area, often covered with tall grasses, where the ground is soft and wet.",
+      "checksum": "c8d16abd1d59d7c1",
+      "output": {
+        "sentence": "The team crossed a soft ### near Huntrix HQ, where frogs sang under the moon."
+      }
+    },
+    {
+      "word": "marshy",
+      "part_of_speech": "adjective",
+      "definition": "Soft and moist underfoot.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|marshy|adjective|Soft and moist underfoot.",
+      "checksum": "d6463324547bff5e",
+      "output": {
+        "sentence": "Huntrix warned that the path would be ###, making the ground slow."
+      }
+    },
+    {
+      "word": "nursery",
+      "part_of_speech": "noun",
+      "definition": "A room or other place set aside for the use of babies and small children.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|nursery|noun|A room or other place set aside for the use of babies and small children.",
+      "checksum": "8b1bdc1e21fe4377",
+      "output": {
+        "sentence": "In the hero base, a bright ### gave Baby Saja a safe place to nap after the show."
+      }
+    },
+    {
+      "word": "nursery",
+      "part_of_speech": "noun",
+      "definition": "A place where plants are grown for sale.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|nursery|noun|A place where plants are grown for sale.",
+      "checksum": "e8127f67cac5f05b",
+      "output": {
+        "sentence": "The studio lot had a small ### where plants were grown for sale."
+      }
+    },
+    {
+      "word": "rely",
+      "part_of_speech": "verb",
+      "definition": "To count on; to look to for support.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|rely|verb|To count on; to look to for support.",
+      "checksum": "4ade0b4cc21c46e9",
+      "output": {
+        "sentence": "Rumi and Mira ### on each other for backup during the demon fight."
+      }
+    },
+    {
+      "word": "reliable",
+      "part_of_speech": "adjective",
+      "definition": "Trustworthy; not likely to fail.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|reliable|adjective|Trustworthy; not likely to fail.",
+      "checksum": "fe73ff7bb091f83c",
+      "output": {
+        "sentence": "The new Huntrix drone was ### for rescuing friends during a mission."
+      }
+    },
+    {
+      "word": "spine",
+      "part_of_speech": "noun",
+      "definition": "The backbone.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|spine|noun|The backbone.",
+      "checksum": "3e2185f90c66b407",
+      "output": {
+        "sentence": "The scientist traced the monster's ### to find its weak spot during a training demo."
+      }
+    },
+    {
+      "word": "spine",
+      "part_of_speech": "noun",
+      "definition": "A thin, sharp, stiff part that sticks out on certain plants and animals.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|spine|noun|A thin, sharp, stiff part that sticks out on certain plants and animals.",
+      "checksum": "285ebd03b715af71",
+      "output": {
+        "sentence": "The plant by the cave had a sharp ### that could prick curious hikers."
+      }
+    },
+    {
+      "word": "thrive",
+      "part_of_speech": "verb",
+      "definition": "To do well; to grow strong and healthy.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-nano|kpop_demon_hunters|113|thrive|verb|To do well; to grow strong and healthy.",
+      "checksum": "04aeed50222c5611",
+      "output": {
+        "sentence": "With practice and songs from Huntrix, the team would ### on tour."
+      }
+    }
+  ],
+  "output": {
+    "subtitle": "Marsh magic and habit-powered teamwork help the KPop Demon Hunters rely on each other."
+  }
+}

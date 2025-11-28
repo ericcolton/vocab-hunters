@@ -1,0 +1,199 @@
+{
+  "type": "check_cache",
+  "source_dataset": "wordly_wise_3000_book_3",
+  "reading_level": {
+    "system": "fp",
+    "level": "P"
+  },
+  "theme": "kpop_demon_hunters",
+  "model": "gpt-5-mini",
+  "seed": 114,
+  "doc_key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114",
+  "doc_checksum": "88d4695441f6ddba",
+  "metadata": {
+    "section": 7,
+    "header": "Avery's KPop Vocab - Section {section}",
+    "footer": "Page {current_page} of {total_pages}"
+  },
+  "data": [
+    {
+      "word": "contain",
+      "part_of_speech": "verb",
+      "definition": "To hold; to have within itself.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|contain|verb|To hold; to have within itself.",
+      "checksum": "f03f92d4fedec486",
+      "output": {
+        "sentence": "Rumi used her magic mic to ### the wild demon energy so it would not escape into the stadium."
+      }
+    },
+    {
+      "word": "container",
+      "part_of_speech": "noun",
+      "definition": "A jar, box, or other object used for holding something.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|container|noun|A jar, box, or other object used for holding something.",
+      "checksum": "c1d7bd105f245cd6",
+      "output": {
+        "sentence": "Zoey carried a glowing ### filled with charms to trap any demon that tried to sneak backstage at the Huntrix concert."
+      }
+    },
+    {
+      "word": "digest",
+      "part_of_speech": "verb",
+      "definition": "To change food that has been eaten into simpler forms that the body can use.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|digest|verb|To change food that has been eaten into simpler forms that the body can use.",
+      "checksum": "d47fdde516172364",
+      "output": {
+        "sentence": "After the Saja Boys’ long show, Jinu needed time to ### his spicy ramen before he went out to hunt demons again."
+      }
+    },
+    {
+      "word": "finicky",
+      "part_of_speech": "adjective",
+      "definition": "Hard to please; fussy.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|finicky|adjective|Hard to please; fussy.",
+      "checksum": "389413e9dce142a8",
+      "output": {
+        "sentence": "The ### ghost in the crowd only liked the loudest K-pop songs and complained about every quiet ballad."
+      }
+    },
+    {
+      "word": "habit",
+      "part_of_speech": "noun",
+      "definition": "Something that a person does so often that it is done without thinking.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|habit|noun|Something that a person does so often that it is done without thinking.",
+      "checksum": "eb31fa11307ced9d",
+      "output": {
+        "sentence": "Mira had a ### of humming Huntrix songs under her breath whenever she felt nervous before a demon battle."
+      }
+    },
+    {
+      "word": "habit",
+      "part_of_speech": "noun",
+      "definition": "A special kind of clothing worn by certain groups.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|habit|noun|A special kind of clothing worn by certain groups.",
+      "checksum": "32ee61cd94c8db61",
+      "output": {
+        "sentence": "For the big K-pop demon battle, the team wore a special ### covered in glowing symbols that showed they were protectors of the city."
+      }
+    },
+    {
+      "word": "hinge",
+      "part_of_speech": "noun",
+      "definition": "A joint on a lid or door that allows it to swing open or shut.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|hinge|noun|A joint on a lid or door that allows it to swing open or shut.",
+      "checksum": "722cc04e92185a75",
+      "output": {
+        "sentence": "Baby Saja pushed the rusty door on its ### and it creaked open to reveal a secret room full of old K-pop records."
+      }
+    },
+    {
+      "word": "marsh",
+      "part_of_speech": "noun",
+      "definition": "A low-lying area, often covered with tall grasses, where the ground is soft and wet.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|marsh|noun|A low-lying area, often covered with tall grasses, where the ground is soft and wet.",
+      "checksum": "15b924ab4649f741",
+      "output": {
+        "sentence": "The demon slipped into a dark ### outside the city, where tall grass and fog made it hard for Rumi to see the soggy ground."
+      }
+    },
+    {
+      "word": "marshy",
+      "part_of_speech": "adjective",
+      "definition": "Soft and moist underfoot.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|marshy|adjective|Soft and moist underfoot.",
+      "checksum": "b4e311ef1760552c",
+      "output": {
+        "sentence": "Zoey almost lost her boot in the ### field where the demon tracks sank deep into the wet ground."
+      }
+    },
+    {
+      "word": "nursery",
+      "part_of_speech": "noun",
+      "definition": "A room or other place set aside for the use of babies and small children.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|nursery|noun|A room or other place set aside for the use of babies and small children.",
+      "checksum": "08f9cf762d3bd025",
+      "output": {
+        "sentence": "Before the concert, the idols visited a bright ### where tiny demon-fighting fans played with toy microphones."
+      }
+    },
+    {
+      "word": "nursery",
+      "part_of_speech": "noun",
+      "definition": "A place where plants are grown for sale.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|nursery|noun|A place where plants are grown for sale.",
+      "checksum": "1bf5dce4081c26f3",
+      "output": {
+        "sentence": "Mira bought glowing moon-flowers at a ### to decorate the stage for the Huntrix show and scare away shy spirits."
+      }
+    },
+    {
+      "word": "rely",
+      "part_of_speech": "verb",
+      "definition": "To count on; to look to for support.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|rely|verb|To count on; to look to for support.",
+      "checksum": "ec0c20b486abae67",
+      "output": {
+        "sentence": "The team could ### on Jinu to play the right song that trapped the demon in its own shadow."
+      }
+    },
+    {
+      "word": "reliable",
+      "part_of_speech": "adjective",
+      "definition": "Trustworthy; not likely to fail.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|reliable|adjective|Trustworthy; not likely to fail.",
+      "checksum": "ac73e7fcead27448",
+      "output": {
+        "sentence": "Rumi’s ### headset never lost signal, even in haunted tunnels, so the whole group could hear her plans."
+      }
+    },
+    {
+      "word": "spine",
+      "part_of_speech": "noun",
+      "definition": "The backbone.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|spine|noun|The backbone.",
+      "checksum": "82e1f469c0c7b7c9",
+      "output": {
+        "sentence": "Zoey felt a chill race up her ### when the demon’s growl echoed under the empty concert hall."
+      }
+    },
+    {
+      "word": "spine",
+      "part_of_speech": "noun",
+      "definition": "A thin, sharp, stiff part that sticks out on certain plants and animals.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|spine|noun|A thin, sharp, stiff part that sticks out on certain plants and animals.",
+      "checksum": "61950a9ef63ca7d2",
+      "output": {
+        "sentence": "The demon’s tail had a sharp ### that flashed red each time it tried to strike at the Saja Boys."
+      }
+    },
+    {
+      "word": "thrive",
+      "part_of_speech": "verb",
+      "definition": "To do well; to grow strong and healthy.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|gpt-5-mini|kpop_demon_hunters|114|thrive|verb|To do well; to grow strong and healthy.",
+      "checksum": "450f24daa0cea44d",
+      "output": {
+        "sentence": "With each new song they wrote, Huntrix seemed to ###, growing stronger and braver in every demon fight."
+      }
+    }
+  ],
+  "output": {
+    "subtitle": "Rumi and Mira rely on their reliable Huntrix habits to thrive in the marshy city while hunting demons at night"
+  }
+}

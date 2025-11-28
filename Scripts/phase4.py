@@ -8,6 +8,9 @@ from typing import Any, Dict, Optional
 
 from openai import OpenAI
 
+# Temperature setting for OpenAI API calls
+OPENAI_TEMPERATURE = 1.0
+
 
 def load_default_paths() -> Dict[str, Optional[str]]:
     """
@@ -157,6 +160,7 @@ def call_openai(
         "instructions": system_prompt,
         "input": user_input,
         "store": True,
+        "temperature": OPENAI_TEMPERATURE,
         "text_format": JsonOutputFormat,
         }
 
