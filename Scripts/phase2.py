@@ -218,11 +218,20 @@ def build_worksheet_id(request, config_path):
         | ((seed_int & ((1 << SEED_BITS) - 1)) << seed_shift)
     )
 
-    # Reversible obfuscation: XOR with a fixed 64-bit key, then add 1 to ensure non-zero.
+    # Reversible obfuscation: XOR with a fixed 64-bit key
     OBFUSCATION_KEY = 0xA5A5A5A5A5
-    obfuscated = (packed ^ OBFUSCATION_KEY) + 1
+    obfuscated = (packed ^ OBFUSCATION_KEY)
 
-    return int(obfuscated)
+    # Return as a lowercase hexadecimal string without the '0x' prefix (e.g. '1a2b3c').
+    # This is reversible: int(hex_string, 16) -> XOR with same key -> unpack bits
+    hex_digits = format(int(obfuscated), 'x')
+
+    # Zero-pad hex digits to at least 10 characters (left-pad with zeros)
+    hex_padded = hex_digits.zfill(10)
+
+    # Insert seperators
+    hex_str = hex_padded[:2] + '-' + hex_padded[2:6] + '-' + hex_padded[6:]
+    return hex_str
 
 
 def main(argv=None):

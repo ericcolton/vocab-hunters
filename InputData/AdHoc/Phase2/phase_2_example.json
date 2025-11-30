@@ -2,7 +2,7 @@
     "type": "check_cache",
     "presentation_metadata": {
       "header": "Avery's KPop Vocab - Section {section}",
-      "footer": "Worksheet {worksheet_id}  (Page {current_page} of {total_pages})",
+      "footer": "{worksheet_id}  (Page {current_page} of {total_pages})",
       "section": 7
     },
     "seed": 1,

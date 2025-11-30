@@ -9,7 +9,7 @@
   "theme": "kpop_demon_hunters",
   "model": "gpt-5-mini",
   "seed": 1,
-  "worksheet_id": 711446375845,
+  "worksheet_id": "a5-a582-2da4",
   "doc_key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1",
   "doc_checksum": "276d39b183afa405",
   "data": [
@@ -21,7 +21,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|contain|verb|To hold; to have within itself.",
       "checksum": "d58a3648f2763875",
       "output": {
-        "sentence": "The silver talisman could ### the dark power within itself."
+        "sentence": "Rumi whispered that the old chest could ### a bright charm inside."
       }
     },
     {
@@ -32,7 +32,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|container|noun|A jar, box, or other object used for holding something.",
       "checksum": "88064e1872264532",
       "output": {
-        "sentence": "Zoey placed the glowing crystal in a small ### backstage."
+        "sentence": "Mira dropped the glowing charm into a small ### before the show."
       }
     },
     {
@@ -43,7 +43,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|digest|verb|To change food that has been eaten into simpler forms that the body can use.",
       "checksum": "0b963bce0c0dc2fb",
       "output": {
-        "sentence": "After the spicy snack, Baby Saja's belly needed time to ###."
+        "sentence": "Zoey waited for her stomach to ### the spicy snack before dancing."
       }
     },
     {
@@ -54,7 +54,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|finicky|adjective|Hard to please; fussy.",
       "checksum": "cd2d881aaa10c3d4",
       "output": {
-        "sentence": "Jinu is so ### about his makeup that he checks it twice before the show."
+        "sentence": "Baby Saja was so ### about stage snacks that she only ate one fruit."
       }
     },
     {
@@ -65,7 +65,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|habit|noun|Something that a person does so often that it is done without thinking.",
       "checksum": "58df0fd0efc01755",
       "output": {
-        "sentence": "Rumi's warm-up song was a ### she did every morning."
+        "sentence": "Jinu's ### of tuning his guitar before practice was always helpful."
       }
     },
     {
@@ -76,7 +76,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|habit|noun|A special kind of clothing worn by certain groups.",
       "checksum": "e5791baf1c8f472a",
       "output": {
-        "sentence": "The old hunter wore a brown ### that showed she belonged to the order."
+        "sentence": "The old monk wore a plain ### that hid his singing voice during rehearsals."
       }
     },
     {
@@ -87,7 +87,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|hinge|noun|A joint on a lid or door that allows it to swing open or shut.",
       "checksum": "8e5819145a7a28d1",
       "output": {
-        "sentence": "Zoey pushed the stage box and heard the ### squeak as it opened."
+        "sentence": "Zoey pushed the shrine door and the ### on it squeaked when it opened."
       }
     },
     {
@@ -98,7 +98,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|marsh|noun|A low-lying area, often covered with tall grasses, where the ground is soft and wet.",
       "checksum": "ebd8932701d88aab",
       "output": {
-        "sentence": "The team crossed a dark ### where the ground was soft and wet."
+        "sentence": "Huntrix walked carefully through the ### where the grass was wet and soft."
       }
     },
     {
@@ -109,7 +109,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|marshy|adjective|Soft and moist underfoot.",
       "checksum": "94ac6691dd250341",
       "output": {
-        "sentence": "Mira sank into the ### mud while she chased the glowing fox."
+        "sentence": "Mira's boots sank into the ### ground near the river."
       }
     },
     {
@@ -120,7 +120,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|nursery|noun|A room or other place set aside for the use of babies and small children.",
       "checksum": "168d64318430f13a",
       "output": {
-        "sentence": "Baby Saja napped in the cozy ### near the dressing room."
+        "sentence": "Zoey wrote a lullaby and sang it in the ### for Baby Saja."
       }
     },
     {
@@ -131,7 +131,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|nursery|noun|A place where plants are grown for sale.",
       "checksum": "453bf895b0d5acac",
       "output": {
-        "sentence": "They bought young trees from the plant ### by the street."
+        "sentence": "Rumi bought a small tree from the ### for the rooftop garden."
       }
     },
     {
@@ -142,7 +142,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|rely|verb|To count on; to look to for support.",
       "checksum": "1e1ae75dbd8952fa",
       "output": {
-        "sentence": "Huntrix must ### on each other during every dangerous show."
+        "sentence": "Huntrix had to ### on their leader when the music faltered."
       }
     },
     {
@@ -153,7 +153,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|reliable|adjective|Trustworthy; not likely to fail.",
       "checksum": "632c0bee048516b0",
       "output": {
-        "sentence": "Mira's flashlight was ### when the power went out."
+        "sentence": "Zoey needed a ### light for the foggy stage."
       }
     },
     {
@@ -164,7 +164,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|spine|noun|The backbone.",
       "checksum": "fc895c675132ce05",
       "output": {
-        "sentence": "Zoey felt a chill down her ### when the door slammed."
+        "sentence": "Jinu stood tall and showed courage from his strong ###."
       }
     },
     {
@@ -175,7 +175,7 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|spine|noun|A thin, sharp, stiff part that sticks out on certain plants and animals.",
       "checksum": "358bff72c7ad7564",
       "output": {
-        "sentence": "The thorny plant had a sharp ### that stuck in Zoey's glove."
+        "sentence": "The demon plant had a sharp ### that pricked Mira's glove."
       }
     },
     {
@@ -186,11 +186,11 @@
       "key": "wordly_wise_3000_book_3|fp-P|8|kpop_demon_hunters|gpt-5-mini|1|thrive|verb|To do well; to grow strong and healthy.",
       "checksum": "8a4dcbc1679788a9",
       "output": {
-        "sentence": "With new songs and practice, Huntrix began to ### on stage."
+        "sentence": "Saja Boys practice hard so their music can ### on stage."
       }
     }
   ],
   "output": {
-    "subtitle": "Huntrix rely on reliable habits to contain demons."
+    "subtitle": "Huntrix rely on a reliable habit to thrive."
   }
 }

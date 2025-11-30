@@ -385,16 +385,14 @@ def build_section_title(header_format, presentation_variables):
 def build_pdf(doc_root, output_stream):
     c = canvas.Canvas(output_stream, pagesize=letter)
         
-    # Format worksheet_id with thousands separators for presentation
-    formatted_worksheet_id = f"{int(doc_root.get('worksheet_id')):,}"
-
+    worksheet_id = doc_root.get('worksheet_id')
     presentation_variables = {
         "section": doc_root["presentation_metadata"]["section"],
         "reading_system": doc_root["reading_level"]["system"],
         "reading_level": doc_root["reading_level"]["level"],
         "model": doc_root["model"],
         "seed": doc_root["seed"],
-        "worksheet_id": formatted_worksheet_id,
+        "worksheet_id": worksheet_id,
         "total_pages": 2,
     }
     header_format = doc_root["presentation_metadata"]["header"]
