@@ -3,6 +3,7 @@
     "presentation_metadata": {
       "header": "Avery's KPop Vocab - Section {section}",
       "footer": "{worksheet_id}  (Page {current_page} of {total_pages})",
+      "answer_key_footer": "{worksheet_id}",
       "section": 7
     },
     "seed": 1,
