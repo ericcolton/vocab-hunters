@@ -192,10 +192,5 @@
   ],
   "output": {
     "subtitle": "Huntrix rely on reliable containers to contain marshy secrets."
-  },
-  "presentation_metadata": {
-    "header": "Avery's KPop Vocab - Section {section}",
-    "footer": "Worksheet {worksheet_id}  (Page {current_page} of {total_pages})",
-    "section": 7
   }
 }

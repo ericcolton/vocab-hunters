@@ -82,12 +82,35 @@ def read_stdin_json() -> Dict[str, Any]:
     except json.JSONDecodeError as exc:
         raise SystemExit(f"Failed to parse JSON from stdin: {exc}") from exc
     
+def build_reading_level_str(request_json: Dict[str, Any]) -> str:
+    reading_level = request_json.get("reading_level")
+    if reading_level:
+        system = reading_level.get("system")
+        level = reading_level.get("level")
+    if (not system or not level):
+        raise SystemExit("Input JSON missing 'reading_level'.")
+    if system == "fp":
+        return f"Fountas & Pinnell level {level}"
+    elif system == "grade":
+        if level == 1:
+            return "1st-grade reading level"
+        elif level == 2:
+            return "2nd-grade reading level"
+        return f"{level}th-grade reading level"
+    else:
+        raise SystemExit(f"Unsupported reading_level system: {system}")
+    
 def read_file_text(path: str) -> str:
     try:
         with open(path, "r", encoding="utf-8") as f:
             return f.read()
     except OSError as exc:
         raise SystemExit(f"Failed to read file '{path}': {exc}") from exc
+
+def flesh_out_system_prompt(raw_system_prompt: str, request_json: Dict[str, Any]) -> str:
+    reading_level = build_reading_level_str(request_json)
+    system_prompt = raw_system_prompt.replace("{reading_level}", reading_level)
+    return system_prompt
 
 def load_theme_content(request: Dict[str, Any], theme_dir: Optional[str]) -> Optional[str]:
     """
@@ -234,7 +257,8 @@ def main() -> None:
     request_json = read_stdin_json()
 
     # 2. Read system prompt file.
-    system_prompt = read_file_text(args.prompt_path)
+    raw_system_prompt = read_file_text(args.prompt_path)
+    system_prompt = flesh_out_system_prompt(raw_system_prompt, request_json)
 
     # 3. Optionally load theme content.
     theme_content = load_theme_content(request_json, args.themes_dir)

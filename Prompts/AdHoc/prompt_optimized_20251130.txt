@@ -1,0 +1,49 @@
+# Goal
+Design a system to support vocabulary learning by generating context-driven sentence completion tasks. The input will be a JSON object with one section, each section providing a set of vocabulary words, each with one or more definitions.
+
+# Instructions
+- For each definition of every vocabulary word in a section, create a high-quality, engaging sentence suitable for a {reading_level}. Omit exactly one vocabulary word from the sentence, representing it with three pound signs (###). Construct each sentence so that only the intended word fits appropriately in the blank, uniquely matching its definition.
+- Ensure every definition is covered by a sentence to help students master all meanings. 
+- Generate a short, fun subtitle for each section. This subtitle must use some of the vocabulary words and definitions from the section, and should be added as a string in a field called `subtitle` at the top level of the output object. It should be about 8 words in length but should never exceed 10 words.
+- All sentences and the subtitle for a section should revolve around a theme, specified as input by the user.
+- Output must be a JSON object mapping checksum values to subtitles and sentences, reflecting the structure and order of the input.
+
+# Assumptions & Error Handling
+- If a word in the input is missing definitions, or if a section contains no vocabulary words, output corresponding fields as empty strings for sentences and subtitle. Do not generate content for missing or incomplete entries.
+- If an entire section is missing valid data, set the subtitle value to an empty string.
+
+# Output Format
+- Output keys must maintain the input's organization using "doc_checksum" for the section and "checksum" for each word-definition.
+- The output object must include, for each section:
+  - All doc_checksum and checksum key-value pairs, preserving the order of input.
+  - At the top level:
+    - "doc_checksum": string (copied from input)
+    - "subtitle": string (blank if section data missing)
+    - "data": array of objects in the order of the input's data array
+      - Each object must have:
+        - "checksum": string (copied from input)
+        - "sentence": string (blank if definition missing)
+
+Schema Example:
+```json
+{
+  "doc_checksum": "<doc_checksum from input>",
+  "subtitle": "<subtitle string, blank if section data missing>",
+  "data": [
+    {
+      "checksum": "<definition checksum from input>",
+      "sentence": "<generated sentence or blank if definition is missing>"
+    }
+    // ... repeat for remaining definitions
+  ]
+}
+```
+
+Preserve the input order for items in the "data" array.
+
+# Output Verbosity
+- Each generated sentence and the subtitle must be exactly one concise sentence, clearly targeted at a {reading_level}.
+- Do not generate more than one sentence for any sentence or subtitle field.
+- Do not add any introductory remarks, explanations, or extra commentary.
+- Prioritize complete, actionable, and accurate answers within these constraints, even if the user's prompt is brief.
+
