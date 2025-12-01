@@ -288,7 +288,7 @@ def draw_footer(c, footer_format, presentation_metadata):
     renderPDF.draw(presentation_metadata["qr_code"], c, M_LEFT, M_BOTTOM / 2 - 20) if presentation_metadata.get("qr_code") else None
     c.drawString((PAGE_W - stringWidth(footer_text, TEXT_FONT, TEXT_SIZE - 2)) / 2, M_BOTTOM / 2, footer_text)
 
-def build_section(c, section_title, seed, section, footer_format, presentation_variables):
+def build_section(c, section_title, seed, section, footer_format, answer_key_footer_format, presentation_variables):
     
     output_subtitle = section["output"]["subtitle"]
     entries = section["data"]
@@ -379,7 +379,8 @@ def build_section(c, section_title, seed, section, footer_format, presentation_v
         # If you want definitions on the answer key, uncomment:
         # c.drawString(M_LEFT + 18, y3, f"— {q['definition']} ({q['pos']})")
         # y3 -= (TEXT_SIZE + 4)
-        
+    
+    draw_footer(c, answer_key_footer_format, presentation_variables)
     c.showPage()
 
     
@@ -426,7 +427,8 @@ def build_pdf(doc_root, output_stream):
 
     title = build_section_title(header_format, presentation_variables)
     footer_format = str(doc_root["presentation_metadata"]["footer"])
-    build_section(c, title, seed, doc_root, footer_format, presentation_variables)
+    answer_key_footer_format = str(doc_root["presentation_metadata"]["answer_key_footer"])
+    build_section(c, title, seed, doc_root, footer_format, answer_key_footer_format, presentation_variables)
 
     c.save()
     
