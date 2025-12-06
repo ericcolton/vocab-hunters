@@ -419,13 +419,37 @@ def build_section(c, section_title, seed, section, footer_format, answer_key_foo
     y3 -= (TEXT_SIZE + 10)
 
     # Answers in the same order as questions
+    # compute fixed column for definitions so they all start at the same offset
+    label_widths = []
     for i, q in enumerate(questions, start=1):
-        ans = f"{i}) {q['word']}"
-        c.drawString(M_LEFT, y3, ans)
+        w_num = stringWidth(f"{i}) ", TEXT_FONT, TEXT_SIZE)
+        w_word = stringWidth(q['word'], TITLE_FONT, TEXT_SIZE)
+        label_widths.append(w_num + w_word)
+    max_label_w = max(label_widths) if label_widths else 0
+
+    # slightly wider gap and smaller font for definitions
+    padding_between = 18
+    x_def = M_LEFT + max_label_w + padding_between
+    def_font = TEXT_FONT
+    def_size = max(8, TEXT_SIZE - 2)
+
+    for i, q in enumerate(questions, start=1):
+        # number
+        num_text = f"{i}) "
+        c.setFont(TEXT_FONT, TEXT_SIZE)
+        c.drawString(M_LEFT, y3, num_text)
+
+        # bold word
+        x_word = M_LEFT + stringWidth(num_text, TEXT_FONT, TEXT_SIZE)
+        c.setFont(TITLE_FONT, TEXT_SIZE)  # bold
+        c.drawString(x_word, y3, q['word'])
+
+        # definition (smaller font) aligned to fixed x_def
+        c.setFont(SUBTITLE_FONT, def_size)
+        def_text = f"  {q['definition']} ({q['pos']})"
+        c.drawString(x_def, y3, def_text)
+
         y3 -= (TEXT_SIZE + 6)
-        # If you want definitions on the answer key, uncomment:
-        # c.drawString(M_LEFT + 18, y3, f"— {q['definition']} ({q['pos']})")
-        # y3 -= (TEXT_SIZE + 4)
     
     draw_answers_footer(c, answer_key_footer_format, presentation_variables)
     c.showPage()
