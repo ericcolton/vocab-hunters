@@ -5,7 +5,7 @@
       "footer": "Page {current_page} of {total_pages}",
       "answer_key_footer": "Fountas & Pinnell Level {reading_level}"
     },
-    "seed": 2,
+    "seed": 6,
     "reading_level": {"system": "fp", "level": "P"},
     "model": "gpt-5-mini",
     "theme": "kpop_demon_hunters",

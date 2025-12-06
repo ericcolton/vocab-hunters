@@ -1,0 +1,213 @@
+{
+  "type": "check_cache",
+  "source_dataset": "wordly_wise_3000_book_3",
+  "reading_level": {
+    "system": "fp",
+    "level": "P"
+  },
+  "section": "9",
+  "theme": "kpop_demon_hunters",
+  "model": "gpt-5-mini",
+  "seed": 4,
+  "worksheet_id": "a5-a582-2ca1",
+  "doc_key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4",
+  "doc_checksum": "345c05101b1d885f",
+  "data": [
+    {
+      "word": "attitude",
+      "part_of_speech": "noun",
+      "definition": "A way of thinking or feeling about certain things.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|attitude|noun|A way of thinking or feeling about certain things.",
+      "checksum": "0575d61208561b6c",
+      "output": {
+        "sentence": "Rumi changed her ###, her way of thinking about the hunt."
+      }
+    },
+    {
+      "word": "confess",
+      "part_of_speech": "verb",
+      "definition": "To say or admit that one has done something wrong.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|confess|verb|To say or admit that one has done something wrong.",
+      "checksum": "9340484485ad2c94",
+      "output": {
+        "sentence": "Jinu walked to the leader and said he would ### what he had done."
+      }
+    },
+    {
+      "word": "defend",
+      "part_of_speech": "verb",
+      "definition": "To keep from being attacked; to protect.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|defend|verb|To keep from being attacked; to protect.",
+      "checksum": "4407516a52a58a6d",
+      "output": {
+        "sentence": "Huntrix raised shields to ### their fans from the demon smoke."
+      }
+    },
+    {
+      "word": "defend",
+      "part_of_speech": "verb",
+      "definition": "To speak for; to argue in favor of.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|defend|verb|To speak for; to argue in favor of.",
+      "checksum": "39a1726cde3c03b9",
+      "output": {
+        "sentence": "Zoey spoke up to ### for Mira's idea in the meeting."
+      }
+    },
+    {
+      "word": "gradual",
+      "part_of_speech": "adjective",
+      "definition": "Happening slowly; taking place little by little.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|gradual|adjective|Happening slowly; taking place little by little.",
+      "checksum": "0bc39c13d13b2e62",
+      "output": {
+        "sentence": "Baby Saja's strength grew in a ### way after each practice."
+      }
+    },
+    {
+      "word": "hint",
+      "part_of_speech": "noun",
+      "definition": "Information given to help someone answer a question; a clue.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|hint|noun|Information given to help someone answer a question; a clue.",
+      "checksum": "e247d35f124625a3",
+      "output": {
+        "sentence": "Rumi gave a small ### about the hidden key in the melody."
+      }
+    },
+    {
+      "word": "hint",
+      "part_of_speech": "verb",
+      "definition": "To suggest something without saying it directly.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|hint|verb|To suggest something without saying it directly.",
+      "checksum": "4bf003398b3ec765",
+      "output": {
+        "sentence": "During practice, Mira would ### that the chorus should get louder."
+      }
+    },
+    {
+      "word": "individual",
+      "part_of_speech": "noun",
+      "definition": "A single person, apart from others in a group.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|individual|noun|A single person, apart from others in a group.",
+      "checksum": "30397f464f8d675d",
+      "output": {
+        "sentence": "An ### stood at the edge of the group to watch the rehearsal."
+      }
+    },
+    {
+      "word": "individual",
+      "part_of_speech": "adjective",
+      "definition": "Meant for just one.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|individual|adjective|Meant for just one.",
+      "checksum": "2daf068eb4235541",
+      "output": {
+        "sentence": "Each fan got an ### ticket for the meet-and-greet."
+      }
+    },
+    {
+      "word": "malice",
+      "part_of_speech": "noun",
+      "definition": "The wish to hurt others on purpose.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|malice|noun|The wish to hurt others on purpose.",
+      "checksum": "54b8cb9d378439c4",
+      "output": {
+        "sentence": "The demon's laugh was full of ### when it broke the lights."
+      }
+    },
+    {
+      "word": "malicious",
+      "part_of_speech": "adjective",
+      "definition": "Done with a wish to harm or cause pain.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|malicious|adjective|Done with a wish to harm or cause pain.",
+      "checksum": "9da06cb79ea63ea1",
+      "output": {
+        "sentence": "A ### message was sent to hurt the band's feelings."
+      }
+    },
+    {
+      "word": "misery",
+      "part_of_speech": "noun",
+      "definition": "A feeling of great unhappiness.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|misery|noun|A feeling of great unhappiness.",
+      "checksum": "a84e51d37c15cabc",
+      "output": {
+        "sentence": "After losing the competition, Zoey sat alone in ###."
+      }
+    },
+    {
+      "word": "miserable",
+      "part_of_speech": "adjective",
+      "definition": "Very unhappy or unpleasant.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|miserable|adjective|Very unhappy or unpleasant.",
+      "checksum": "4b784a39391fc5db",
+      "output": {
+        "sentence": "The dancers felt ### after the long, cold night behind the stage."
+      }
+    },
+    {
+      "word": "solution",
+      "part_of_speech": "noun",
+      "definition": "The answer to a problem or puzzle.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|solution|noun|The answer to a problem or puzzle.",
+      "checksum": "44c68b04adea8ebe",
+      "output": {
+        "sentence": "Mira smiled and said she had the ### to the stage puzzle."
+      }
+    },
+    {
+      "word": "solution",
+      "part_of_speech": "noun",
+      "definition": "A mixture formed when a liquid and some other stuff are mixed together.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|solution|noun|A mixture formed when a liquid and some other stuff are mixed together.",
+      "checksum": "89f96b6d84a6368c",
+      "output": {
+        "sentence": "In the lab, Zoey stirred powder into water to make a clear ###."
+      }
+    },
+    {
+      "word": "survey",
+      "part_of_speech": "noun",
+      "definition": "The act of looking over or examining something carefully.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|survey|noun|The act of looking over or examining something carefully.",
+      "checksum": "4af3ccf5d9c9cdff",
+      "output": {
+        "sentence": "Before dawn, Huntrix did a quick ### of the alley for tracks."
+      }
+    },
+    {
+      "word": "survey",
+      "part_of_speech": "verb",
+      "definition": "To look over; to examine.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|9|kpop_demon_hunters|gpt-5-mini|4|survey|verb|To look over; to examine.",
+      "checksum": "08990b4159cdd44b",
+      "output": {
+        "sentence": "Rumi will ### the rooftop to find any broken wires."
+      }
+    }
+  ],
+  "output": {
+    "subtitle": "Rumi's gradual attitude helps defend Huntrix and friends."
+  },
+  "presentation_metadata": {
+    "header": "Avery's KPop Vocab - Section {section}",
+    "footer": "Page {current_page} of {total_pages}",
+    "answer_key_footer": "Fountas & Pinnell Level {reading_level}",
+    "section": 9
+  }
+}
