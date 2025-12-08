@@ -981,87 +981,93 @@
       "subtitle": "Gusts over a chasm, we rig the schedule.",
       "entries": [
         {
-          "word": "accessible",
-          "part_of_speech": "adjective",
-          "definition": "Able to be reached or easily approached.",
-          "def_num": 1
-        },
-        {
-          "word": "communicate",
-          "part_of_speech": "verb",
-          "definition": "To make known; to give or exchange information.",
-          "def_num": 1
-        },
-        {
-          "word": "communication",
+          "word": "cable",
           "part_of_speech": "noun",
-          "definition": "The exchange of information.",
+          "definition": "A thick steel rope made of strands of wire twisted together.",
           "def_num": 1
         },
         {
-          "word": "communities",
+          "word": "cable",
           "part_of_speech": "noun",
-          "definition": "Places where people live, work, and play together.",
+          "definition": "A bundle of wires covered by rubber or plastic along which an electric current can pass.",
+          "def_num": 2
+        },
+        {
+          "word": "cathedral",
+          "part_of_speech": "noun",
+          "definition": "A large and important church.",
           "def_num": 1
         },
         {
           "word": "convey",
           "part_of_speech": "verb",
-          "definition": "To carry from one place to another; to transport.",
+          "definition": "To carry or move from one place to another.",
           "def_num": 1
         },
         {
-          "word": "decline",
+          "word": "convey",
           "part_of_speech": "verb",
-          "definition": "To become less or weaker; to refuse politely.",
-          "def_num": 1
+          "definition": "To make an idea or feeling known.",
+          "def_num": 2
         },
         {
-          "word": "idiom",
+          "word": "device",
           "part_of_speech": "noun",
-          "definition": "An expression whose meaning is different from the meaning of the individual words.",
+          "definition": "Something made or invented for a particular use.",
           "def_num": 1
         },
         {
-          "word": "misinterpret",
-          "part_of_speech": "verb",
-          "definition": "To understand incorrectly.",
-          "def_num": 1
-        },
-        {
-          "word": "rare",
-          "part_of_speech": "adjective",
-          "definition": "Not common; unusual.",
-          "def_num": 1
-        },
-        {
-          "word": "refer",
-          "part_of_speech": "verb",
-          "definition": "To direct attention to or speak about.",
-          "def_num": 1
-        },
-        {
-          "word": "reference",
+          "word": "freight",
           "part_of_speech": "noun",
-          "definition": "A mention of a source of information.",
+          "definition": "Goods carried from place to place, as by plane, boat, truck, or train.",
           "def_num": 1
         },
         {
-          "word": "slang",
+          "word": "landmark",
           "part_of_speech": "noun",
-          "definition": "Informal words or phrases that are more common in speech than in writing.",
+          "definition": "A building or natural feature that is easy to see and can be used as a guide.",
           "def_num": 1
         },
         {
-          "word": "visual",
-          "part_of_speech": "adjective",
-          "definition": "Having to do with sight or seeing.",
+          "word": "landmark",
+          "part_of_speech": "noun",
+          "definition": "An important event.",
+          "def_num": 2
+        },
+        {
+          "word": "method",
+          "part_of_speech": "noun",
+          "definition": "A way of doing something.",
           "def_num": 1
         },
         {
-          "word": "visualize",
-          "part_of_speech": "verb",
-          "definition": "To form a mental picture of; to imagine.",
+          "word": "rod",
+          "part_of_speech": "noun",
+          "definition": "A thin, straight piece of wood, metal, or other material.",
+          "def_num": 1
+        },
+        {
+          "word": "shaft",
+          "part_of_speech": "noun",
+          "definition": "A long open tunnel that runs straight up and down.",
+          "def_num": 1
+        },
+        {
+          "word": "shaft",
+          "part_of_speech": "noun",
+          "definition": "A bar that connects with other moving parts of a machine.",
+          "def_num": 2
+        },
+        {
+          "word": "shaft",
+          "part_of_speech": "noun",
+          "definition": "The long, narrow part of an arrow or other object.",
+          "def_num": 3
+        },
+        {
+          "word": "structure",
+          "part_of_speech": "noun",
+          "definition": "Something that is built, as a building or bridge.",
           "def_num": 1
         }
       ]

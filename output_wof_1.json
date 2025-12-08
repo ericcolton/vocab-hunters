@@ -14,162 +14,173 @@
   "doc_checksum": "ccda16168297a808",
   "data": [
     {
-      "word": "accessible",
-      "part_of_speech": "adjective",
-      "definition": "Able to be reached or easily approached.",
-      "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|accessible|adjective|Able to be reached or easily approached.",
-      "checksum": "5ad7f53918738252",
-      "output": {
-        "sentence": "The mountain pass was icy, but the hidden cave was ### to the dragonets."
-      }
-    },
-    {
-      "word": "communicate",
-      "part_of_speech": "verb",
-      "definition": "To make known; to give or exchange information.",
-      "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|communicate|verb|To make known; to give or exchange information.",
-      "checksum": "8c499caf6fd5098d",
-      "output": {
-        "sentence": "Starflight used soft calls and clicks to ### with the others at night."
-      }
-    },
-    {
-      "word": "communication",
+      "word": "cable",
       "part_of_speech": "noun",
-      "definition": "The exchange of information.",
+      "definition": "A thick steel rope made of strands of wire twisted together.",
       "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|communication|noun|The exchange of information.",
-      "checksum": "7a427fb371e2e01a",
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|cable|noun|A thick steel rope made of strands of wire twisted together.",
+      "checksum": "d7c614af84a5ae10",
       "output": {
-        "sentence": "Smoke on the ridge was the only ### between the tribes during the storm."
+        "sentence": "The bridge held because the crew tightened the thick steel ###."
       }
     },
     {
-      "word": "communities",
+      "word": "cable",
       "part_of_speech": "noun",
-      "definition": "Places where people live, work, and play together.",
-      "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|communities|noun|Places where people live, work, and play together.",
-      "checksum": "223b53e597d6a9d5",
+      "definition": "A bundle of wires covered by rubber or plastic along which an electric current can pass.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|cable|noun|A bundle of wires covered by rubber or plastic along which an electric current can pass.",
+      "checksum": "e74d91489daa0547",
       "output": {
-        "sentence": "After the battle, small ### gathered to repair their homes."
+        "sentence": "A hidden bundle of rubber-coated wires called a ### ran to the watchtower lamp."
+      }
+    },
+    {
+      "word": "cathedral",
+      "part_of_speech": "noun",
+      "definition": "A large and important church.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|cathedral|noun|A large and important church.",
+      "checksum": "d21685ec7bae554a",
+      "output": {
+        "sentence": "The old ### became a hospital for dragons after the attack."
       }
     },
     {
       "word": "convey",
       "part_of_speech": "verb",
-      "definition": "To carry from one place to another; to transport.",
+      "definition": "To carry or move from one place to another.",
       "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|convey|verb|To carry from one place to another; to transport.",
-      "checksum": "ef67811403309771",
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|convey|verb|To carry or move from one place to another.",
+      "checksum": "9ea1bd4d996775bf",
       "output": {
-        "sentence": "A messenger dove and dropped a glowing shell to ### news across the sea."
+        "sentence": "The rescue team had to ### the wounded dragon out of the burning hall."
       }
     },
     {
-      "word": "decline",
+      "word": "convey",
       "part_of_speech": "verb",
-      "definition": "To become less or weaker; to refuse politely.",
-      "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|decline|verb|To become less or weaker; to refuse politely.",
-      "checksum": "cf6d445cc7c8ad33",
+      "definition": "To make an idea or feeling known.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|convey|verb|To make an idea or feeling known.",
+      "checksum": "16fb22ea7e741039",
       "output": {
-        "sentence": "As winter came, the river's water began to ### until only puddles remained."
+        "sentence": "Sunny tried to ### hope with her bright smile to the frightened hatchlings."
       }
     },
     {
-      "word": "idiom",
+      "word": "device",
       "part_of_speech": "noun",
-      "definition": "An expression whose meaning is different from the meaning of the individual words.",
+      "definition": "Something made or invented for a particular use.",
       "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|idiom|noun|An expression whose meaning is different from the meaning of the individual words.",
-      "checksum": "f47754308e2da6f1",
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|device|noun|Something made or invented for a particular use.",
+      "checksum": "3869d928c0de331e",
       "output": {
-        "sentence": "When the old dragon said 'fly with the wind' but meant 'go away,' it was an ###."
+        "sentence": "Glory built a clever ### to lift the heavy egg from the trap."
       }
     },
     {
-      "word": "misinterpret",
-      "part_of_speech": "verb",
-      "definition": "To understand incorrectly.",
-      "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|misinterpret|verb|To understand incorrectly.",
-      "checksum": "b544770cac3f2fd0",
-      "output": {
-        "sentence": "If a scout reads the scroll wrong, they might ### the enemy's plans."
-      }
-    },
-    {
-      "word": "rare",
-      "part_of_speech": "adjective",
-      "definition": "Not common; unusual.",
-      "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|rare|adjective|Not common; unusual.",
-      "checksum": "3261488b6aa41035",
-      "output": {
-        "sentence": "A SandWing with bright blue scales was ### in the desert."
-      }
-    },
-    {
-      "word": "refer",
-      "part_of_speech": "verb",
-      "definition": "To direct attention to or speak about.",
-      "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|refer|verb|To direct attention to or speak about.",
-      "checksum": "5035f07fb969d43c",
-      "output": {
-        "sentence": "When asked where to hide, Glory would ### to the jagged rocks on the map."
-      }
-    },
-    {
-      "word": "reference",
+      "word": "freight",
       "part_of_speech": "noun",
-      "definition": "A mention of a source of information.",
+      "definition": "Goods carried from place to place, as by plane, boat, truck, or train.",
       "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|reference|noun|A mention of a source of information.",
-      "checksum": "2ddb3d7a92e78008",
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|freight|noun|Goods carried from place to place, as by plane, boat, truck, or train.",
+      "checksum": "3078608178ca4431",
       "output": {
-        "sentence": "Starflight kept a small ### book of laws and maps in his satchel."
+        "sentence": "The ship carried a big ### of food and armor for the troops."
       }
     },
     {
-      "word": "slang",
+      "word": "landmark",
       "part_of_speech": "noun",
-      "definition": "Informal words or phrases that are more common in speech than in writing.",
+      "definition": "A building or natural feature that is easy to see and can be used as a guide.",
       "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|slang|noun|Informal words or phrases that are more common in speech than in writing.",
-      "checksum": "c0f462030d664208",
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|landmark|noun|A building or natural feature that is easy to see and can be used as a guide.",
+      "checksum": "7a82a66b2907aada",
       "output": {
-        "sentence": "The NightWings used secret ### that were short, informal, and new."
+        "sentence": "The ruined tower was a bright ### when dragons flew through the fog."
       }
     },
     {
-      "word": "visual",
-      "part_of_speech": "adjective",
-      "definition": "Having to do with sight or seeing.",
-      "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|visual|adjective|Having to do with sight or seeing.",
-      "checksum": "aaac29bac74c96fd",
+      "word": "landmark",
+      "part_of_speech": "noun",
+      "definition": "An important event.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|landmark|noun|An important event.",
+      "checksum": "ceb03f9e260becd2",
       "output": {
-        "sentence": "The general made a ### chart with red marks to show safe routes."
+        "sentence": "The signing of peace was a true ### after years of fighting."
       }
     },
     {
-      "word": "visualize",
-      "part_of_speech": "verb",
-      "definition": "To form a mental picture of; to imagine.",
+      "word": "method",
+      "part_of_speech": "noun",
+      "definition": "A way of doing something.",
       "def_num": 1,
-      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|visualize|verb|To form a mental picture of; to imagine.",
-      "checksum": "5db6a2b339d6586b",
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|method|noun|A way of doing something.",
+      "checksum": "f8c3616014dd691e",
       "output": {
-        "sentence": "Before the raid, Clay closed his eyes to ### the safest path home."
+        "sentence": "Starflight learned a new ### for reading old battle maps."
+      }
+    },
+    {
+      "word": "rod",
+      "part_of_speech": "noun",
+      "definition": "A thin, straight piece of wood, metal, or other material.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|rod|noun|A thin, straight piece of wood, metal, or other material.",
+      "checksum": "0094d0d1c2a3f9bc",
+      "output": {
+        "sentence": "A thin iron ### held the trap door closed until the dragon tugged it."
+      }
+    },
+    {
+      "word": "shaft",
+      "part_of_speech": "noun",
+      "definition": "A long open tunnel that runs straight up and down.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|shaft|noun|A long open tunnel that runs straight up and down.",
+      "checksum": "274fc76a47f4051f",
+      "output": {
+        "sentence": "Miners lowered a lantern into the deep ### and listened for echoes."
+      }
+    },
+    {
+      "word": "shaft",
+      "part_of_speech": "noun",
+      "definition": "A bar that connects with other moving parts of a machine.",
+      "def_num": 2,
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|shaft|noun|A bar that connects with other moving parts of a machine.",
+      "checksum": "30d11cbed382d672",
+      "output": {
+        "sentence": "The engine stalled when the bent ### could no longer turn the gears."
+      }
+    },
+    {
+      "word": "shaft",
+      "part_of_speech": "noun",
+      "definition": "The long, narrow part of an arrow or other object.",
+      "def_num": 3,
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|shaft|noun|The long, narrow part of an arrow or other object.",
+      "checksum": "a86c0302ca374ba9",
+      "output": {
+        "sentence": "Clay fitted the feather to the arrow's smooth wooden ### before he fired."
+      }
+    },
+    {
+      "word": "structure",
+      "part_of_speech": "noun",
+      "definition": "Something that is built, as a building or bridge.",
+      "def_num": 1,
+      "key": "wordly_wise_3000_book_3|fp-P|10|wings_of_fire|gpt-5-mini|1|structure|noun|Something that is built, as a building or bridge.",
+      "checksum": "c9b6eb07f07327ff",
+      "output": {
+        "sentence": "The broken ### still cast a shadow over the ruined camp."
       }
     }
   ],
   "output": {
-    "subtitle": "Dragonet communication connects rare communities across war-torn Pyrrhia"
+    "subtitle": "Dragons convey freight by cable to a landmark cathedral."
   },
   "presentation_metadata": {
     "header": "Avery's WoF Vocab - Section {section}",
