@@ -1,8 +1,8 @@
 {
-    "source_datasets": "/users/ericcolton/Documents/Development/AIWorkflows/homework-hero/InputData/source_datasets/vocabulary",
+    "source_datasets": "/Users/ericcolton/OneDrive/Development/homework-hero/Source_Datasets/vocabulary_datasets",
     "prompt_path": "/users/ericcolton/Documents/Development/AIWorkflows/homework-hero/Prompts/prompt_optimized_20251130.txt",
     "themes_dir": "/users/ericcolton/Documents/Development/AIWorkflows/homework-hero/Themes/",
-    "responses_datastore": "/users/ericcolton/Documents/Development/AIWorkflows/homework-hero/Output/Response_Datastore",
+    "responses_datastore": "/Users/ericcolton/OneDrive/Development/homework-hero/Response_Datastore",
     "scripts": "/users/ericcolton/Documents/Development/AIWorkflows/homework-hero/Scripts/",
     "reference_data": "/users/ericcolton/Documents/Development/AIWorkflows/homework-hero/Reference_Data/"
 }
