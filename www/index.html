@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPop Vocab Hunters</title>
+    <style>
+        /* * CORE VARIABLES 
+         * Default Theme: "K-pop Demon Hunters" (Neon/Concert Style)
+         */
+        :root {
+            --bg-color: #0a0a12;
+            --card-bg: #161625;
+            --text-color: #ffffff;
+            --accent-primary: #ff007f; /* Hot Pink */
+            --accent-secondary: #00f3ff; /* Electric Blue */
+            --border-glow: 0 0 15px rgba(255, 0, 127, 0.6);
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --btn-gradient: linear-gradient(90deg, #ff007f, #6600ff);
+            --header-font-weight: 800;
+            --input-bg: #222233;
+        }
+
+        /* * ALTERNATE THEME: "Wings of Fire" (Dragon/Fantasy Style)
+         * Triggered by adding class .theme-wof to the body
+         */
+        body.theme-wof {
+            --bg-color: #2b1d14; /* Dark Earth */
+            --card-bg: #3e2b1f; /* Leather/Parchment dark */
+            --text-color: #f0e6d2; /* Parchment White */
+            --accent-primary: #d4af37; /* Dragon Gold */
+            --accent-secondary: #c23b22; /* Fire Red */
+            --border-glow: 0 0 10px rgba(212, 175, 55, 0.3);
+            --font-main: 'Georgia', serif;
+            --btn-gradient: linear-gradient(180deg, #8b0000, #b22222);
+            --header-font-weight: 600;
+            --input-bg: #553e32;
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        /* HEADER STYLES */
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: var(--header-font-weight);
+            background: var(--btn-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 4px 15px rgba(0,0,0,0.5);
+        }
+
+        p.subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        /* CONTROL PANEL CARD */
+        .control-panel {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative "Glow" Border effect for K-pop theme */
+        .control-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: var(--btn-gradient);
+            box-shadow: var(--border-glow);
+        }
+
+        /* FORM GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--accent-secondary);
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--input-bg);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 1rem;
+            appearance: none; /* Removes default system arrow */
+            cursor: pointer;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        /* Custom Arrow for Selects */
+        .select-wrapper {
+            position: relative;
+        }
+        
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.7rem;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-primary);
+            pointer-events: none;
+        }
+
+        /* ACTION BUTTON */
+        .generate-btn {
+            grid-column: span 2;
+            margin-top: 1.5rem;
+            padding: 16px;
+            background: var(--btn-gradient);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: var(--border-glow);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.2);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>KPop Vocab Hunters</h1>
+        <p class="subtitle">Hunt Vocabulary. Defeat Demons.</p>
+    </header>
+
+    <div class="control-panel">
+        <form class="grid">
+            <div class="full-width">
+                <label for="theme">Theme</label>
+                <div class="select-wrapper">
+                    <select id="theme" onchange="changeTheme()">
+                        <option value="kpop">KPop Demon Hunters</option>
+                        <option value="wof">Wings of Fire</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="full-width">
+                <label for="source_dataset">Source</label>
+                <div class="select-wrapper">
+                    <select id="source_dataset">
+                        <option value="ww3000_bk3" selected>Wordly Wise 3000 Book 3</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="section">Section</label>
+                <div class="select-wrapper">
+                    <select id="section">
+                        </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="level">F&P Reading Level</label>
+                <div class="select-wrapper">
+                    <select id="level">
+                        </select>
+                </div>
+            </div>
+            <div class="full-width">
+                <label for="model">AI Model</label>
+                <div class="select-wrapper">
+                    <select id="model">
+                        <option value="gpt-5-mini" selected>gpt-5-mini</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="button" class="generate-btn">Generate Worksheet</button>
+
+        </form>
+    </div>
+
+    <div class="footer">
+        System Status: ONLINE // HUNTR/X Protocol Active. cindysoftware.com
+    </div>
+</div>
+
+<script>
+    // 1. Populate Section Dropdown (1-15)
+    const sectionSelect = document.getElementById('section');
+    for (let i = 1; i <= 15; i++) {
+        let opt = document.createElement('option');
+        opt.value = i;
+        opt.innerHTML = i;
+        sectionSelect.appendChild(opt);
+    }
+
+    // 2. Populate Reading Level (A-Z)
+    const levelSelect = document.getElementById('level');
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    alphabet.forEach(letter => {
+        let opt = document.createElement('option');
+        opt.value = letter;
+        opt.innerHTML = letter;
+        levelSelect.appendChild(opt);
+    });
+
+    // 3. Theme Switcher Logic
+    function changeTheme() {
+        const theme = document.getElementById('theme').value;
+        const body = document.body;
+        const title = document.querySelector('h1');
+        const subtitle = document.querySelector('.subtitle');
+        
+        if (theme === 'wof') {
+            body.classList.add('theme-wof');
+            title.innerText = "Dragon Vocab Scrolls";
+            subtitle.innerText = "Fly High. Burn Bright. Learn Words.";
+        } else {
+            body.classList.remove('theme-wof');
+            title.innerText = "KPop Vocab Hunters";
+            subtitle.innerText = "Hunt Vocabulary. Defeat Demons.";
+        }
+    }
+</script>
+
+</body>
+</html>
