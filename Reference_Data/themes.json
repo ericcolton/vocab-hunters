@@ -1,7 +1,7 @@
 [
     {
         "id": 1,
-        "short_name": "kpop_demon_hunters",
+        "key_name": "kpop_demon_hunters",
         "name": "KPop Demon Hunters",
         "css_class": "",
         "ui_title": "KPop Vocab Hunters",
@@ -9,7 +9,7 @@
     },
     {
         "id": 2,
-        "short_name": "wings_of_fire",
+        "key_name": "wings_of_fire",
         "name": "Wings of Fire",
         "css_class": "theme-wof",
         "ui_title": "Dragon Vocab Scrolls",

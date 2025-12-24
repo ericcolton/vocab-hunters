@@ -47,11 +47,11 @@ def load_source_datasets():
         raise ValueError("Reference_Data/source_datasets.json must be a list or object.")
     data_sources = []
     for item in data:
-        short_name = item.get("short_name")
-        if not short_name:
+        key_name = item.get("key_name")
+        if not key_name:
             continue
-        name = item.get("name") or short_name.replace("_", " ").title()
-        data_sources.append({"id": short_name, "name": name})
+        name = item.get("name") or key_name.replace("_", " ").title()
+        data_sources.append({"id": key_name, "name": name})
     return data_sources
 
 def load_themes():
@@ -65,13 +65,13 @@ def load_themes():
         raise ValueError("Reference_Data/themes.json must be a list or object.")
     themes = []
     for item in data:
-        short_name = item.get("short_name")
-        if not short_name:
+        key_name = item.get("key_name")
+        if not key_name:
             continue
-        display_name = item.get("name") or short_name.replace("_", " ").title()
+        display_name = item.get("name") or key_name.replace("_", " ").title()
         themes.append(
             {
-                "id": short_name,
+                "id": key_name,
                 "name": display_name,
                 "css_class": item.get("css_class", ""),
                 "ui_title": item.get("ui_title") or display_name,
@@ -92,15 +92,15 @@ def load_models():
     models = []
     default_set = False
     for item in data:
-        short_name = item.get("short_name")
-        if not short_name:
+        key_name = item.get("key_name")
+        if not key_name:
             continue
-        display_name = item.get("name") or short_name
+        display_name = item.get("name") or key_name
         is_default = bool(item.get("is_default")) and not default_set
         if is_default:
             default_set = True
         models.append(
-            {"id": short_name, "name": display_name, "is_default": is_default}
+            {"id": key_name, "name": display_name, "is_default": is_default}
         )
     if models and not default_set:
         models[0]["is_default"] = True

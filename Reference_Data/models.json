@@ -1,13 +1,13 @@
 [
     {
         "id": 1,
-        "short_name": "gpt-5-nano",
+        "key_name": "gpt-5-nano",
         "name": "gpt-5-nano",
         "is_default": false
     },
     {
         "id": 2,
-        "short_name": "gpt-5-mini",
+        "key_name": "gpt-5-mini",
         "name": "gpt-5-mini",
         "is_default": true
     }
