@@ -206,7 +206,7 @@
             <div class="full-width">
                 <label for="datasource">Source</label>
                 <div class="select-wrapper">
-                    <select id="datasource" name="datasource">
+                    <select id="datasource" name="datasource" onchange="changeSourceDataset()">
                         {% for source in config.data_sources %}
                         <option value="{{ source.id }}">{{ source.name }}</option>
                         {% endfor %}
@@ -312,6 +312,31 @@
         // Reset classes and apply new theme class
         document.body.className = currentTheme.css_class;
     }
+
+    async function changeSourceDataset() {
+        const selectedId = document.getElementById('datasource').value;
+        try {
+            const response = await fetch(`/sections/${encodeURIComponent(selectedId)}`);
+            const payload = await response.json();
+            if (!response.ok) {
+                return;
+            }
+            const sectionSelect = document.getElementById('section');
+            sectionSelect.innerHTML = '';
+            (payload.sections || []).forEach((num) => {
+                const option = document.createElement('option');
+                option.value = num;
+                option.textContent = num;
+                sectionSelect.appendChild(option);
+            });
+        } catch (err) {
+            // Keep existing sections if the request fails.
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        changeSourceDataset();
+    });
 </script>
 
 </body>

@@ -24,6 +24,23 @@ def get_reference_data_path():
         )
     return Path(reference_data_path)
 
+def get_source_datasets_dir():
+    config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
+    if not config_path:
+        raise RuntimeError("HOMEWORK_HERO_CONFIG_PATH is not set.")
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        raise RuntimeError(f"Failed to load HOMEWORK_HERO_CONFIG_PATH='{config_path}': {e}") from e
+
+    source_datasets_dir = config.get("source_datasets")
+    if not source_datasets_dir:
+        raise RuntimeError(
+            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'source_datasets'."
+        )
+    return Path(source_datasets_dir)
+
 def load_source_datasets():
     reference_data_path = get_reference_data_path()
     source_datasets_path = reference_data_path / "source_datasets.json"
@@ -94,12 +111,32 @@ def load_models():
         models[0]["is_default"] = True
     return models
 
+def load_sections_for_dataset(source_dataset):
+    source_datasets_dir = get_source_datasets_dir()
+    dataset_path = source_datasets_dir / f"{source_dataset}.json"
+    with open(dataset_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    sections = data.get("sections", [])
+    if not isinstance(sections, list):
+        return []
+    section_numbers = []
+    for section in sections:
+        if isinstance(section, dict) and "section" in section:
+            section_numbers.append(section["section"])
+    if section_numbers:
+        return sorted({int(s) for s in section_numbers if str(s).isdigit()})
+    return list(range(1, len(sections) + 1))
+
 # --- CONFIGURATION / PLUGINS ---
+data_sources = load_source_datasets()
+default_sections = (
+    load_sections_for_dataset(data_sources[0]["id"]) if data_sources else []
+)
 app_config = {
-    "data_sources": load_source_datasets(),
+    "data_sources": data_sources,
     "themes": load_themes(),
     "models": load_models(),
-    "sections": list(range(1, 16)), # Generates [1, 2, ... 15]
+    "sections": default_sections,
     "levels": list("ABCDEFGHIJKLMNOPQRSTUVWXYZ") # Generates ['A', 'B', ... 'Z']
 }
 
@@ -114,6 +151,14 @@ def generate():
     data = request.form
     print(f"Generating with: {data}")
     return jsonify({"status": "success", "message": "Worksheet generation started..."})
+
+@app.route('/sections/<source_dataset>')
+def sections(source_dataset):
+    try:
+        sections = load_sections_for_dataset(source_dataset)
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+    return jsonify({"sections": sections})
 
 @app.route('/about')
 def about():
