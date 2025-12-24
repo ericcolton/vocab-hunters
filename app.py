@@ -68,14 +68,37 @@ def load_themes():
         )
     return themes
 
+def load_models():
+    reference_data_path = get_reference_data_path()
+    models_path = reference_data_path / "models.json"
+    with open(models_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    if isinstance(data, dict):
+        data = [data]
+    if not isinstance(data, list):
+        raise ValueError("Reference_Data/models.json must be a list or object.")
+    models = []
+    default_set = False
+    for item in data:
+        short_name = item.get("short_name")
+        if not short_name:
+            continue
+        display_name = item.get("name") or short_name
+        is_default = bool(item.get("is_default")) and not default_set
+        if is_default:
+            default_set = True
+        models.append(
+            {"id": short_name, "name": display_name, "is_default": is_default}
+        )
+    if models and not default_set:
+        models[0]["is_default"] = True
+    return models
+
 # --- CONFIGURATION / PLUGINS ---
 app_config = {
     "data_sources": load_source_datasets(),
     "themes": load_themes(),
-    "models": [
-        {"id": "gpt-5-mini", "name": "gpt-5-mini"},
-        {"id": "gpt-4o", "name": "gpt-4o (High Cost)"},
-    ],
+    "models": load_models(),
     "sections": list(range(1, 16)), # Generates [1, 2, ... 15]
     "levels": list("ABCDEFGHIJKLMNOPQRSTUVWXYZ") # Generates ['A', 'B', ... 'Z']
 }

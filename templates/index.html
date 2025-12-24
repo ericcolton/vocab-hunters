@@ -272,7 +272,7 @@
                     <div class="select-wrapper">
                         <select id="model" name="model">
                             {% for model in config.models %}
-                            <option value="{{ model.id }}">{{ model.name }}</option>
+                            <option value="{{ model.id }}" {% if model.is_default %}selected{% endif %}>{{ model.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
