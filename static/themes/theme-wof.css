@@ -1,0 +1,12 @@
+body.theme-wof {
+    --bg-color: #2b1d14;
+    --card-bg: #3e2b1f;
+    --text-color: #f0e6d2;
+    --accent-primary: #d4af37;
+    --accent-secondary: #c23b22;
+    --border-glow: 0 0 10px rgba(212, 175, 55, 0.3);
+    --font-main: 'Georgia', serif;
+    --btn-gradient: linear-gradient(180deg, #8b0000, #b22222);
+    --header-font-weight: 600;
+    --input-bg: #553e32;
+}
