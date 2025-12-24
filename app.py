@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-def get_reference_data_path():
+def get_global_config():
     config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
     if not config_path:
         raise RuntimeError("HOMEWORK_HERO_CONFIG_PATH is not set.")
@@ -16,7 +16,10 @@ def get_reference_data_path():
             config = json.load(f)
     except (OSError, json.JSONDecodeError) as e:
         raise RuntimeError(f"Failed to load HOMEWORK_HERO_CONFIG_PATH='{config_path}': {e}") from e
-    
+    return config, config_path
+
+def get_reference_data_path():
+    config, config_path = get_global_config()
     reference_data_path = config.get("reference_data")
     if not reference_data_path:
         raise RuntimeError(
@@ -25,15 +28,7 @@ def get_reference_data_path():
     return Path(reference_data_path)
 
 def get_source_datasets_dir():
-    config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
-    if not config_path:
-        raise RuntimeError("HOMEWORK_HERO_CONFIG_PATH is not set.")
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    except (OSError, json.JSONDecodeError) as e:
-        raise RuntimeError(f"Failed to load HOMEWORK_HERO_CONFIG_PATH='{config_path}': {e}") from e
-
+    config, config_path = get_global_config()
     source_datasets_dir = config.get("source_datasets")
     if not source_datasets_dir:
         raise RuntimeError(
