@@ -160,6 +160,45 @@
         .advanced-content label { margin-top: 0.9rem; }
         .advanced-content label:first-child { margin-top: 0; }
         .advanced-content input { margin-top: 0.35rem; }
+        .advanced-legend {
+            margin-top: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            background-color: rgba(0,0,0,0.12);
+        }
+        .advanced-legend summary {
+            list-style: none;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+            color: var(--accent-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .advanced-legend summary::-webkit-details-marker { display: none; }
+        .advanced-legend summary::after {
+            content: ">";
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+            transform: rotate(0deg);
+            transition: transform 0.2s ease;
+        }
+        .advanced-legend[open] summary::after { transform: rotate(90deg); }
+        .advanced-legend .legend-body {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            opacity: 0.8;
+        }
+        .advanced-legend .legend-note { margin-bottom: 0.4rem; }
+        .advanced-legend .legend-key {
+            font-family: "Courier New", Courier, monospace;
+            color: var(--accent-secondary);
+        }
 
         .advanced-fieldset {
             border: 1px solid rgba(255,255,255,0.15);
@@ -235,6 +274,24 @@
 
                         <label for="answer_key_footer">Answer Key Footer</label>
                         <input id="answer_key_footer" name="answer_key_footer" type="text" placeholder="Fountas & Pinnell Level {reading_level}">
+                        
+                        <details class="advanced-legend">
+                            <summary>Label Variables</summary>
+                            <div class="legend-body" aria-label="Text field variable legend">
+                                <div class="legend-note">Use any of these variables within the above labels:</div>
+                                <div><span class="legend-key">{source}</span>: Full data-source title</div>
+                                <div><span class="legend-key">{source_abbr}</span>: Abbreviated data-source title</div>
+                                <div><span class="legend-key">{theme}</span>: Full theme title</div>
+                                <div><span class="legend-key">{theme_abbr}</span>: Abbreviated theme title</div>
+                                <div><span class="legend-key">{section}</span>: Section # within the data source</div>
+                                <div><span class="legend-key">{episode}</span>: Episode #</div>
+                                <div><span class="legend-key">{reading_level}</span>: F&amp;P reading level</div>
+                                <div><span class="legend-key">{worksheet_id}</span>: Unique worksheet identifier</div>
+                                <div><span class="legend-key">{current_page}</span>: Page number within worksheet</div>
+                                <div><span class="legend-key">{total_pages}</span>: Total worksheet pages</div>
+                                <div><span class="legend-key">{model}</span>: AI model identifier</div>
+                            </div>
+                        </details>
                     </div>
 
                     <label for="model">AI Model</label>
