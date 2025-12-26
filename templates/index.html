@@ -369,6 +369,33 @@
         document.body.className = currentTheme.css_class;
     }
 
+    function getPreferenceSnapshot() {
+        return {
+            theme: document.getElementById('theme').value,
+            datasource: document.getElementById('datasource').value,
+            section: document.getElementById('section').value,
+            level: document.getElementById('level').value,
+            model: document.getElementById('model').value
+        };
+    }
+
+    function savePreferences() {
+        try {
+            localStorage.setItem('homeworkHeroPrefs', JSON.stringify(getPreferenceSnapshot()));
+        } catch (err) {
+            // Ignore storage issues (private mode, quota, etc.)
+        }
+    }
+
+    function loadPreferences() {
+        try {
+            const raw = localStorage.getItem('homeworkHeroPrefs');
+            return raw ? JSON.parse(raw) : null;
+        } catch (err) {
+            return null;
+        }
+    }
+
     async function updateEpisodes() {
         const container = document.getElementById('episode-list-container');
         const list = document.getElementById('episode_list');
@@ -450,11 +477,57 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-        changeSourceDataset();
-        document.getElementById('theme').addEventListener('change', updateEpisodes);
-        document.getElementById('level').addEventListener('change', updateEpisodes);
-        document.getElementById('section').addEventListener('change', updateEpisodes);
-        document.getElementById('model').addEventListener('change', updateEpisodes);
+        const themeSelect = document.getElementById('theme');
+        const sourceSelect = document.getElementById('datasource');
+        const sectionSelect = document.getElementById('section');
+        const levelSelect = document.getElementById('level');
+        const modelSelect = document.getElementById('model');
+
+        const saved = loadPreferences();
+        if (saved) {
+            if (saved.theme) {
+                themeSelect.value = saved.theme;
+                changeTheme();
+            }
+            if (saved.datasource) {
+                sourceSelect.value = saved.datasource;
+            }
+            if (saved.level) {
+                levelSelect.value = saved.level;
+            }
+            if (saved.model) {
+                modelSelect.value = saved.model;
+            }
+        }
+
+        changeSourceDataset().then(() => {
+            if (saved && saved.section) {
+                sectionSelect.value = saved.section;
+            }
+            updateEpisodes();
+        });
+
+        themeSelect.addEventListener('change', () => {
+            changeTheme();
+            savePreferences();
+            updateEpisodes();
+        });
+        sourceSelect.addEventListener('change', () => {
+            changeSourceDataset();
+            savePreferences();
+        });
+        levelSelect.addEventListener('change', () => {
+            savePreferences();
+            updateEpisodes();
+        });
+        sectionSelect.addEventListener('change', () => {
+            savePreferences();
+            updateEpisodes();
+        });
+        modelSelect.addEventListener('change', () => {
+            savePreferences();
+            updateEpisodes();
+        });
     });
 </script>
 
