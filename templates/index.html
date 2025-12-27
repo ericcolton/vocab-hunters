@@ -328,13 +328,13 @@
             </details>
 
             <div id="episode-list-container" class="episode-list full-width" hidden>
-                <label>Available Worksheets</label>
-                <div class="episode-list-panel" role="region" aria-label="Available worksheets">
+                <label>Browse Past Episodes</label>
+                <div class="episode-list-panel" role="region" aria-label="Browse Past Episodes">
                     <ul id="episode_list" class="episode-list-items"></ul>
                 </div>
             </div>
 
-            <button id="generate-btn" type="submit" class="generate-btn">Generate Worksheet</button>
+            <button id="generate-btn" type="submit" class="generate-btn">Generate Episode</button>
 
         </form>
     </div>
@@ -401,7 +401,7 @@
         if (!button) {
             return;
         }
-        button.textContent = hasEpisodes ? 'Generate New Worksheet' : 'Generate Worksheet';
+        button.textContent = hasEpisodes ? 'Generate New Episode' : 'Generate Episode';
     }
 
     async function updateEpisodes() {
