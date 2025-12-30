@@ -8,6 +8,12 @@ import hashlib
 from pathlib import Path
 
 
+class Phase2Error(Exception):
+    def __init__(self, message, exit_code=1):
+        super().__init__(message)
+        self.exit_code = exit_code
+
+
 def build_reading_level_segment(reading_level):
     """
     Convert the reading_level object to a path segment.
@@ -234,17 +240,7 @@ def build_worksheet_id(request, config_path):
     return hex_str
 
 
-def main(argv=None):
-    default_responses_datastore, default_scripts_dir, config_path = load_env_defaults()
-    args = parse_args(argv, default_responses_datastore=default_responses_datastore, default_scripts_dir=default_scripts_dir)
-
-    # Read JSON request from stdin
-    try:
-        request = json.load(sys.stdin)
-    except json.JSONDecodeError as e:
-        print(f"Error: Failed to parse JSON from stdin: {e}", file=sys.stderr)
-        sys.exit(1)
-
+def process_request(request, responses_datastore, scripts_dir, config_path):
     # Extract required fields from the request
     try:
         source_dataset = request["source_dataset"]
@@ -254,12 +250,11 @@ def main(argv=None):
         section = request["section"]
         seed = request["seed"]
     except KeyError as e:
-        print(f"Error: Missing required field in request JSON: {e}", file=sys.stderr)
-        sys.exit(1)
+        raise Phase2Error(f"Missing required field in request JSON: {e}") from e
 
     reading_level_segment = build_reading_level_segment(reading_level)
 
-    datastore_root = Path(args.responses_datastore)
+    datastore_root = Path(responses_datastore)
 
     # Build expected cache file path:
     # {responses_datastore}/{source_dataset}/{theme}/{reading_level}/{model}/{section}/{seed}.json
@@ -274,7 +269,6 @@ def main(argv=None):
     )
 
     if not cache_path.is_file():
-
         phase_3_input_json = json.dumps(request, ensure_ascii=False)
         # Remove presentation_metadata from phase3 input
         phase_3_input = json.loads(phase_3_input_json)
@@ -284,7 +278,7 @@ def main(argv=None):
         worksheet_id = build_worksheet_id(request, config_path)
         phase_3_input["worksheet_id"] = worksheet_id
 
-        phase3_path = Path(args.scripts) / "phase3.py"
+        phase3_path = Path(scripts_dir) / "phase3.py"
         process = subprocess.run(
             ["python3", str(phase3_path)],
             input=json.dumps(phase_3_input, ensure_ascii=False),
@@ -295,11 +289,12 @@ def main(argv=None):
         phase_3_stdout_data = process.stdout
         phase_3_stderr = process.stderr
         if phase_3_return_code != 0:
-            print(f"Error: phase3.py failed with return code {phase_3_return_code}", file=sys.stderr)
-            print(phase_3_stderr, file=sys.stderr)
-            sys.exit(phase_3_return_code)
+            raise Phase2Error(
+                f"phase3.py failed with return code {phase_3_return_code}\n{phase_3_stderr}",
+                exit_code=phase_3_return_code,
+            )
         # Execute phase4.py with stdout_data from phase3
-        phase4_path = Path(args.scripts) / "phase4.py"
+        phase4_path = Path(scripts_dir) / "phase4.py"
         process = subprocess.run(
             ["python3", str(phase4_path)],
             input=phase_3_stdout_data,
@@ -310,9 +305,10 @@ def main(argv=None):
         phase_4_stdout_data = process.stdout
         phase_4_stderr = process.stderr
         if phase_4_return_code != 0:
-            print(f"Error: phase4.py failed with return code {phase_4_return_code}", file=sys.stderr)
-            print(phase_4_stderr, file=sys.stderr)
-            sys.exit(phase_4_return_code)
+            raise Phase2Error(
+                f"phase4.py failed with return code {phase_4_return_code}\n{phase_4_stderr}",
+                exit_code=phase_4_return_code,
+            )
         
         # Write phase_4_stdout_data to cache_path, creating subdirectories as needed
         cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -324,15 +320,69 @@ def main(argv=None):
         with cache_path.open("r", encoding="utf-8") as f:
             output_payload = json.load(f)
     except (OSError, json.JSONDecodeError) as e:
-        print(f"Error: Failed to read/parse cache file: {e}", file=sys.stderr)
-        sys.exit(1)
+        raise Phase2Error(f"Failed to read/parse cache file: {e}") from e
 
-    # Emit combined JSON to stdout
     # Add the presentation_metadata from the original request if present
     request_metadata = request.get("presentation_metadata")
     if request_metadata:
         request_metadata["section"] = section
         output_payload["presentation_metadata"] = request_metadata
+
+    return output_payload
+
+
+def run_from_json(request_json, responses_datastore=None, scripts_dir=None, config_path=None):
+    default_responses_datastore, default_scripts_dir, default_config_path = load_env_defaults()
+    responses_datastore = responses_datastore or default_responses_datastore
+    scripts_dir = scripts_dir or default_scripts_dir
+    config_path = config_path or default_config_path
+    if not responses_datastore or not scripts_dir or not config_path:
+        raise Phase2Error("responses_datastore, scripts_dir, and config_path are required.")
+
+    try:
+        request = json.loads(request_json)
+    except json.JSONDecodeError as e:
+        raise Phase2Error(f"Failed to parse request JSON: {e}") from e
+
+    output_payload = process_request(
+        request,
+        responses_datastore=responses_datastore,
+        scripts_dir=scripts_dir,
+        config_path=config_path,
+    )
+    return json.dumps(output_payload, ensure_ascii=False, indent=2)
+
+
+def run_with_json(request_json, responses_datastore=None, scripts_dir=None, config_path=None):
+    return run_from_json(
+        request_json,
+        responses_datastore=responses_datastore,
+        scripts_dir=scripts_dir,
+        config_path=config_path,
+    )
+
+
+def main(argv=None):
+    default_responses_datastore, default_scripts_dir, config_path = load_env_defaults()
+    args = parse_args(argv, default_responses_datastore=default_responses_datastore, default_scripts_dir=default_scripts_dir)
+
+    # Read JSON request from stdin
+    try:
+        request = json.load(sys.stdin)
+    except json.JSONDecodeError as e:
+        print(f"Error: Failed to parse JSON from stdin: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        output_payload = process_request(
+            request,
+            responses_datastore=args.responses_datastore,
+            scripts_dir=args.scripts,
+            config_path=config_path,
+        )
+    except Phase2Error as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(e.exit_code)
 
     json.dump(output_payload, sys.stdout, ensure_ascii=False, indent=2)
     sys.stdout.write("\n")

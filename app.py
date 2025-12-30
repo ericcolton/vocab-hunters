@@ -1,11 +1,18 @@
 
 import json
 import os
+import sys
 from pathlib import Path
 
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
+
+scripts_dir = Path(__file__).resolve().parent / "Scripts"
+if str(scripts_dir) not in sys.path:
+    sys.path.append(str(scripts_dir))
+
+from phase2 import run_with_json, Phase2Error
 
 def get_global_config():
     config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
@@ -223,8 +230,23 @@ def episodes():
 @app.route('/fetch_episode', methods=['POST'])
 def fetch_episode():
     payload = request.get_json(silent=True) or {}
-    app.logger.info("episode_tap %s", payload)
-    return jsonify({"status": "ok"})
+    presentation_metadata = payload.get("presentation_metadata") or {}
+    for key in ("header", "footer", "answer_key_footer"):
+        if key in payload:
+            presentation_metadata[key] = payload.pop(key)
+    if presentation_metadata:
+        payload["presentation_metadata"] = presentation_metadata
+    if "episode" in payload and "seed" not in payload:
+        payload["seed"] = payload["episode"]
+
+    try:
+        response_json = run_with_json(json.dumps(payload, ensure_ascii=False))
+        response_payload = json.loads(response_json)
+    except Phase2Error as exc:
+        return jsonify({"error": str(exc)}), 400
+    except json.JSONDecodeError as exc:
+        return jsonify({"error": f"Failed to parse phase2 response: {exc}"}), 500
+    return jsonify(response_payload)
 
 @app.route('/about')
 def about():
