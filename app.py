@@ -236,8 +236,8 @@ def fetch_episode():
             presentation_metadata[key] = payload.pop(key)
     if presentation_metadata:
         payload["presentation_metadata"] = presentation_metadata
-    if "episode" in payload and "seed" not in payload:
-        payload["seed"] = payload["episode"]
+    payload["seed"] = payload["episode"]
+    payload["reading_level"] = {"system": "fp", "level": payload["reading_level"]}
 
     try:
         response_json = run_with_json(json.dumps(payload, ensure_ascii=False))

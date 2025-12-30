@@ -135,20 +135,20 @@ def build_worksheet_id(request, config_path):
         except (OSError, json.JSONDecodeError) as e:
             raise SystemExit(f"Failed to load reference data from {filename} ({field_name}): {e}") from e
 
-    # Load lists and compute index mapping based on short_name
+    # Load lists and compute index mapping based on key_name
     datasets = load_list("source_datasets.json", "source_dataset")
     themes = load_list("themes.json", "theme")
     models = load_list("models.json", "model")
 
-    def find_index_by_shortname(items, short_name, filename):
+    def find_index_by_keyname(items, key_name, filename):
         for idx, item in enumerate(items):
-            if item.get("short_name") == short_name:
+            if item.get("key_name") == key_name:
                 return idx
-        raise SystemExit(f"Could not find short_name '{short_name}' in {filename}.")
+        raise SystemExit(f"Could not find key_name '{key_name}' in {filename}.")
 
-    dataset_idx = find_index_by_shortname(datasets, source_dataset, "source_datasets.json")
-    theme_idx = find_index_by_shortname(themes, theme, "themes.json")
-    model_idx = find_index_by_shortname(models, model, "models.json")
+    dataset_idx = find_index_by_keyname(datasets, source_dataset, "source_datasets.json")
+    theme_idx = find_index_by_keyname(themes, theme, "themes.json")
+    model_idx = find_index_by_keyname(models, model, "models.json")
 
     # Find reading_level_id
     if isinstance(reading_level, dict):
