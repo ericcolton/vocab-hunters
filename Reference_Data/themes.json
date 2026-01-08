@@ -3,6 +3,7 @@
         "id": 1,
         "key_name": "kpop_demon_hunters",
         "title": "KPop Demon Hunters",
+        "title_abbr": "KPop",
         "css_class": "",
         "ui_title": "KPop Vocab Hunters",
         "ui_subtitle": "Hunt Vocabulary. Defeat Demons."
@@ -11,6 +12,7 @@
         "id": 2,
         "key_name": "wings_of_fire",
         "title": "Wings of Fire",
+        "title_abbr": "WoF",
         "css_class": "theme-wof",
         "ui_title": "Dragon Vocab Scrolls",
         "ui_subtitle": "Fly High. Burn Bright. Learn Words."

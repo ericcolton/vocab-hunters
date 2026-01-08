@@ -1,6 +1,5 @@
 
 import json
-import os
 import sys
 from pathlib import Path
 
@@ -14,44 +13,13 @@ if str(scripts_dir) not in sys.path:
 
 from phase2 import run_with_json, Phase2Error
 from phase5 import run_with_json as run_phase5_with_json
-
-def get_global_config():
-    config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
-    if not config_path:
-        raise RuntimeError("HOMEWORK_HERO_CONFIG_PATH is not set.")
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    except (OSError, json.JSONDecodeError) as e:
-        raise RuntimeError(f"Failed to load HOMEWORK_HERO_CONFIG_PATH='{config_path}': {e}") from e
-    return config, config_path
-
-def get_reference_data_path():
-    config, config_path = get_global_config()
-    reference_data_path = config.get("reference_data")
-    if not reference_data_path:
-        raise RuntimeError(
-            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'reference_data'."
-        )
-    return Path(reference_data_path)
-
-def get_source_datasets_dir():
-    config, config_path = get_global_config()
-    source_datasets_dir = config.get("source_datasets")
-    if not source_datasets_dir:
-        raise RuntimeError(
-            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'source_datasets'."
-        )
-    return Path(source_datasets_dir)
-
-def get_responses_datastore_path():
-    config, config_path = get_global_config()
-    responses_datastore = config.get("responses_datastore")
-    if not responses_datastore:
-        raise RuntimeError(
-            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'responses_datastore'."
-        )
-    return Path(responses_datastore)
+from Libraries.reference_data import (
+    get_reference_data_path,
+    get_source_datasets_dir,
+    get_responses_datastore_path,
+    load_source_datasets,
+    load_themes,
+)
 
 def build_reading_level_segment(reading_level):
     # assume F&P
@@ -87,50 +55,6 @@ def list_cached_episodes(source_dataset, theme, reading_level, model, section):
                 subtitle = ""
             episodes.append({"episode": int(path.stem), "subtitle": subtitle})
     return sorted(episodes, key=lambda item: item["episode"])
-
-def load_source_datasets():
-    reference_data_path = get_reference_data_path()
-    source_datasets_path = reference_data_path / "source_datasets.json"
-    with open(source_datasets_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    if isinstance(data, dict):
-        data = [data]
-    if not isinstance(data, list):
-        raise ValueError("Reference_Data/source_datasets.json must be a list or object.")
-    data_sources = []
-    for item in data:
-        key_name = item.get("key_name")
-        if not key_name:
-            continue
-        title = item.get("title") or key_name.replace("_", " ").title()
-        data_sources.append({"id": key_name, "title": title})
-    return data_sources
-
-def load_themes():
-    reference_data_path = get_reference_data_path()
-    themes_path = reference_data_path / "themes.json"
-    with open(themes_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    if isinstance(data, dict):
-        data = [data]
-    if not isinstance(data, list):
-        raise ValueError("Reference_Data/themes.json must be a list or object.")
-    themes = []
-    for item in data:
-        key_name = item.get("key_name")
-        if not key_name:
-            continue
-        display_title = item.get("title") or key_name.replace("_", " ").title()
-        themes.append(
-            {
-                "id": key_name,
-                "title": display_title,
-                "css_class": item.get("css_class", ""),
-                "ui_title": item.get("ui_title") or display_title,
-                "ui_subtitle": item.get("ui_subtitle", ""),
-            }
-        )
-    return themes
 
 def load_models():
     reference_data_path = get_reference_data_path()

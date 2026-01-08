@@ -6,6 +6,8 @@ import os
 import sys
 import hashlib
 from pathlib import Path
+
+from Libraries.reference_data import lookup_source_dataset, lookup_theme
 #from Libraries.datasets import load_dataset_metadata
 
 class Phase2Error(Exception):
@@ -327,8 +329,14 @@ def process_request(request, responses_datastore, scripts_dir, config_path):
     if request_metadata:
 
         # load dataset metadata for source, source_abbr
-        dataset_title = ""
-        dataset_abbr = ""
+        dataset_entry = lookup_source_dataset(source_dataset)
+        dataset_title = (dataset_entry or {}).get("title", "")
+        dataset_abbr = (dataset_entry or {}).get("title_abbr", "")
+
+        # load theme metadata for theme, theme_abbr
+        theme_entry = lookup_theme(theme)
+        theme_title = (theme_entry or {}).get("title", "")
+        theme_abbr = (theme_entry or {}).get("title_abbr", "")
 
         presentation_variables = {
             "section": section,
@@ -339,6 +347,8 @@ def process_request(request, responses_datastore, scripts_dir, config_path):
             "worksheet_id": worksheet_id,
             "source": dataset_title,
             "source_abbr": dataset_abbr,
+            "theme": theme_title,
+            "theme_abbr": theme_abbr,
         }
 
         interpolated_metadata = dict(request_metadata)
