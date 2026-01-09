@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 import argparse
 import json
-import subprocess
 import os
 import sys
 import hashlib
 from pathlib import Path
 
+from phase3 import run_with_json as run_phase3_with_json
+
 from Libraries.reference_data import lookup_source_dataset, lookup_theme
-#from Libraries.datasets import load_dataset_metadata
 
 class Phase2Error(Exception):
     def __init__(self, message, exit_code=1):
@@ -280,21 +280,17 @@ def process_request(request, responses_datastore, scripts_dir, config_path):
         # Build and add worksheet_id
         phase_3_input["worksheet_id"] = worksheet_id
 
-        phase3_path = Path(scripts_dir) / "phase3.py"
-        process = subprocess.run(
-            ["python3", str(phase3_path)],
-            input=json.dumps(phase_3_input, ensure_ascii=False),
-            text=True,
-            capture_output=True
-        )
-        phase_3_return_code = process.returncode
-        phase_3_stdout_data = process.stdout
-        phase_3_stderr = process.stderr
-        if phase_3_return_code != 0:
-            raise Phase2Error(
-                f"phase3.py failed with return code {phase_3_return_code}\n{phase_3_stderr}",
-                exit_code=phase_3_return_code,
+        # try:
+        #     from phase3 import run_with_json as run_phase3_with_json
+        # except Exception as e:
+        #     raise Phase2Error(f"Failed to import phase3 runner: {e}") from e
+
+        try:
+            phase_3_stdout_data = run_phase3_with_json(
+                json.dumps(phase_3_input, ensure_ascii=False)
             )
+        except SystemExit as e:
+            raise Phase2Error(str(e)) from e
         # Execute phase4.py with stdout_data from phase3
         phase4_path = Path(scripts_dir) / "phase4.py"
         process = subprocess.run(

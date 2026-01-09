@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from Libraries.datasets import load_dataset
+from Libraries.reference_data import get_global_config
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -169,6 +170,29 @@ def main():
 
     output = build_output(request, entries)
     json.dump(output, sys.stdout, ensure_ascii=False, indent=2)
+
+
+def run_from_json(request_json: str) -> str:
+    request = load_request(request_json)
+    source_dataset = request["source_dataset"]
+    try:
+        (_, config_path) = get_global_config()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
+    dataset = load_dataset(source_dataset, config_path)
+
+    section_number = request.get("section")
+    if section_number is None:
+        raise SystemExit("Section number not found in request (section).")
+
+    section_obj = find_section(dataset, int(section_number))
+    entries = section_obj.get("entries", [])
+    output = build_output(request, entries)
+    return json.dumps(output, ensure_ascii=False, indent=2)
+
+
+def run_with_json(request_json: str):
+    return run_from_json(request_json)
 
 
 if __name__ == "__main__":
