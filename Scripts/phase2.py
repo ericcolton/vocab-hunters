@@ -343,7 +343,7 @@ def process_request(request, responses_datastore, scripts_dir, config_path):
             "reading_system": reading_level["system"],
             "reading_level": reading_level["level"],
             "model": model,
-            "seed": seed,
+            "episode": seed,
             "worksheet_id": worksheet_id,
             "source": dataset_title,
             "source_abbr": dataset_abbr,
