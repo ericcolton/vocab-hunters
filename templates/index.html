@@ -90,8 +90,23 @@
             border-radius: 8px; color: white;
             font-size: 1.1rem; font-weight: bold; text-transform: uppercase;
             cursor: pointer; box-shadow: var(--border-glow);
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 0.6rem;
         }
         .generate-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .generate-btn.is-loading { cursor: wait; filter: brightness(1); transform: none; }
+        .generate-btn:disabled { opacity: 0.7; }
+        .spinner {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff;
+            animation: spin 0.9s linear infinite;
+            display: none;
+        }
+        .generate-btn.is-loading .spinner { display: inline-block; }
+        .generate-btn.is-loading .btn-label { opacity: 0.85; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .footer { margin-top: 2rem; text-align: center; font-size: 0.8rem; opacity: 0.5; }
         .footer a {
@@ -364,7 +379,10 @@
                     </div>
                 </div>
 
-                <button id="generate-btn" type="submit" class="generate-btn">Generate Episode</button>
+                <button id="generate-btn" type="submit" class="generate-btn">
+                    <span class="btn-label">Generate Episode</span>
+                    <span class="spinner" aria-hidden="true"></span>
+                </button>
 
             </form>
         </div>
@@ -436,7 +454,10 @@
         if (!button) {
             return;
         }
-        button.textContent = hasEpisodes ? 'Generate New Episode' : 'Generate Episode';
+        const label = button.querySelector('.btn-label');
+        if (label) {
+            label.textContent = hasEpisodes ? 'Generate New Episode' : 'Generate Episode';
+        }
     }
 
     function hidePdfPreview() {
@@ -461,6 +482,7 @@
 
     let currentPdfUrl = null;
     let currentFitMode = null;
+    let isGenerating = false;
 
     function updatePdfPreview() {
         const preview = document.getElementById('episode-pdf-preview');
@@ -526,6 +548,77 @@
             }
         } catch (err) {
             // Fetch failures should not affect UX.
+        }
+    }
+
+    function setGenerateLoading(isLoading) {
+        const button = document.getElementById('generate-btn');
+        if (!button) {
+            return;
+        }
+        isGenerating = isLoading;
+        button.classList.toggle('is-loading', isLoading);
+        button.disabled = isLoading;
+        button.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+    }
+
+    async function handleGenerate(event) {
+        event.preventDefault();
+        if (isGenerating) {
+            return;
+        }
+        const headerInput = document.getElementById('header_text');
+        const footerInput = document.getElementById('footer_text');
+        const answerKeyFooterInput = document.getElementById('answer_key_footer');
+        const headerValue = (headerInput && headerInput.value.trim()) || (headerInput && headerInput.placeholder) || '';
+        const footerValue = (footerInput && footerInput.value.trim()) || (footerInput && footerInput.placeholder) || '';
+        const answerKeyFooterValue = (answerKeyFooterInput && answerKeyFooterInput.value.trim())
+            || (answerKeyFooterInput && answerKeyFooterInput.placeholder)
+            || '';
+        const payload = {
+            datasource: document.getElementById('datasource').value,
+            theme: document.getElementById('theme').value,
+            level: document.getElementById('level').value,
+            model: document.getElementById('model').value,
+            section: document.getElementById('section').value,
+            header_text: headerValue,
+            footer_text: footerValue,
+            answer_key_footer: answerKeyFooterValue
+        };
+        setGenerateLoading(true);
+        try {
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    const errorPayload = await response.json();
+                    throw new Error(errorPayload.error || 'Generate failed.');
+                }
+                throw new Error('Generate failed.');
+            }
+            const pdfBuffer = await response.arrayBuffer();
+            const pdfBlob = new Blob([pdfBuffer], { type: 'application/pdf' });
+            currentPdfUrl = URL.createObjectURL(pdfBlob);
+            currentFitMode = null;
+            const preview = document.getElementById('episode-pdf-preview');
+            const frame = document.getElementById('episode-pdf-frame');
+            if (preview && frame) {
+                preview.hidden = false;
+                const container = document.querySelector('.container');
+                if (container) {
+                    container.classList.add('has-preview');
+                }
+                updatePdfPreview();
+            }
+            updateEpisodes();
+        } catch (err) {
+            // Optional: surface error state in a future UI block.
+        } finally {
+            setGenerateLoading(false);
         }
     }
 
@@ -626,6 +719,7 @@
         const levelSelect = document.getElementById('level');
         const modelSelect = document.getElementById('model');
         const episodeList = document.getElementById('episode_list');
+        const generateForm = document.querySelector('.panel-form');
 
         const saved = loadPreferences();
         if (saved) {
@@ -680,6 +774,10 @@
                     handleEpisodeTap(item);
                 }
             });
+        }
+
+        if (generateForm) {
+            generateForm.addEventListener('submit', handleGenerate);
         }
 
         window.addEventListener('resize', () => {

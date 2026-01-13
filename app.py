@@ -3,7 +3,7 @@ import json
 import sys
 from pathlib import Path
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 
 app = Flask(__name__)
 
@@ -187,7 +187,7 @@ def generate():
     except ValueError as exc:
         return jsonify({"error": f"Failed to build PDF: {exc}"}), 500
 
-    return pdf_bytes
+    return Response(pdf_bytes, mimetype="application/pdf")
 
 @app.route('/sections/<source_dataset>')
 def sections(source_dataset):
@@ -243,7 +243,7 @@ def fetch_episode():
     except ValueError as exc:
         return jsonify({"error": f"Failed to build PDF: {exc}"}), 500
 
-    return pdf_bytes
+    return Response(pdf_bytes, mimetype="application/pdf")
 
 @app.route('/about')
 def about():
