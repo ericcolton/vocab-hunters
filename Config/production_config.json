@@ -1,0 +1,7 @@
+{
+    "source_datasets": "/var/data/Source_Datasets/vocabulary_datasets",
+    "prompt_path": "/var/data/Prompts/prompt_optimized_20251130.txt",
+    "themes_dir": "/var/data/Themes/",
+    "responses_datastore": "/var/data/Response_Datastore",
+    "reference_data": "/var/data/Reference_Data/"
+}
