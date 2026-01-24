@@ -1,7 +1,7 @@
 {
-    "source_datasets": "/var/data/Source_Datasets/vocabulary_datasets",
-    "prompt_path": "/var/data/Prompts/prompt_optimized_20251130.txt",
-    "themes_dir": "/var/data/Themes/",
-    "responses_datastore": "/var/data/Response_Datastore",
-    "reference_data": "/var/data/Reference_Data/"
+    "source_datasets": "/var/data/vocab_hunters/Source_Datasets/vocabulary_datasets",
+    "prompt_path": "/var/data/vocab_hunters/prompt_optimized_20251130.txt",
+    "themes_dir": "/var/data/vocab_hunters/",
+    "responses_datastore": "/var/data/vocab_hunters",
+    "reference_data": "/var/data/vocab_hunters/Reference_Data/"
 }
