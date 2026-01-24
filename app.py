@@ -1,6 +1,7 @@
 
 import json
 import sys
+from functools import lru_cache
 from pathlib import Path
 
 from flask import Flask, render_template, request, jsonify, Response
@@ -98,23 +99,24 @@ def load_sections_for_dataset(source_dataset):
         return sorted({int(s) for s in section_numbers if str(s).isdigit()})
     return list(range(1, len(sections) + 1))
 
-# --- CONFIGURATION / PLUGINS ---
-data_sources = load_source_datasets()
-default_sections = (
-    load_sections_for_dataset(data_sources[0]["id"]) if data_sources else []
-)
-app_config = {
-    "data_sources": data_sources,
-    "themes": load_themes(),
-    "models": load_models(),
-    "sections": default_sections,
-    "levels": list("ABCDEFGHIJKLMNOPQRSTUVWXYZ") # Generates ['A', 'B', ... 'Z']
-}
+@lru_cache(maxsize=1)
+def get_app_config():
+    data_sources = load_source_datasets()
+    default_sections = (
+        load_sections_for_dataset(data_sources[0]["id"]) if data_sources else []
+    )
+    return {
+        "data_sources": data_sources,
+        "themes": load_themes(),
+        "models": load_models(),
+        "sections": default_sections,
+        "levels": list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),  # Generates ['A', 'B', ... 'Z']
+    }
 
 @app.route('/')
 def index():
     # Pass the config to the template to generate dropdowns dynamically
-    return render_template('index.html', config=app_config)
+    return render_template('index.html', config=get_app_config())
 
 @app.route('/generate', methods=['POST'])
 def generate():
@@ -247,7 +249,7 @@ def fetch_episode():
 
 @app.route('/about')
 def about():
-    return render_template('about.html', config=app_config)
+    return render_template('about.html', config=get_app_config())
 
 if __name__ == '__main__':
     app.run(debug=True)
