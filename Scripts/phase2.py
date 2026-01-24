@@ -37,11 +37,11 @@ def build_reading_level_segment(reading_level):
 
 def load_env_defaults():
     """
-    If HOMEWORK_HERO_CONFIG_PATH is set, load JSON and return config dict and path.
+    If HOMEWORK_HERO_CONFIG_PATH is set, load JSON and return defaults and path.
     """
     config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
     if not config_path:
-        return None, None, None
+        return None, None
 
     try:
         with open(config_path, "r", encoding="utf-8") as f:
@@ -55,16 +55,10 @@ def load_env_defaults():
             f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'responses_datastore'."
         )
     
-    default_scripts_dir = config.get("scripts")
-    if default_scripts_dir is None:
-        raise SystemExit(
-            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'scripts'."
-        )
-    
-    return default_responses_datastore, default_scripts_dir, config_path
+    return default_responses_datastore, config_path
 
 
-def parse_args(argv=None, default_responses_datastore=None, default_scripts_dir=None):
+def parse_args(argv=None, default_responses_datastore=None):
     parser = argparse.ArgumentParser(
         description="Look up cached payloads for a vocab request."
     )
@@ -76,16 +70,6 @@ def parse_args(argv=None, default_responses_datastore=None, default_scripts_dir=
         help=(
             "Root directory of the responses datastore. "
             "Defaults to config['responses_datastore'] when HOMEWORK_HERO_CONFIG_PATH is set."
-        ),
-    )
-    parser.add_argument(
-        "-s",
-        "--scripts",
-        default=default_scripts_dir,
-        required=default_scripts_dir is None,
-        help=(
-            "Directory containing the phase scripts. "
-            "Defaults to config['scripts'] when HOMEWORK_HERO_CONFIG_PATH is set."
         ),
     )
     return parser.parse_args(argv)
@@ -243,7 +227,7 @@ def build_worksheet_id(request, config_path):
     return hex_str
 
 
-def process_request(request, responses_datastore, scripts_dir, config_path):
+def process_request(request, responses_datastore, config_path):
     # Extract required fields from the request
     try:
         source_dataset = request["source_dataset"]
@@ -353,13 +337,12 @@ def process_request(request, responses_datastore, scripts_dir, config_path):
     return output_payload
 
 
-def run_from_json(request_json, responses_datastore=None, scripts_dir=None, config_path=None):
-    default_responses_datastore, default_scripts_dir, default_config_path = load_env_defaults()
+def run_from_json(request_json, responses_datastore=None, config_path=None):
+    default_responses_datastore, default_config_path = load_env_defaults()
     responses_datastore = responses_datastore or default_responses_datastore
-    scripts_dir = scripts_dir or default_scripts_dir
     config_path = config_path or default_config_path
-    if not responses_datastore or not scripts_dir or not config_path:
-        raise Phase2Error("responses_datastore, scripts_dir, and config_path are required.")
+    if not responses_datastore or not config_path:
+        raise Phase2Error("responses_datastore and config_path are required.")
 
     try:
         request = json.loads(request_json)
@@ -369,24 +352,22 @@ def run_from_json(request_json, responses_datastore=None, scripts_dir=None, conf
     output_payload = process_request(
         request,
         responses_datastore=responses_datastore,
-        scripts_dir=scripts_dir,
         config_path=config_path,
     )
     return json.dumps(output_payload, ensure_ascii=False, indent=2)
 
 
-def run_with_json(request_json, responses_datastore=None, scripts_dir=None, config_path=None):
+def run_with_json(request_json, responses_datastore=None, config_path=None):
     return run_from_json(
         request_json,
         responses_datastore=responses_datastore,
-        scripts_dir=scripts_dir,
         config_path=config_path,
     )
 
 
 def main(argv=None):
-    default_responses_datastore, default_scripts_dir, config_path = load_env_defaults()
-    args = parse_args(argv, default_responses_datastore=default_responses_datastore, default_scripts_dir=default_scripts_dir)
+    default_responses_datastore, config_path = load_env_defaults()
+    args = parse_args(argv, default_responses_datastore=default_responses_datastore)
 
     # Read JSON request from stdin
     try:
@@ -399,7 +380,6 @@ def main(argv=None):
         output_payload = process_request(
             request,
             responses_datastore=args.responses_datastore,
-            scripts_dir=args.scripts,
             config_path=config_path,
         )
     except Phase2Error as e:
