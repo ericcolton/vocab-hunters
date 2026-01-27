@@ -292,6 +292,7 @@ def process_request(request, responses_datastore, config_path):
             phase_4_stdout_data = run_phase4_with_json(phase_3_stdout_data)
             logger.debug("Exiting run_phase4_with_json()")
         except SystemExit as e:
+            logger.debug("Failed to run run_phase4_with_json() with error: %s", str(e))
             raise Phase2Error(str(e)) from e
         
         # Write phase_4_stdout_data to cache_path, creating subdirectories as needed
