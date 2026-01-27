@@ -4,8 +4,10 @@ import json
 import os
 import sys
 import hashlib
+import logging
 from pathlib import Path
 
+from flask import current_app, has_app_context
 from phase3 import run_with_json as run_phase3_with_json
 from phase4 import run_phase4_with_json
 
@@ -15,6 +17,12 @@ class Phase2Error(Exception):
     def __init__(self, message, exit_code=1):
         super().__init__(message)
         self.exit_code = exit_code
+
+
+def get_logger():
+    if has_app_context():
+        return current_app.logger
+    return logging.getLogger(__name__)
 
 
 def build_reading_level_segment(reading_level):
@@ -228,6 +236,7 @@ def build_worksheet_id(request, config_path):
 
 
 def process_request(request, responses_datastore, config_path):
+    logger = get_logger()
     # Extract required fields from the request
     try:
         source_dataset = request["source_dataset"]
@@ -271,18 +280,23 @@ def process_request(request, responses_datastore, config_path):
         #     raise Phase2Error(f"Failed to import phase3 runner: {e}") from e
 
         try:
+            logger.debug("Entering run_phase3_with_json()")
             phase_3_stdout_data = run_phase3_with_json(
                 json.dumps(phase_3_input, ensure_ascii=False)
             )
+            logger.debug("Exiting run_phase3_with_json()")
         except SystemExit as e:
             raise Phase2Error(str(e)) from e
         try:
+            logger.debug("Entering run_phase4_with_json()")
             phase_4_stdout_data = run_phase4_with_json(phase_3_stdout_data)
+            logger.debug("Exiting run_phase4_with_json()")
         except SystemExit as e:
             raise Phase2Error(str(e)) from e
         
         # Write phase_4_stdout_data to cache_path, creating subdirectories as needed
         cache_path.parent.mkdir(parents=True, exist_ok=True)
+        logger.debug("Writing phase4 output to cache_path=%s", cache_path)
         with cache_path.open("w", encoding="utf-8") as f:
             f.write(phase_4_stdout_data)
 
