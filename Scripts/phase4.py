@@ -191,6 +191,7 @@ def call_openai(
     seed = request.get("seed")
 
     logger = get_logger()
+    logger.debug("Calling OpenAI with model=%s seed=%s", model, seed)
     client = OpenAI()  # expects OPENAI_API_KEY in env
 
     # The Responses API takes `instructions` (system-level) and `input` (user-level) :contentReference[oaicite:3]{index=3}
