@@ -2,14 +2,22 @@
 import argparse
 import json
 import os
+import logging
 from pydantic import BaseModel
 import sys
 from typing import Any, Dict, Optional
 
+from flask import current_app, has_app_context
 from openai import OpenAI
 
 # Temperature setting for OpenAI API calls
 OPENAI_TEMPERATURE = 1.0
+
+
+def get_logger():
+    if has_app_context():
+        return current_app.logger
+    return logging.getLogger(__name__)
 
 
 def load_default_paths() -> Dict[str, Optional[str]]:
@@ -182,6 +190,8 @@ def call_openai(
 
     seed = request.get("seed")
 
+    logger = get_logger()
+    logger.debug("Calling OpenAI with model=%s seed=%s", model, seed)
     client = OpenAI()  # expects OPENAI_API_KEY in env
 
     # The Responses API takes `instructions` (system-level) and `input` (user-level) :contentReference[oaicite:3]{index=3}
@@ -194,7 +204,12 @@ def call_openai(
         "text_format": JsonOutputFormat,
         }
 
-    response = client.responses.parse(**kwargs)
+    try:
+        logger.debug("Calling OpenAI")
+        response = client.responses.parse(**kwargs)
+    except Exception as exc:
+        logger.debug("OpenAI API call failed: %s", exc, exc_info=True)
+        raise SystemExit(f"OpenAI API call failed: {exc}") from exc
     
     output = response.output_parsed
     
@@ -202,7 +217,7 @@ def call_openai(
         return output
 
     response_text = getattr(response, "output_text", None)
-    print(f"raw_text: {response_text}", file=sys.stderr)
+    logger.debug("OpenAI response parsing failed; raw_text=%s", response_text)
     exit(1)
 
 def append_response_json(request_json: Dict[str, Any], response_json: JsonOutputFormat):

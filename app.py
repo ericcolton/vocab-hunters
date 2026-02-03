@@ -1,5 +1,6 @@
 
 import json
+import logging
 import sys
 from functools import lru_cache
 from pathlib import Path
@@ -7,6 +8,8 @@ from pathlib import Path
 from flask import Flask, render_template, request, jsonify, Response
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.DEBUG)
+app.logger.setLevel(logging.DEBUG)
 
 scripts_dir = Path(__file__).resolve().parent / "Scripts"
 if str(scripts_dir) not in sys.path:
