@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homework Hero - Vocabulary Worksheets That Kids Actually Want to Do</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='themes/root.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='themes/theme-wof.css') }}">
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 3rem 0 4rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin: 0 0 1rem;
+            font-weight: var(--header-font-weight);
+            background: var(--btn-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            opacity: 0.85;
+            max-width: 550px;
+            margin: 0 auto 2rem;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: var(--btn-gradient);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: var(--border-glow);
+            transition: transform 0.2s, filter 0.2s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.15);
+        }
+
+        /* Section Styling */
+        .section {
+            padding: 3rem 0;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            text-align: center;
+            margin: 0 0 2rem;
+            font-weight: var(--header-font-weight);
+            color: var(--accent-secondary);
+        }
+
+        /* How It Works */
+        .steps {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .step {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--btn-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .step-content h3 {
+            margin: 0 0 0.5rem;
+            font-size: 1.1rem;
+            color: var(--accent-primary);
+        }
+
+        .step-content p {
+            margin: 0;
+            opacity: 0.85;
+            font-size: 0.95rem;
+        }
+
+        /* Theme Showcase */
+        .theme-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .theme-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--btn-gradient);
+        }
+
+        .theme-card h3 {
+            margin: 0 0 0.5rem;
+            font-size: 1.2rem;
+            background: var(--btn-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .theme-card p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .theme-card.wof {
+            --btn-gradient: linear-gradient(180deg, #8b0000, #b22222);
+            --card-bg: #3e2b1f;
+            --text-color: #f0e6d2;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        /* For Everyone */
+        .audience-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .audience-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .audience-card h3 {
+            margin: 0 0 0.75rem;
+            font-size: 1.1rem;
+            color: var(--accent-secondary);
+        }
+
+        .audience-card ul {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+
+        .audience-card li {
+            margin-bottom: 0.5rem;
+            opacity: 0.85;
+            font-size: 0.95rem;
+        }
+
+        .audience-card li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            font-size: 0.85rem;
+            opacity: 0.6;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 2rem;
+        }
+
+        .footer a {
+            color: var(--accent-secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (min-width: 600px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .steps {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .step {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .step-number {
+                margin: 0 auto;
+            }
+
+            .theme-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .audience-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 900px) {
+            .container {
+                padding: 2rem;
+            }
+
+            .hero {
+                padding: 4rem 0 5rem;
+            }
+
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Turn Vocabulary Into an Adventure</h1>
+        <p class="hero-subtitle">
+            AI-generated themed worksheets that make vocabulary practice feel like reading your favorite book.
+        </p>
+        <a href="/create" class="cta-btn">Create a Worksheet</a>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Pick a Theme</h3>
+                    <p>Choose from worlds like KPop Demon Hunters or Wings of Fire dragons.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Select Your Words</h3>
+                    <p>Pick a vocabulary list and reading level that fits your learner.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Generate Magic</h3>
+                    <p>AI creates unique themed sentences with your vocabulary words.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Theme Showcase -->
+    <section class="section">
+        <h2 class="section-title">Themes That Spark Joy</h2>
+        <div class="theme-grid">
+            {% for theme in config.themes %}
+            <div class="theme-card{% if theme.css_class == 'theme-wof' %} wof{% endif %}">
+                <h3>{{ theme.title }}</h3>
+                <p>{{ theme.ui_subtitle }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- For Everyone -->
+    <section class="section">
+        <h2 class="section-title">For Everyone</h2>
+        <div class="audience-grid">
+            <div class="audience-card">
+                <h3>For Kids</h3>
+                <ul>
+                    <li>Sentences that are actually fun to read</li>
+                    <li>Stories featuring characters you love</li>
+                    <li>Practice that feels like play</li>
+                </ul>
+            </div>
+            <div class="audience-card">
+                <h3>For Educators</h3>
+                <ul>
+                    <li>Print-ready PDFs with answer keys</li>
+                    <li>Adjustable reading levels (A-Z)</li>
+                    <li>Unlimited unique worksheets per vocabulary set</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <a href="/create">Create Worksheet</a> · <a href="/about">About</a>
+    </footer>
+</div>
+
+</body>
+</html>

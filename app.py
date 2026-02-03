@@ -117,9 +117,12 @@ def get_app_config():
     }
 
 @app.route('/')
-def index():
-    # Pass the config to the template to generate dropdowns dynamically
-    return render_template('index.html', config=get_app_config())
+def landing():
+    return render_template('landing.html', config=get_app_config())
+
+@app.route('/create')
+def create():
+    return render_template('generator.html', config=get_app_config())
 
 @app.route('/generate', methods=['POST'])
 def generate():
