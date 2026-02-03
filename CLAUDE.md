@@ -42,11 +42,21 @@ Individual phases can be run independently or piped together. Phase 2 can skip t
 
 ### Flask App (`app.py`)
 
-The web app imports Phase 2 and Phase 5 directly, bypassing the CLI pipeline:
+The web app imports Phase 2 and Phase 5 directly, bypassing the CLI pipeline.
+
+**Routes:**
+- `GET /` - Landing page explaining Homework Hero
+- `GET /create` - Worksheet generator UI
+- `GET /about` - About page
 - `POST /generate` - Create new worksheet PDF
 - `POST /fetch_episode` - Retrieve cached worksheet
 - `GET /sections/<dataset>` - List available sections
 - `GET /episodes` - List cached episodes for given parameters
+
+**Templates:**
+- `templates/landing.html` - Landing page
+- `templates/generator.html` - Worksheet generator (theme switching, PDF preview)
+- `templates/about.html` - About page
 
 ### Configuration
 
