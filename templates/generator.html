@@ -272,6 +272,133 @@
             .container.has-preview .preview-panel { flex: 1; margin-top: 0; }
             #episode-pdf-frame { height: 75vh; }
         }
+
+        /* Loading Modal Styles */
+        .loading-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.25);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .loading-modal-overlay.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Dim the content when loading */
+        body.is-loading .container {
+            opacity: 0.7;
+            pointer-events: none;
+            filter: blur(1px);
+            transition: opacity 0.3s ease, filter 0.3s ease;
+        }
+        .loading-modal {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 3rem 4rem;
+            text-align: center;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+            max-width: 90vw;
+            animation: modalPulse 2s ease-in-out infinite;
+        }
+        .loading-modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--btn-gradient);
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+        @keyframes modalPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        @keyframes shimmer {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        .loading-spinner-container {
+            margin-bottom: 1.5rem;
+        }
+        .loading-spinner-big {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-primary);
+            border-right-color: var(--accent-secondary);
+            animation: spinBig 1s linear infinite;
+            margin: 0 auto;
+            position: relative;
+        }
+        .loading-spinner-big::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: var(--accent-secondary);
+            border-left-color: var(--accent-primary);
+            animation: spinBig 0.6s linear reverse infinite;
+        }
+        @keyframes spinBig {
+            to { transform: rotate(360deg); }
+        }
+        .loading-title {
+            font-size: 1.6rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.75rem;
+            background: var(--btn-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .loading-phrase {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            opacity: 0.9;
+            min-height: 1.5em;
+            animation: fadePhrase 0.4s ease-in-out;
+        }
+        @keyframes fadePhrase {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 0.9; transform: translateY(0); }
+        }
+        .loading-dots {
+            display: inline-block;
+            width: 24px;
+            text-align: left;
+        }
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        @keyframes dots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+            100% { content: ''; }
+        }
     </style>
 </head>
 <body class="{{ config.themes[0].css_class }}">
@@ -409,6 +536,98 @@
         },
         {% endfor %}
     };
+
+    // Silly loading phrases
+    const loadingPhrases = [
+        "Warming up the AI brain",
+        "Teaching vocabulary to robots",
+        "Consulting the word wizards",
+        "Brewing a fresh batch of sentences",
+        "Asking the thesaurus for directions",
+        "Sharpening the digital pencils",
+        "Convincing electrons to form words",
+        "Summoning the grammar gremlins",
+        "Downloading extra creativity",
+        "Untangling the syntax spaghetti",
+        "Polishing the vocabulary gems",
+        "Waking up the sentence elves",
+        "Calibrating the fun-o-meter",
+        "Herding the alphabet cats",
+        "Spinning up the word tornado",
+        "Feeding the hungry algorithms",
+        "Consulting ancient dictionaries",
+        "Negotiating with the punctuation union",
+        "Assembling the sentence squad",
+        "Loading extra awesome sauce",
+        "Tuning the linguistic engines",
+        "Asking nicely for good answers",
+        "Bribing the AI with cookies",
+        "Stretching the neural networks",
+        "Doing vocabulary jumping jacks"
+    ];
+
+    let loadingPhraseInterval = null;
+    let currentPhraseIndex = 0;
+
+    function shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    function showLoadingModal() {
+        const modal = document.getElementById('loading-modal');
+        const phraseText = document.getElementById('loading-phrase-text');
+        if (!modal) return;
+
+        // Shuffle phrases and start from beginning
+        const shuffledPhrases = shuffleArray(loadingPhrases);
+        currentPhraseIndex = 0;
+
+        // Set initial phrase
+        if (phraseText) {
+            phraseText.textContent = shuffledPhrases[currentPhraseIndex];
+        }
+
+        // Dim the content behind
+        document.body.classList.add('is-loading');
+
+        // Show modal
+        modal.classList.add('is-visible');
+        modal.setAttribute('aria-hidden', 'false');
+
+        // Rotate phrases every 2.5 seconds
+        loadingPhraseInterval = setInterval(() => {
+            currentPhraseIndex = (currentPhraseIndex + 1) % shuffledPhrases.length;
+            if (phraseText) {
+                phraseText.style.animation = 'none';
+                phraseText.offsetHeight; // Trigger reflow
+                phraseText.style.animation = 'fadePhrase 0.4s ease-in-out';
+                phraseText.textContent = shuffledPhrases[currentPhraseIndex];
+            }
+        }, 2500);
+    }
+
+    function hideLoadingModal() {
+        const modal = document.getElementById('loading-modal');
+        if (!modal) return;
+
+        // Stop phrase rotation
+        if (loadingPhraseInterval) {
+            clearInterval(loadingPhraseInterval);
+            loadingPhraseInterval = null;
+        }
+
+        // Undim the content
+        document.body.classList.remove('is-loading');
+
+        // Hide modal
+        modal.classList.remove('is-visible');
+        modal.setAttribute('aria-hidden', 'true');
+    }
 
     function changeTheme() {
         const selectedId = document.getElementById('theme').value;
@@ -560,6 +779,13 @@
         button.classList.toggle('is-loading', isLoading);
         button.disabled = isLoading;
         button.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+
+        // Show/hide the loading modal
+        if (isLoading) {
+            showLoadingModal();
+        } else {
+            hideLoadingModal();
+        }
     }
 
     async function handleGenerate(event) {
@@ -785,6 +1011,19 @@
         });
     });
 </script>
+
+<!-- Loading Modal -->
+<div id="loading-modal" class="loading-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="loading-title" aria-describedby="loading-phrase">
+    <div class="loading-modal">
+        <div class="loading-spinner-container">
+            <div class="loading-spinner-big"></div>
+        </div>
+        <div id="loading-title" class="loading-title">Building Episode</div>
+        <div id="loading-phrase" class="loading-phrase">
+            <span id="loading-phrase-text">Warming up the AI brain</span><span class="loading-dots"></span>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
