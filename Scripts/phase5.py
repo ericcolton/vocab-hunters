@@ -444,7 +444,7 @@ def build_pdf(doc_root, output_stream):
 
     # Generate QR code image for http://cindysoftware.com/ws={worksheet_id}
     try:
-        base_url = f"http://cindysoftware.com/id={worksheet_id}" if worksheet_id is not None else "http://cindysoftware.com/ws="
+        base_url = f"http://vocabhunters.com/id={worksheet_id}" if worksheet_id is not None else "http://vocabhungers.com/"
         qr_widget = QrCodeWidget(base_url)
         b = qr_widget.getBounds()
         w = b[2] - b[0]

@@ -181,11 +181,11 @@ def build_worksheet_id(request, config_path):
         raise SystemExit("seed must be an integer or integer-like string.") from None
 
     # Bit-size allocations (must match the spec)
-    DATASET_BITS = 7
-    THEME_BITS = 7
-    MODEL_BITS = 5
-    READING_BITS = 6
-    SECTION_BITS = 7
+    DATASET_BITS = 16
+    THEME_BITS = 16
+    MODEL_BITS = 8
+    READING_BITS = 10
+    SECTION_BITS = 10
     SEED_BITS = 8
 
     # Validate index ranges
@@ -219,19 +219,19 @@ def build_worksheet_id(request, config_path):
         | ((seed_int & ((1 << SEED_BITS) - 1)) << seed_shift)
     )
 
-    # Reversible obfuscation: XOR with a fixed 64-bit key
-    OBFUSCATION_KEY = 0xA5A5A5A5A5
+    # Reversible obfuscation: XOR with a fixed 68-bit key
+    OBFUSCATION_KEY = 0xA5A5A5A5A5A5A5A5A
     obfuscated = (packed ^ OBFUSCATION_KEY)
 
     # Return as a lowercase hexadecimal string without the '0x' prefix (e.g. '1a2b3c').
     # This is reversible: int(hex_string, 16) -> XOR with same key -> unpack bits
     hex_digits = format(int(obfuscated), 'x')
 
-    # Zero-pad hex digits to at least 10 characters (left-pad with zeros)
-    hex_padded = hex_digits.zfill(10)
+    # Zero-pad hex digits to at least 17 characters (left-pad with zeros)
+    hex_padded = hex_digits.zfill(17)
 
-    # Insert seperators
-    hex_str = hex_padded[:2] + '-' + hex_padded[2:6] + '-' + hex_padded[6:]
+    # Insert separators
+    hex_str = hex_padded[:5] + '-' + hex_padded[5:9] + '-' + hex_padded[9:13] + '-' + hex_padded[13:]
     return hex_str
 
 
