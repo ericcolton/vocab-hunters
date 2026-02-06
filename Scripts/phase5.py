@@ -294,7 +294,7 @@ def draw_answers_footer(c, footer_text, seed, qr_code):
 
     if qr_code:
         try:
-            b = qr.getBounds()
+            b = qr_code.getBounds()
             qr_w = (b[2] - b[0]) if b else 40
             qr_h = (b[3] - b[1]) if b else 40
         except Exception:
@@ -305,7 +305,7 @@ def draw_answers_footer(c, footer_text, seed, qr_code):
         # qr_y = M_BOTTOM / 2 - (qr_h / 2) + 15
         qr_y = M_BOTTOM / 2 - (qr_h / 2) + 50
         try:
-            renderPDF.draw(qr, c, qr_x, qr_y)
+            renderPDF.draw(qr_code, c, qr_x, qr_y)
         except Exception:
             pass
 
