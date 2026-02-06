@@ -5,7 +5,7 @@ import sys
 from functools import lru_cache
 from pathlib import Path
 
-from flask import Flask, render_template, request, jsonify, Response
+from flask import Flask, render_template, request, jsonify, Response, redirect, url_for
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -15,7 +15,7 @@ scripts_dir = Path(__file__).resolve().parent / "Scripts"
 if str(scripts_dir) not in sys.path:
     sys.path.append(str(scripts_dir))
 
-from phase2 import run_with_json, Phase2Error
+from phase2 import run_with_json, Phase2Error, decode_worksheet_id, load_env_defaults
 from phase5 import run_with_json as run_phase5_with_json
 from Libraries.reference_data import (
     get_reference_data_path,
@@ -122,7 +122,34 @@ def landing():
 
 @app.route('/create')
 def create():
-    return render_template('generator.html', config=get_app_config())
+    return render_template('generator.html', config=get_app_config(), worksheet_params=None)
+
+@app.route('/worksheet')
+def worksheet():
+    worksheet_id = request.args.get('id')
+    if not worksheet_id:
+        return redirect(url_for('create'))
+
+    _, config_path = load_env_defaults()
+    if not config_path:
+        return redirect(url_for('create'))
+
+    try:
+        decoded = decode_worksheet_id(worksheet_id, config_path)
+    except Phase2Error:
+        return redirect(url_for('create'))
+
+    reading_level = decoded["reading_level"]
+    worksheet_params = {
+        "source_dataset": decoded["source_dataset"],
+        "theme": decoded["theme"],
+        "model": decoded["model"],
+        "reading_level": reading_level.get("level"),
+        "section": decoded["section"],
+        "seed": decoded["seed"],
+    }
+
+    return render_template('generator.html', config=get_app_config(), worksheet_params=worksheet_params)
 
 @app.route('/generate', methods=['POST'])
 def generate():

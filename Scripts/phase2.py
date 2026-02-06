@@ -235,6 +235,119 @@ def build_worksheet_id(request, config_path):
     return hex_str
 
 
+def decode_worksheet_id(worksheet_id_str, config_path):
+    """
+    Reverse build_worksheet_id: decode an opaque hex worksheet ID back into
+    its component parameters.
+
+    Returns a dict with: source_dataset, theme, model, reading_level (dict),
+    section, seed.
+    Raises Phase2Error on invalid input.
+    """
+    # Strip separators and parse hex
+    hex_clean = worksheet_id_str.replace('-', '')
+    try:
+        obfuscated = int(hex_clean, 16)
+    except ValueError as e:
+        raise Phase2Error(f"Invalid worksheet ID hex: {e}") from e
+
+    # Reverse XOR obfuscation
+    OBFUSCATION_KEY = 0xA5A5A5A5A5A5A5A5A
+    packed = obfuscated ^ OBFUSCATION_KEY
+
+    # Bit-size allocations (must match build_worksheet_id)
+    DATASET_BITS = 16
+    THEME_BITS = 16
+    MODEL_BITS = 8
+    READING_BITS = 10
+    SECTION_BITS = 10
+    SEED_BITS = 8
+
+    # Bit positions (seed lowest, same order as build)
+    seed_shift = 0
+    section_shift = seed_shift + SEED_BITS
+    reading_shift = section_shift + SECTION_BITS
+    model_shift = reading_shift + READING_BITS
+    theme_shift = model_shift + MODEL_BITS
+    dataset_shift = theme_shift + THEME_BITS
+
+    # Extract fields
+    seed_int = (packed >> seed_shift) & ((1 << SEED_BITS) - 1)
+    section_int = (packed >> section_shift) & ((1 << SECTION_BITS) - 1)
+    reading_level_id = (packed >> reading_shift) & ((1 << READING_BITS) - 1)
+    model_idx = (packed >> model_shift) & ((1 << MODEL_BITS) - 1)
+    theme_idx = (packed >> theme_shift) & ((1 << THEME_BITS) - 1)
+    dataset_idx = (packed >> dataset_shift) & ((1 << DATASET_BITS) - 1)
+
+    # Load config to find reference_data directory
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        raise Phase2Error(f"Failed to load config from '{config_path}': {e}") from e
+
+    reference_data_dir = config.get("reference_data")
+    if not reference_data_dir:
+        raise Phase2Error(f"Config at '{config_path}' missing 'reference_data' key.")
+
+    reference_data_dir = Path(reference_data_dir)
+
+    def load_list(filename, field_name):
+        ref_path = reference_data_dir / filename
+        try:
+            with open(ref_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                data = [data]
+            if not isinstance(data, list):
+                raise Phase2Error(f"Reference file {filename} ({field_name}) is not a list or object.")
+            return data
+        except (OSError, json.JSONDecodeError) as e:
+            raise Phase2Error(f"Failed to load reference data from {filename} ({field_name}): {e}") from e
+
+    datasets = load_list("source_datasets.json", "source_dataset")
+    themes = load_list("themes.json", "theme")
+    models = load_list("models.json", "model")
+
+    # Map indices back to key_names
+    if dataset_idx >= len(datasets):
+        raise Phase2Error(f"dataset_idx {dataset_idx} out of range (max {len(datasets) - 1}).")
+    if theme_idx >= len(themes):
+        raise Phase2Error(f"theme_idx {theme_idx} out of range (max {len(themes) - 1}).")
+    if model_idx >= len(models):
+        raise Phase2Error(f"model_idx {model_idx} out of range (max {len(models) - 1}).")
+
+    source_dataset = datasets[dataset_idx].get("key_name")
+    theme = themes[theme_idx].get("key_name")
+    model = models[model_idx].get("key_name")
+
+    if not source_dataset or not theme or not model:
+        raise Phase2Error("Reference data entry missing 'key_name'.")
+
+    # Decode reading_level_id back to system/level
+    if reading_level_id < 26:
+        reading_level = {
+            "system": "fp",
+            "level": chr(reading_level_id + ord('A')),
+        }
+    elif reading_level_id >= 30:
+        reading_level = {
+            "system": "grade",
+            "level": reading_level_id - 30,
+        }
+    else:
+        raise Phase2Error(f"Unknown reading_level_id: {reading_level_id}")
+
+    return {
+        "source_dataset": source_dataset,
+        "theme": theme,
+        "model": model,
+        "reading_level": reading_level,
+        "section": section_int,
+        "seed": seed_int,
+    }
+
+
 def process_request(request, responses_datastore, config_path):
     logger = get_logger()
     # Extract required fields from the request
