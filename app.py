@@ -120,24 +120,24 @@ def get_app_config():
 def landing():
     return render_template('landing.html', config=get_app_config())
 
-@app.route('/create')
-def create():
+@app.route('/worksheets')
+def worksheets():
     return render_template('generator.html', config=get_app_config(), worksheet_params=None)
 
 @app.route('/worksheet')
 def worksheet():
     worksheet_id = request.args.get('id')
     if not worksheet_id:
-        return redirect(url_for('create'))
+        return redirect(url_for('worksheets'))
 
     _, config_path = load_env_defaults()
     if not config_path:
-        return redirect(url_for('create'))
+        return redirect(url_for('worksheets'))
 
     try:
         decoded = decode_worksheet_id(worksheet_id, config_path)
     except Phase2Error:
-        return redirect(url_for('create'))
+        return redirect(url_for('worksheets'))
 
     reading_level = decoded["reading_level"]
     worksheet_params = {

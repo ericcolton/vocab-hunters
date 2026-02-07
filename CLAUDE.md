@@ -46,7 +46,7 @@ The web app imports Phase 2 and Phase 5 directly, bypassing the CLI pipeline.
 
 **Routes:**
 - `GET /` - Landing page explaining Homework Hero
-- `GET /create` - Worksheet generator UI
+- `GET /worksheets` - Worksheet generator UI
 - `GET /about` - About page
 - `POST /generate` - Create new worksheet PDF
 - `POST /fetch_episode` - Retrieve cached worksheet
