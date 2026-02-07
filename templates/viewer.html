@@ -391,7 +391,7 @@
     {% endif %}
 
     <div class="pdf-container">
-        <iframe id="pdf-frame" src="/worksheet_pdf?id={{ viewer.worksheet_id }}" title="Worksheet PDF"></iframe>
+        <iframe id="pdf-frame" {% if viewer.episode_exists %}src="/worksheet_pdf?id={{ viewer.worksheet_id }}"{% endif %} title="Worksheet PDF"></iframe>
     </div>
 
     {% if viewer.next_worksheet_id %}
@@ -714,47 +714,17 @@
             if (!response.ok) throw new Error('Generate failed');
 
             // Fetch updated episodes list to get the new episode's worksheet ID
-            const epParams = new URLSearchParams({
-                source_dataset: viewerData.params.source_dataset,
-                theme: viewerData.params.theme,
-                reading_level: viewerData.params.reading_level,
-                model: viewerData.params.model,
-                section: String(viewerData.params.section),
-            });
-            const epResponse = await fetch('/episodes?' + epParams.toString());
-            if (!epResponse.ok) throw new Error('Failed to fetch episodes');
-            const epData = await epResponse.json();
-            const episodes = epData.episodes || [];
-
-            // Find the newly generated episode
             const newEpisode = pageState.nextGenerateEpisode;
-            const newEpEntry = episodes.find(ep => ep.episode === newEpisode);
+            await fetchAndUpdateEpisodes();
+
+            const newEpEntry = pageState.episodes.find(ep => ep.episode === newEpisode);
             if (!newEpEntry || !newEpEntry.worksheet_id) throw new Error('New episode not found in list');
             const newId = newEpEntry.worksheet_id;
 
-            // Update state
+            // Advance state to the new episode and recompute nav locally
             pageState.worksheetId = newId;
             pageState.episode = newEpisode;
-            pageState.episodes = episodes;
-
-            const currentIdx = episodes.findIndex(ep => ep.episode === newEpisode);
-            pageState.prevWorksheetId = currentIdx > 0 ? episodes[currentIdx - 1].worksheet_id : null;
-
-            if (currentIdx >= 0 && currentIdx < episodes.length - 1) {
-                pageState.nextWorksheetId = episodes[currentIdx + 1].worksheet_id;
-                pageState.nextIsGenerate = false;
-                pageState.nextGenerateEpisode = null;
-            } else {
-                pageState.nextWorksheetId = null;
-                const lastEp = episodes.length > 0 ? episodes[episodes.length - 1].episode : 0;
-                if (lastEp < MAX_SEED) {
-                    pageState.nextIsGenerate = true;
-                    pageState.nextGenerateEpisode = lastEp + 1;
-                } else {
-                    pageState.nextIsGenerate = false;
-                    pageState.nextGenerateEpisode = null;
-                }
-            }
+            recomputeNavState();
 
             // Update all UI elements in place
             updateIframe();
@@ -774,10 +744,80 @@
         }
     }
 
+    // ── Shared: recompute prev/next nav from current episodes + episode ──
+    function recomputeNavState() {
+        const episodes = pageState.episodes;
+        const currentIdx = episodes.findIndex(ep => ep.episode === pageState.episode);
+        pageState.prevWorksheetId = currentIdx > 0 ? episodes[currentIdx - 1].worksheet_id : null;
+
+        if (currentIdx >= 0 && currentIdx < episodes.length - 1) {
+            pageState.nextWorksheetId = episodes[currentIdx + 1].worksheet_id;
+            pageState.nextIsGenerate = false;
+            pageState.nextGenerateEpisode = null;
+        } else {
+            pageState.nextWorksheetId = null;
+            const lastEp = episodes.length > 0 ? episodes[episodes.length - 1].episode : 0;
+            if (lastEp < MAX_SEED) {
+                pageState.nextIsGenerate = true;
+                pageState.nextGenerateEpisode = lastEp + 1;
+            } else {
+                pageState.nextIsGenerate = false;
+                pageState.nextGenerateEpisode = null;
+            }
+        }
+    }
+
+    // ── Shared: fetch episodes list from server and update nav state ──
+    async function fetchAndUpdateEpisodes() {
+        const epParams = new URLSearchParams({
+            source_dataset: viewerData.params.source_dataset,
+            theme: viewerData.params.theme,
+            reading_level: viewerData.params.reading_level,
+            model: viewerData.params.model,
+            section: String(viewerData.params.section),
+        });
+        const epResponse = await fetch('/episodes?' + epParams.toString());
+        if (!epResponse.ok) throw new Error('Failed to fetch episodes');
+        const epData = await epResponse.json();
+        pageState.episodes = epData.episodes || [];
+        recomputeNavState();
+    }
+
+    // ── Generate missing episode (QR code for uncached episode) ──
+    async function generateMissingEpisode() {
+        showLoadingModal();
+        try {
+            // Trigger generation via worksheet_pdf (generates any specific episode)
+            const pdfResponse = await fetch('/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId));
+            if (!pdfResponse.ok) throw new Error('PDF generation failed');
+
+            // Load the PDF into the iframe using a blob URL
+            const pdfBytes = await pdfResponse.arrayBuffer();
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const frame = document.getElementById('pdf-frame');
+            if (frame) frame.src = URL.createObjectURL(blob);
+
+            // Fetch updated episodes and update navigation state
+            await fetchAndUpdateEpisodes();
+
+            updateNavArrows();
+            updatePaginationBar();
+            hideLoadingModal();
+        } catch (err) {
+            console.error('Episode generation failed:', err);
+            hideLoadingModal();
+        }
+    }
+
     // Attach handler to initial generate button (if present)
     const initialGenerateBtn = document.getElementById('generate-next-btn');
     if (initialGenerateBtn) {
         initialGenerateBtn.addEventListener('click', handleGenerateClick);
+    }
+
+    // If the episode doesn't exist yet, generate it on page load
+    if (!viewerData.episode_exists) {
+        generateMissingEpisode();
     }
 
     // Handle browser back/forward after pushState

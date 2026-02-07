@@ -229,6 +229,7 @@ def worksheet():
         "worksheet_id": worksheet_id,
         "params": params,
         "episodes": episodes_list,
+        "episode_exists": current_idx is not None,
         "prev_worksheet_id": prev_worksheet_id,
         "next_worksheet_id": next_worksheet_id,
         "next_is_generate": next_is_generate,
