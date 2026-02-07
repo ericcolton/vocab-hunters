@@ -462,6 +462,18 @@ def process_request(request, responses_datastore, config_path):
 
         output_payload["presentation_metadata"] = interpolated_metadata
 
+    # Build a worksheet_id for the next episode (seed+1) for use as the QR code target
+    SEED_BITS = 8
+    max_seed = (1 << SEED_BITS) - 1
+    seed_int = int(seed)
+    if seed_int < max_seed:
+        next_request = dict(request)
+        next_request["seed"] = seed_int + 1
+        try:
+            output_payload["qr_worksheet_id"] = build_worksheet_id(next_request, config_path)
+        except SystemExit:
+            pass
+
     return output_payload
 
 
