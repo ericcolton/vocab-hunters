@@ -246,6 +246,26 @@
             opacity: 0.7;
             margin-top: 0.2rem;
         }
+        .episode-preview-link {
+            margin-left: auto;
+            flex-shrink: 0;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+            border-radius: 999px;
+            background: transparent;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .episode-preview-link:hover {
+            background: var(--accent-primary);
+            color: #fff;
+        }
         .preview-panel {
             margin-top: 1.5rem;
             border-radius: 12px;
@@ -961,6 +981,17 @@
                 }
 
                 entry.appendChild(content);
+
+                const worksheetId = (episode && typeof episode === 'object') ? episode.worksheet_id : null;
+                if (worksheetId) {
+                    const previewLink = document.createElement('a');
+                    previewLink.className = 'episode-preview-link';
+                    previewLink.href = '/worksheet?id=' + encodeURIComponent(worksheetId);
+                    previewLink.textContent = 'View';
+                    previewLink.addEventListener('click', (e) => e.stopPropagation());
+                    entry.appendChild(previewLink);
+                }
+
                 list.appendChild(entry);
             });
             updateGenerateButton(true);

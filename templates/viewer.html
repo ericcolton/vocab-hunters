@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet Viewer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='themes/root.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='themes/theme-wof.css') }}">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            background: var(--card-bg);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+            gap: 0.75rem;
+        }
+
+        .top-bar-left, .top-bar-right {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .top-bar-center {
+            flex: 1;
+            text-align: center;
+            min-width: 0;
+        }
+
+        .top-bar-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--btn-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .top-bar-episode {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 0.1rem;
+        }
+
+        .bar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .bar-btn:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: var(--accent-primary);
+        }
+
+        .bar-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* ── Main Area ── */
+        .main-area {
+            flex: 1;
+            display: flex;
+            align-items: stretch;
+            min-height: 0;
+        }
+
+        .nav-arrow {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 2rem;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s, background 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-arrow:hover {
+            opacity: 1;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .nav-arrow.disabled {
+            opacity: 0.15;
+            pointer-events: none;
+            cursor: default;
+        }
+
+        .nav-arrow.generate-next {
+            position: relative;
+        }
+
+        .nav-arrow.generate-next::after {
+            content: '+';
+            position: absolute;
+            bottom: 40%;
+            right: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: var(--accent-secondary);
+        }
+
+        .nav-arrow svg {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+
+        .pdf-container {
+            flex: 1;
+            min-width: 0;
+            background: #fff;
+        }
+
+        .pdf-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+
+        /* ── Pagination Bar ── */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            padding: 0.6rem 1rem;
+            background: var(--card-bg);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 0.5rem;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .page-btn:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: var(--accent-primary);
+        }
+
+        .page-btn.active {
+            background: var(--btn-gradient);
+            border-color: transparent;
+            color: #fff;
+            cursor: default;
+            box-shadow: var(--border-glow);
+        }
+
+        .page-ellipsis {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 36px;
+            font-size: 0.85rem;
+            opacity: 0.4;
+            flex-shrink: 0;
+        }
+
+        /* ── Loading overlay for generate ── */
+        .viewer-loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .viewer-loading-overlay.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .viewer-loading-spinner {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid rgba(255,255,255,0.15);
+            border-top-color: var(--accent-primary);
+            border-right-color: var(--accent-secondary);
+            animation: viewer-spin 0.8s linear infinite;
+        }
+
+        @keyframes viewer-spin { to { transform: rotate(360deg); } }
+
+        /* ── Mobile ── */
+        @media (max-width: 600px) {
+            .nav-arrow { width: 40px; }
+            .nav-arrow svg { width: 22px; height: 22px; }
+            .top-bar { padding: 0.5rem 0.6rem; }
+            .top-bar-title { font-size: 0.95rem; }
+            .bar-btn { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
+            .bar-btn .btn-text { display: none; }
+        }
+    </style>
+</head>
+<body class="{{ viewer.theme_entry.css_class if viewer.theme_entry else '' }}">
+
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="top-bar-left">
+        <a href="/worksheets" class="bar-btn">
+            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            <span class="btn-text">Back</span>
+        </a>
+    </div>
+    <div class="top-bar-center">
+        <div class="top-bar-title">{{ viewer.theme_entry.ui_title if viewer.theme_entry else 'Worksheet' }}</div>
+        <div class="top-bar-episode">Episode {{ viewer.params.seed }} &middot; Section {{ viewer.params.section }}</div>
+    </div>
+    <div class="top-bar-right">
+        <a href="/worksheet_pdf?id={{ viewer.worksheet_id }}" download class="bar-btn">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            <span class="btn-text">Download</span>
+        </a>
+    </div>
+</div>
+
+<!-- Main Area -->
+<div class="main-area">
+    {% if viewer.prev_worksheet_id %}
+    <a href="/worksheet?id={{ viewer.prev_worksheet_id }}" class="nav-arrow" title="Previous episode">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </a>
+    {% else %}
+    <span class="nav-arrow disabled">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </span>
+    {% endif %}
+
+    <div class="pdf-container">
+        <iframe id="pdf-frame" src="/worksheet_pdf?id={{ viewer.worksheet_id }}" title="Worksheet PDF"></iframe>
+    </div>
+
+    {% if viewer.next_worksheet_id %}
+    <a href="/worksheet?id={{ viewer.next_worksheet_id }}" class="nav-arrow" title="Next episode">
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    </a>
+    {% elif viewer.next_is_generate %}
+    <button id="generate-next-btn" class="nav-arrow generate-next" title="Generate Episode {{ viewer.next_generate_episode }}">
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    </button>
+    {% else %}
+    <span class="nav-arrow disabled">
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    </span>
+    {% endif %}
+</div>
+
+<!-- Pagination Bar -->
+<div class="pagination-bar" id="pagination-bar">
+    {% set episodes = viewer.episodes %}
+    {% set current_seed = viewer.params.seed %}
+    {% set total = episodes | length %}
+    {% set current_idx = namespace(val=0) %}
+    {% for ep in episodes %}
+        {% if ep.episode == current_seed %}
+            {% set current_idx.val = loop.index0 %}
+        {% endif %}
+    {% endfor %}
+
+    {% if total <= 7 %}
+        {# Show all #}
+        {% for ep in episodes %}
+            {% if ep.episode == current_seed %}
+                <span class="page-btn active">{{ ep.episode }}</span>
+            {% else %}
+                <a href="/worksheet?id={{ ep.worksheet_id }}" class="page-btn">{{ ep.episode }}</a>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        {# Smart pagination: first, ..., neighbors, ..., last #}
+        {% set ci = current_idx.val %}
+        {% set show = namespace(indices=[]) %}
+
+        {# Always include first and last #}
+        {% set show.indices = [0, total - 1] %}
+
+        {# Include neighbors of current #}
+        {% for offset in [-1, 0, 1] %}
+            {% set idx = ci + offset %}
+            {% if idx >= 0 and idx < total and idx not in show.indices %}
+                {% set show.indices = show.indices + [idx] %}
+            {% endif %}
+        {% endfor %}
+
+        {# Sort indices #}
+        {% set show.indices = show.indices | sort %}
+
+        {% set prev_idx = namespace(val=-2) %}
+        {% for idx in show.indices %}
+            {% if idx - prev_idx.val > 1 %}
+                <span class="page-ellipsis">&hellip;</span>
+            {% endif %}
+            {% set ep = episodes[idx] %}
+            {% if ep.episode == current_seed %}
+                <span class="page-btn active">{{ ep.episode }}</span>
+            {% else %}
+                <a href="/worksheet?id={{ ep.worksheet_id }}" class="page-btn">{{ ep.episode }}</a>
+            {% endif %}
+            {% set prev_idx.val = idx %}
+        {% endfor %}
+    {% endif %}
+</div>
+
+<!-- Loading Overlay -->
+<div id="viewer-loading" class="viewer-loading-overlay">
+    <div class="viewer-loading-spinner"></div>
+</div>
+
+<script>
+    const viewerData = {{ viewer | tojson }};
+
+    {% if viewer.next_is_generate %}
+    const generateBtn = document.getElementById('generate-next-btn');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', async () => {
+            const overlay = document.getElementById('viewer-loading');
+            if (overlay) overlay.classList.add('is-visible');
+            generateBtn.disabled = true;
+
+            const payload = {
+                source_dataset: viewerData.params.source_dataset,
+                theme: viewerData.params.theme,
+                level: viewerData.params.reading_level,
+                model: viewerData.params.model,
+                section: viewerData.params.section,
+            };
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                if (!response.ok) {
+                    throw new Error('Generate failed');
+                }
+                const newId = response.headers.get('X-Worksheet-Id');
+                if (newId) {
+                    window.location.href = '/worksheet?id=' + encodeURIComponent(newId);
+                } else {
+                    window.location.reload();
+                }
+            } catch (err) {
+                if (overlay) overlay.classList.remove('is-visible');
+                generateBtn.disabled = false;
+            }
+        });
+    }
+    {% endif %}
+</script>
+
+</body>
+</html>

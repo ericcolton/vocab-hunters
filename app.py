@@ -15,7 +15,7 @@ scripts_dir = Path(__file__).resolve().parent / "Scripts"
 if str(scripts_dir) not in sys.path:
     sys.path.append(str(scripts_dir))
 
-from phase2 import run_with_json, Phase2Error, decode_worksheet_id, load_env_defaults
+from phase2 import run_with_json, Phase2Error, decode_worksheet_id, build_worksheet_id, load_env_defaults
 from phase5 import run_with_json as run_phase5_with_json
 from Libraries.reference_data import (
     get_reference_data_path,
@@ -28,6 +28,23 @@ from Libraries.reference_data import (
 def build_reading_level_segment(reading_level):
     # assume F&P
     return f"fp_{reading_level}"
+
+def build_worksheet_id_from_params(source_dataset, theme, model, reading_level, section, seed):
+    _, config_path = load_env_defaults()
+    if not config_path:
+        return None
+    request_dict = {
+        "source_dataset": source_dataset,
+        "theme": theme,
+        "model": model,
+        "reading_level": {"system": "fp", "level": reading_level},
+        "section": section,
+        "seed": seed,
+    }
+    try:
+        return build_worksheet_id(request_dict, config_path)
+    except (SystemExit, Exception):
+        return None
 
 def list_cached_episodes(source_dataset, theme, reading_level, model, section):
     datastore_root = get_responses_datastore_path()
@@ -140,16 +157,129 @@ def worksheet():
         return redirect(url_for('worksheets'))
 
     reading_level = decoded["reading_level"]
-    worksheet_params = {
+    rl_letter = reading_level.get("level")
+    params = {
         "source_dataset": decoded["source_dataset"],
         "theme": decoded["theme"],
         "model": decoded["model"],
-        "reading_level": reading_level.get("level"),
+        "reading_level": rl_letter,
         "section": decoded["section"],
         "seed": decoded["seed"],
     }
 
-    return render_template('generator.html', config=get_app_config(), worksheet_params=worksheet_params)
+    # List all cached episodes for this config
+    episodes_list = list_cached_episodes(
+        source_dataset=params["source_dataset"],
+        theme=params["theme"],
+        reading_level=params["reading_level"],
+        model=params["model"],
+        section=params["section"],
+    )
+
+    # Enrich episodes with worksheet IDs
+    for ep in episodes_list:
+        ep["worksheet_id"] = build_worksheet_id_from_params(
+            source_dataset=params["source_dataset"],
+            theme=params["theme"],
+            model=params["model"],
+            reading_level=params["reading_level"],
+            section=params["section"],
+            seed=ep["episode"],
+        )
+
+    # Find current position and compute prev/next
+    current_seed = params["seed"]
+    current_idx = None
+    for i, ep in enumerate(episodes_list):
+        if ep["episode"] == current_seed:
+            current_idx = i
+            break
+
+    prev_worksheet_id = None
+    next_worksheet_id = None
+    next_is_generate = False
+    next_generate_episode = None
+
+    SEED_BITS = 8
+    max_seed = (1 << SEED_BITS) - 1
+
+    if current_idx is not None:
+        if current_idx > 0:
+            prev_worksheet_id = episodes_list[current_idx - 1]["worksheet_id"]
+        if current_idx < len(episodes_list) - 1:
+            next_worksheet_id = episodes_list[current_idx + 1]["worksheet_id"]
+        else:
+            # At the last cached episode — next triggers generate
+            last_episode = episodes_list[-1]["episode"]
+            if last_episode < max_seed:
+                next_is_generate = True
+                next_generate_episode = last_episode + 1
+
+    # Resolve theme entry for CSS class
+    app_config = get_app_config()
+    theme_entry = None
+    for t in app_config["themes"]:
+        if t["id"] == params["theme"]:
+            theme_entry = t
+            break
+    if not theme_entry and app_config["themes"]:
+        theme_entry = app_config["themes"][0]
+
+    viewer = {
+        "worksheet_id": worksheet_id,
+        "params": params,
+        "episodes": episodes_list,
+        "prev_worksheet_id": prev_worksheet_id,
+        "next_worksheet_id": next_worksheet_id,
+        "next_is_generate": next_is_generate,
+        "next_generate_episode": next_generate_episode,
+        "theme_entry": theme_entry,
+    }
+
+    return render_template('viewer.html', viewer=viewer, config=app_config)
+
+@app.route('/worksheet_pdf')
+def worksheet_pdf():
+    worksheet_id = request.args.get('id')
+    if not worksheet_id:
+        return jsonify({"error": "Missing worksheet id"}), 400
+
+    _, config_path = load_env_defaults()
+    if not config_path:
+        return jsonify({"error": "Server configuration error"}), 500
+
+    try:
+        decoded = decode_worksheet_id(worksheet_id, config_path)
+    except Phase2Error as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    reading_level = decoded["reading_level"]
+    payload = {
+        "source_dataset": decoded["source_dataset"],
+        "theme": decoded["theme"],
+        "model": decoded["model"],
+        "reading_level": reading_level,
+        "section": decoded["section"],
+        "seed": decoded["seed"],
+        "episode": decoded["seed"],
+        "presentation_metadata": {
+            "header": "{theme} - Section {section}",
+            "footer": "Page {current_page} of {total_pages}",
+            "answer_key_footer": "Fountas & Pinnell Level {reading_level}",
+        },
+    }
+
+    try:
+        response_json = run_with_json(json.dumps(payload, ensure_ascii=False))
+    except Phase2Error as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    try:
+        pdf_bytes = run_phase5_with_json(response_json)
+    except ValueError as exc:
+        return jsonify({"error": f"Failed to build PDF: {exc}"}), 500
+
+    return Response(pdf_bytes, mimetype="application/pdf")
 
 @app.route('/generate', methods=['POST'])
 def generate():
@@ -222,7 +352,18 @@ def generate():
     except ValueError as exc:
         return jsonify({"error": f"Failed to build PDF: {exc}"}), 500
 
-    return Response(pdf_bytes, mimetype="application/pdf")
+    new_worksheet_id = build_worksheet_id_from_params(
+        source_dataset=source_dataset,
+        theme=theme,
+        model=model,
+        reading_level=reading_level,
+        section=section,
+        seed=next_episode,
+    )
+    resp = Response(pdf_bytes, mimetype="application/pdf")
+    if new_worksheet_id:
+        resp.headers["X-Worksheet-Id"] = new_worksheet_id
+    return resp
 
 @app.route('/sections/<source_dataset>')
 def sections(source_dataset):
@@ -251,6 +392,15 @@ def episodes():
         )
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
+    for ep in episodes_list:
+        ep["worksheet_id"] = build_worksheet_id_from_params(
+            source_dataset=source_dataset,
+            theme=theme,
+            model=model,
+            reading_level=reading_level,
+            section=section,
+            seed=ep["episode"],
+        )
     return jsonify({"episodes": episodes_list})
 
 @app.route('/fetch_episode', methods=['POST'])
