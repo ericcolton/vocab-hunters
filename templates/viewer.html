@@ -216,36 +216,134 @@
             flex-shrink: 0;
         }
 
-        /* ── Loading overlay for generate ── */
-        .viewer-loading-overlay {
+        /* ── Loading Modal Styles ── */
+        .loading-modal-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.25);
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             z-index: 9999;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-
-        .viewer-loading-overlay.is-visible {
+        .loading-modal-overlay.is-visible {
             opacity: 1;
             visibility: visible;
         }
 
-        .viewer-loading-spinner {
-            width: 60px;
-            height: 60px;
+        /* Dim the content when loading */
+        body.is-loading .top-bar,
+        body.is-loading .main-area,
+        body.is-loading .pagination-bar {
+            opacity: 0.7;
+            pointer-events: none;
+            filter: blur(1px);
+            transition: opacity 0.3s ease, filter 0.3s ease;
+        }
+        .loading-modal {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 3rem 4rem;
+            text-align: center;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+            max-width: 90vw;
+            animation: modalPulse 2s ease-in-out infinite;
+        }
+        .loading-modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--btn-gradient);
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+        @keyframes modalPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        @keyframes shimmer {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        .loading-spinner-container {
+            margin-bottom: 1.5rem;
+        }
+        .loading-spinner-big {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            border: 4px solid rgba(255,255,255,0.15);
+            border: 4px solid rgba(255, 255, 255, 0.1);
             border-top-color: var(--accent-primary);
             border-right-color: var(--accent-secondary);
-            animation: viewer-spin 0.8s linear infinite;
+            animation: spinBig 1s linear infinite;
+            margin: 0 auto;
+            position: relative;
         }
-
-        @keyframes viewer-spin { to { transform: rotate(360deg); } }
+        .loading-spinner-big::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: var(--accent-secondary);
+            border-left-color: var(--accent-primary);
+            animation: spinBig 0.6s linear reverse infinite;
+        }
+        @keyframes spinBig {
+            to { transform: rotate(360deg); }
+        }
+        .loading-title {
+            font-size: 1.6rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.75rem;
+            background: var(--btn-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .loading-phrase {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            opacity: 0.9;
+            min-height: 1.5em;
+            animation: fadePhrase 0.4s ease-in-out;
+        }
+        @keyframes fadePhrase {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 0.9; transform: translateY(0); }
+        }
+        .loading-dots {
+            display: inline-block;
+            width: 24px;
+            text-align: left;
+        }
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        @keyframes dots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+            100% { content: ''; }
+        }
 
         /* ── Mobile ── */
         @media (max-width: 600px) {
@@ -367,52 +465,325 @@
     {% endif %}
 </div>
 
-<!-- Loading Overlay -->
-<div id="viewer-loading" class="viewer-loading-overlay">
-    <div class="viewer-loading-spinner"></div>
+<!-- Loading Modal -->
+<div id="loading-modal" class="loading-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="loading-title" aria-describedby="loading-phrase">
+    <div class="loading-modal">
+        <div class="loading-spinner-container">
+            <div class="loading-spinner-big"></div>
+        </div>
+        <div id="loading-title" class="loading-title">Building Episode</div>
+        <div id="loading-phrase" class="loading-phrase">
+            <span id="loading-phrase-text">Warming up the AI brain</span><span class="loading-dots"></span>
+        </div>
+    </div>
 </div>
 
 <script>
     const viewerData = {{ viewer | tojson }};
 
-    {% if viewer.next_is_generate %}
-    const generateBtn = document.getElementById('generate-next-btn');
-    if (generateBtn) {
-        generateBtn.addEventListener('click', async () => {
-            const overlay = document.getElementById('viewer-loading');
-            if (overlay) overlay.classList.add('is-visible');
-            generateBtn.disabled = true;
+    // Silly loading phrases
+    const loadingPhrases = [
+        "Warming up the AI brain",
+        "Teaching vocabulary to robots",
+        "Consulting the word wizards",
+        "Brewing a fresh batch of sentences",
+        "Asking the thesaurus for directions",
+        "Sharpening the digital pencils",
+        "Convincing electrons to form words",
+        "Summoning the grammar gremlins",
+        "Downloading extra creativity",
+        "Untangling the syntax spaghetti",
+        "Polishing the vocabulary gems",
+        "Waking up the sentence elves",
+        "Calibrating the fun-o-meter",
+        "Herding the alphabet cats",
+        "Spinning up the word tornado",
+        "Feeding the hungry algorithms",
+        "Consulting ancient dictionaries",
+        "Negotiating with the punctuation union",
+        "Assembling the sentence squad",
+        "Loading extra awesome sauce",
+        "Tuning the linguistic engines",
+        "Asking nicely for good answers",
+        "Bribing the AI with cookies",
+        "Stretching the neural networks",
+        "Doing vocabulary jumping jacks"
+    ];
 
-            const payload = {
+    let loadingPhraseInterval = null;
+    let currentPhraseIndex = 0;
+
+    function shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    function showLoadingModal() {
+        const modal = document.getElementById('loading-modal');
+        const phraseText = document.getElementById('loading-phrase-text');
+        if (!modal) return;
+
+        const shuffledPhrases = shuffleArray(loadingPhrases);
+        currentPhraseIndex = 0;
+
+        if (phraseText) {
+            phraseText.textContent = shuffledPhrases[currentPhraseIndex];
+        }
+
+        document.body.classList.add('is-loading');
+        modal.classList.add('is-visible');
+        modal.setAttribute('aria-hidden', 'false');
+
+        loadingPhraseInterval = setInterval(() => {
+            currentPhraseIndex = (currentPhraseIndex + 1) % shuffledPhrases.length;
+            if (phraseText) {
+                phraseText.style.animation = 'none';
+                phraseText.offsetHeight; // Trigger reflow
+                phraseText.style.animation = 'fadePhrase 0.4s ease-in-out';
+                phraseText.textContent = shuffledPhrases[currentPhraseIndex];
+            }
+        }, 2500);
+    }
+
+    function hideLoadingModal() {
+        const modal = document.getElementById('loading-modal');
+        if (!modal) return;
+
+        if (loadingPhraseInterval) {
+            clearInterval(loadingPhraseInterval);
+            loadingPhraseInterval = null;
+        }
+
+        document.body.classList.remove('is-loading');
+        modal.classList.remove('is-visible');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    // ── Page State ──
+    const SEED_BITS = 8;
+    const MAX_SEED = (1 << SEED_BITS) - 1;
+
+    const PREV_ARROW_SVG = '<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>';
+    const NEXT_ARROW_SVG = '<svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>';
+
+    const pageState = {
+        worksheetId: viewerData.worksheet_id,
+        episode: viewerData.params.seed,
+        episodes: viewerData.episodes,
+        prevWorksheetId: viewerData.prev_worksheet_id,
+        nextWorksheetId: viewerData.next_worksheet_id,
+        nextIsGenerate: viewerData.next_is_generate,
+        nextGenerateEpisode: viewerData.next_generate_episode,
+    };
+
+    // ── UI Update Functions ──
+    function updateIframe() {
+        const frame = document.getElementById('pdf-frame');
+        if (frame) frame.src = '/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId);
+    }
+
+    function updateHeader() {
+        const el = document.querySelector('.top-bar-episode');
+        if (el) el.innerHTML = 'Episode ' + pageState.episode + ' &middot; Section ' + viewerData.params.section;
+    }
+
+    function updateDownloadLink() {
+        const link = document.querySelector('.top-bar-right .bar-btn');
+        if (link) link.href = '/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId);
+    }
+
+    function updateNavArrows() {
+        const mainArea = document.querySelector('.main-area');
+        if (!mainArea) return;
+
+        const children = mainArea.children;
+        const prevArrow = children[0];
+        const nextArrow = children[children.length - 1];
+
+        // Rebuild prev arrow
+        let newPrev;
+        if (pageState.prevWorksheetId) {
+            newPrev = document.createElement('a');
+            newPrev.href = '/worksheet?id=' + encodeURIComponent(pageState.prevWorksheetId);
+            newPrev.className = 'nav-arrow';
+            newPrev.title = 'Previous episode';
+        } else {
+            newPrev = document.createElement('span');
+            newPrev.className = 'nav-arrow disabled';
+        }
+        newPrev.innerHTML = PREV_ARROW_SVG;
+        mainArea.replaceChild(newPrev, prevArrow);
+
+        // Rebuild next arrow
+        let newNext;
+        if (pageState.nextWorksheetId) {
+            newNext = document.createElement('a');
+            newNext.href = '/worksheet?id=' + encodeURIComponent(pageState.nextWorksheetId);
+            newNext.className = 'nav-arrow';
+            newNext.title = 'Next episode';
+        } else if (pageState.nextIsGenerate) {
+            newNext = document.createElement('button');
+            newNext.id = 'generate-next-btn';
+            newNext.className = 'nav-arrow generate-next';
+            newNext.title = 'Generate Episode ' + pageState.nextGenerateEpisode;
+            newNext.addEventListener('click', handleGenerateClick);
+        } else {
+            newNext = document.createElement('span');
+            newNext.className = 'nav-arrow disabled';
+        }
+        newNext.innerHTML = NEXT_ARROW_SVG;
+        mainArea.replaceChild(newNext, nextArrow);
+    }
+
+    function updatePaginationBar() {
+        const bar = document.getElementById('pagination-bar');
+        if (!bar) return;
+
+        const episodes = pageState.episodes;
+        const current = pageState.episode;
+        const total = episodes.length;
+        let html = '';
+
+        if (total <= 7) {
+            for (const ep of episodes) {
+                if (ep.episode === current) {
+                    html += '<span class="page-btn active">' + ep.episode + '</span>';
+                } else {
+                    html += '<a href="/worksheet?id=' + encodeURIComponent(ep.worksheet_id) + '" class="page-btn">' + ep.episode + '</a>';
+                }
+            }
+        } else {
+            const ci = episodes.findIndex(ep => ep.episode === current);
+            const indices = new Set([0, total - 1]);
+            for (const offset of [-1, 0, 1]) {
+                const idx = ci + offset;
+                if (idx >= 0 && idx < total) indices.add(idx);
+            }
+            const sorted = Array.from(indices).sort((a, b) => a - b);
+
+            let prevIdx = -2;
+            for (const idx of sorted) {
+                if (idx - prevIdx > 1) {
+                    html += '<span class="page-ellipsis">&hellip;</span>';
+                }
+                const ep = episodes[idx];
+                if (ep.episode === current) {
+                    html += '<span class="page-btn active">' + ep.episode + '</span>';
+                } else {
+                    html += '<a href="/worksheet?id=' + encodeURIComponent(ep.worksheet_id) + '" class="page-btn">' + ep.episode + '</a>';
+                }
+                prevIdx = idx;
+            }
+        }
+
+        bar.innerHTML = html;
+    }
+
+    // ── Generate Handler ──
+    async function handleGenerateClick() {
+        const btn = document.getElementById('generate-next-btn');
+        if (!btn || btn.disabled) return;
+
+        showLoadingModal();
+        btn.disabled = true;
+
+        const payload = {
+            source_dataset: viewerData.params.source_dataset,
+            theme: viewerData.params.theme,
+            level: viewerData.params.reading_level,
+            model: viewerData.params.model,
+            section: viewerData.params.section,
+            presentation_metadata: {
+                header: '{theme} - Section {section}',
+                footer: 'Page {current_page} of {total_pages}',
+                answer_key_footer: 'Fountas & Pinnell Level {reading_level}',
+            },
+        };
+
+        try {
+            // Generate the new episode on the server
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            if (!response.ok) throw new Error('Generate failed');
+
+            // Fetch updated episodes list to get the new episode's worksheet ID
+            const epParams = new URLSearchParams({
                 source_dataset: viewerData.params.source_dataset,
                 theme: viewerData.params.theme,
-                level: viewerData.params.reading_level,
+                reading_level: viewerData.params.reading_level,
                 model: viewerData.params.model,
-                section: viewerData.params.section,
-            };
+                section: String(viewerData.params.section),
+            });
+            const epResponse = await fetch('/episodes?' + epParams.toString());
+            if (!epResponse.ok) throw new Error('Failed to fetch episodes');
+            const epData = await epResponse.json();
+            const episodes = epData.episodes || [];
 
-            try {
-                const response = await fetch('/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-                if (!response.ok) {
-                    throw new Error('Generate failed');
-                }
-                const newId = response.headers.get('X-Worksheet-Id');
-                if (newId) {
-                    window.location.href = '/worksheet?id=' + encodeURIComponent(newId);
+            // Find the newly generated episode
+            const newEpisode = pageState.nextGenerateEpisode;
+            const newEpEntry = episodes.find(ep => ep.episode === newEpisode);
+            if (!newEpEntry || !newEpEntry.worksheet_id) throw new Error('New episode not found in list');
+            const newId = newEpEntry.worksheet_id;
+
+            // Update state
+            pageState.worksheetId = newId;
+            pageState.episode = newEpisode;
+            pageState.episodes = episodes;
+
+            const currentIdx = episodes.findIndex(ep => ep.episode === newEpisode);
+            pageState.prevWorksheetId = currentIdx > 0 ? episodes[currentIdx - 1].worksheet_id : null;
+
+            if (currentIdx >= 0 && currentIdx < episodes.length - 1) {
+                pageState.nextWorksheetId = episodes[currentIdx + 1].worksheet_id;
+                pageState.nextIsGenerate = false;
+                pageState.nextGenerateEpisode = null;
+            } else {
+                pageState.nextWorksheetId = null;
+                const lastEp = episodes.length > 0 ? episodes[episodes.length - 1].episode : 0;
+                if (lastEp < MAX_SEED) {
+                    pageState.nextIsGenerate = true;
+                    pageState.nextGenerateEpisode = lastEp + 1;
                 } else {
-                    window.location.reload();
+                    pageState.nextIsGenerate = false;
+                    pageState.nextGenerateEpisode = null;
                 }
-            } catch (err) {
-                if (overlay) overlay.classList.remove('is-visible');
-                generateBtn.disabled = false;
             }
-        });
+
+            // Update all UI elements in place
+            updateIframe();
+            updateHeader();
+            updateDownloadLink();
+            updateNavArrows();
+            updatePaginationBar();
+
+            // Update browser URL without full navigation
+            history.pushState(null, '', '/worksheet?id=' + encodeURIComponent(newId));
+
+            hideLoadingModal();
+        } catch (err) {
+            console.error('Generate failed:', err);
+            hideLoadingModal();
+            if (btn) btn.disabled = false;
+        }
     }
-    {% endif %}
+
+    // Attach handler to initial generate button (if present)
+    const initialGenerateBtn = document.getElementById('generate-next-btn');
+    if (initialGenerateBtn) {
+        initialGenerateBtn.addEventListener('click', handleGenerateClick);
+    }
+
+    // Handle browser back/forward after pushState
+    window.addEventListener('popstate', () => {
+        window.location.reload();
+    });
 </script>
 
 </body>
