@@ -35,6 +35,7 @@
             flex: 0 0 auto;
             display: flex;
             align-items: center;
+            gap: 0.5rem;
         }
 
         .top-bar-center {
@@ -371,6 +372,10 @@
         <div class="top-bar-episode">Episode {{ viewer.params.seed }} &middot; Section {{ viewer.params.section }}</div>
     </div>
     <div class="top-bar-right">
+        <button type="button" class="bar-btn" id="print-btn" onclick="handlePrint()">
+            <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+            <span class="btn-text">Print</span>
+        </button>
         <a href="/worksheet_pdf?id={{ viewer.worksheet_id }}" download="{{ viewer.pdf_filename }}" class="bar-btn">
             <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
             <span class="btn-text">Download</span>
@@ -618,6 +623,34 @@
             link.href = '/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId);
             link.download = buildPdfFilename(pageState.episode);
         }
+    }
+
+    function handlePrint() {
+        const url = '/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId);
+
+        // Remove any previous print frame
+        const existing = document.getElementById('print-frame');
+        if (existing) existing.remove();
+
+        const frame = document.createElement('iframe');
+        frame.id = 'print-frame';
+        frame.style.position = 'fixed';
+        frame.style.width = '0';
+        frame.style.height = '0';
+        frame.style.border = '0';
+        frame.src = url;
+
+        frame.onload = () => {
+            try {
+                frame.contentWindow.focus();
+                frame.contentWindow.print();
+            } catch (e) {
+                // Fallback: open in new tab for manual printing
+                window.open(url, '_blank');
+            }
+        };
+
+        document.body.appendChild(frame);
     }
 
     function updateNavArrows() {
