@@ -371,7 +371,7 @@
         <div class="top-bar-episode">Episode {{ viewer.params.seed }} &middot; Section {{ viewer.params.section }}</div>
     </div>
     <div class="top-bar-right">
-        <a href="/worksheet_pdf?id={{ viewer.worksheet_id }}" download class="bar-btn">
+        <a href="/worksheet_pdf?id={{ viewer.worksheet_id }}" download="{{ viewer.pdf_filename }}" class="bar-btn">
             <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
             <span class="btn-text">Download</span>
         </a>
@@ -591,9 +591,33 @@
         if (el) el.innerHTML = 'Episode ' + pageState.episode + ' &middot; Section ' + viewerData.params.section;
     }
 
+    function buildPdfFilename(episode) {
+        const config = {{ config | tojson }};
+        const params = viewerData.params;
+        let sourceAbbr = params.source_dataset;
+        for (const ds of config.data_sources) {
+            if (ds.id === params.source_dataset) {
+                sourceAbbr = ds.title_abbr || ds.key_name || params.source_dataset;
+                break;
+            }
+        }
+        let themeAbbr = params.theme;
+        for (const t of config.themes) {
+            if (t.id === params.theme) {
+                themeAbbr = t.title_abbr || t.key_name || params.theme;
+                break;
+            }
+        }
+        const sanitize = s => s.replace(/ /g, '_').replace(/\//g, '-');
+        return sanitize(sourceAbbr) + '-' + sanitize(themeAbbr) + '-S' + params.section + '-E' + episode + '.pdf';
+    }
+
     function updateDownloadLink() {
         const link = document.querySelector('.top-bar-right .bar-btn');
-        if (link) link.href = '/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId);
+        if (link) {
+            link.href = '/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId);
+            link.download = buildPdfFilename(pageState.episode);
+        }
     }
 
     function updateNavArrows() {

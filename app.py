@@ -29,6 +29,32 @@ def build_reading_level_segment(reading_level):
     # assume F&P
     return f"fp_{reading_level}"
 
+def build_pdf_filename(source_dataset, theme, section, episode):
+    """Build a descriptive PDF filename from worksheet parameters.
+
+    Uses title_abbr from reference data when available, falling back to key_name.
+    Format: {source_abbr}-{theme_abbr}-S{section}-E{episode}.pdf
+    """
+    app_config = get_app_config()
+
+    source_abbr = source_dataset
+    for ds in app_config["data_sources"]:
+        if ds["id"] == source_dataset:
+            source_abbr = ds.get("title_abbr") or ds.get("key_name") or source_dataset
+            break
+
+    theme_abbr = theme
+    for t in app_config["themes"]:
+        if t["id"] == theme:
+            theme_abbr = t.get("title_abbr") or t.get("key_name") or theme
+            break
+
+    # Sanitize: replace spaces with underscores, remove problematic chars
+    def sanitize(s):
+        return s.replace(" ", "_").replace("/", "-")
+
+    return f"{sanitize(source_abbr)}-{sanitize(theme_abbr)}-S{section}-E{episode}.pdf"
+
 def build_worksheet_id_from_params(source_dataset, theme, model, reading_level, section, seed):
     _, config_path = load_env_defaults()
     if not config_path:
@@ -225,8 +251,16 @@ def worksheet():
     if not theme_entry and app_config["themes"]:
         theme_entry = app_config["themes"][0]
 
+    pdf_filename = build_pdf_filename(
+        source_dataset=params["source_dataset"],
+        theme=params["theme"],
+        section=params["section"],
+        episode=params["seed"],
+    )
+
     viewer = {
         "worksheet_id": worksheet_id,
+        "pdf_filename": pdf_filename,
         "params": params,
         "episodes": episodes_list,
         "episode_exists": current_idx is not None,
@@ -280,7 +314,15 @@ def worksheet_pdf():
     except ValueError as exc:
         return jsonify({"error": f"Failed to build PDF: {exc}"}), 500
 
-    return Response(pdf_bytes, mimetype="application/pdf")
+    filename = build_pdf_filename(
+        source_dataset=decoded["source_dataset"],
+        theme=decoded["theme"],
+        section=decoded["section"],
+        episode=decoded["seed"],
+    )
+    resp = Response(pdf_bytes, mimetype="application/pdf")
+    resp.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+    return resp
 
 @app.route('/generate', methods=['POST'])
 def generate():
@@ -361,7 +403,14 @@ def generate():
         section=section,
         seed=next_episode,
     )
+    filename = build_pdf_filename(
+        source_dataset=source_dataset,
+        theme=theme,
+        section=section,
+        episode=next_episode,
+    )
     resp = Response(pdf_bytes, mimetype="application/pdf")
+    resp.headers["Content-Disposition"] = f'inline; filename="{filename}"'
     if new_worksheet_id:
         resp.headers["X-Worksheet-Id"] = new_worksheet_id
     return resp
@@ -429,7 +478,15 @@ def fetch_episode():
     except ValueError as exc:
         return jsonify({"error": f"Failed to build PDF: {exc}"}), 500
 
-    return Response(pdf_bytes, mimetype="application/pdf")
+    filename = build_pdf_filename(
+        source_dataset=payload["source_dataset"],
+        theme=payload["theme"],
+        section=payload["section"],
+        episode=payload["episode"],
+    )
+    resp = Response(pdf_bytes, mimetype="application/pdf")
+    resp.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+    return resp
 
 @app.route('/about')
 def about():
