@@ -330,14 +330,27 @@ def build_presentation_str(template, page, total_pages):
     formatted = template.replace("{current_page}", str(page)).replace("{total_pages}", str(total_pages))
     return formatted
 
-def build_section(c, header_format, seed, section, footer_format, answer_key_footer_format, qr_code):
+def _rng_seed_from_worksheet_id(worksheet_id):
+    if worksheet_id is None:
+        return None
+    if isinstance(worksheet_id, (int, float)):
+        return worksheet_id
+    # Stable, deterministic seed for non-numeric ids
+    digest = hashlib.sha256(str(worksheet_id).encode("utf-8")).digest()
+    return int.from_bytes(digest[:8], "big", signed=False)
+
+
+def build_section(c, header_format, seed, worksheet_id, section, footer_format, answer_key_footer_format, qr_code):
     
     output_subtitle = section["output"]["subtitle"]
     entries = section["data"]
 
     subtitle_with_episode = f"Episode {seed}: " + output_subtitle
     
-    rng = random.Random(seed)
+    rng_seed = _rng_seed_from_worksheet_id(worksheet_id)
+    if rng_seed is None:
+        rng_seed = seed
+    rng = random.Random(rng_seed)
     shuffled_entries = rng.sample(entries, k=len(entries)) 
     
     questions = []
@@ -463,7 +476,7 @@ def build_pdf(doc_root, output_stream):
 
     footer_format = doc_root["presentation_metadata"]["footer"]
     answer_key_footer_format = doc_root["presentation_metadata"]["answer_key_footer"]
-    build_section(c, header_format, seed, doc_root, footer_format, answer_key_footer_format, qr_code)
+    build_section(c, header_format, seed, worksheet_id, doc_root, footer_format, answer_key_footer_format, qr_code)
 
     c.save()
     
