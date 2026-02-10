@@ -729,7 +729,11 @@
                 }
                 throw new Error('Generate failed.');
             }
-            updateEpisodes();
+            const worksheetId = response.headers.get('X-Worksheet-Id');
+            if (worksheetId) {
+                window.location.href = '/worksheet?id=' + encodeURIComponent(worksheetId);
+                return;
+            }
         } catch (err) {
             // Optional: surface error state in a future UI block.
         } finally {
