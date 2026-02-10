@@ -266,33 +266,6 @@
             background: var(--accent-primary);
             color: #fff;
         }
-        .preview-panel {
-            margin-top: 1.5rem;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(0,0,0,0.2);
-        }
-        #episode-pdf-frame {
-            width: 100%;
-            height: 70vh;
-            border: 0;
-            display: block;
-            background: #fff;
-        }
-
-        @media (min-width: 900px) {
-            .container.has-preview { max-width: 1100px; }
-            .container.has-preview .main-layout {
-                display: flex;
-                align-items: flex-start;
-                gap: 1.5rem;
-            }
-            .container.has-preview .control-panel { flex: 0 0 520px; }
-            .container.has-preview .preview-panel { flex: 1; margin-top: 0; }
-            #episode-pdf-frame { height: 75vh; }
-        }
-
         /* Loading Modal Styles */
         .loading-modal-overlay {
             position: fixed;
@@ -534,9 +507,6 @@
             </form>
         </div>
 
-        <div id="episode-pdf-preview" class="preview-panel" hidden>
-            <iframe id="episode-pdf-frame" title="Episode PDF Preview"></iframe>
-        </div>
     </div>
 
     <div class="footer">
@@ -701,150 +671,7 @@
         }
     }
 
-    function hidePdfPreview() {
-        const preview = document.getElementById('episode-pdf-preview');
-        const frame = document.getElementById('episode-pdf-frame');
-        if (frame) {
-            frame.src = '';
-        }
-        if (preview) {
-            preview.hidden = true;
-        }
-        const container = document.querySelector('.container');
-        if (container) {
-            container.classList.remove('has-preview');
-        }
-        if (currentPdfUrl) {
-            URL.revokeObjectURL(currentPdfUrl);
-            currentPdfUrl = null;
-        }
-        currentFitMode = null;
-    }
-
-    let currentPdfUrl = null;
-    let currentFitMode = null;
     let isGenerating = false;
-
-    function updatePdfPreview() {
-        const preview = document.getElementById('episode-pdf-preview');
-        const frame = document.getElementById('episode-pdf-frame');
-        if (!preview || !frame || preview.hidden || !currentPdfUrl) {
-            return;
-        }
-        const frameBox = frame.getBoundingClientRect();
-        const fitMode = frameBox.width >= frameBox.height ? 'FitH' : 'FitV';
-        if (fitMode !== currentFitMode) {
-            frame.src = `${currentPdfUrl}#view=${fitMode}`;
-            currentFitMode = fitMode;
-        }
-    }
-
-    async function handleEpisodeTap(item) {
-        if (!item) {
-            return;
-        }
-        const headerInput = document.getElementById('header_text');
-        const footerInput = document.getElementById('footer_text');
-        const answerKeyFooterInput = document.getElementById('answer_key_footer');
-        const headerValue = (headerInput && headerInput.value.trim()) || (headerInput && headerInput.placeholder) || '';
-        const footerValue = (footerInput && footerInput.value.trim()) || (footerInput && footerInput.placeholder) || '';
-        const answerKeyFooterValue = (answerKeyFooterInput && answerKeyFooterInput.value.trim())
-            || (answerKeyFooterInput && answerKeyFooterInput.placeholder)
-            || '';
-
-        const payload = {
-            episode: item.dataset.episode || null,
-            subtitle: item.dataset.subtitle || "",
-            source_dataset: document.getElementById('datasource').value,
-            theme: document.getElementById('theme').value,
-            reading_level: document.getElementById('level').value,
-            model: document.getElementById('model').value,
-            section: document.getElementById('section').value,
-            header: headerValue,
-            footer: footerValue,
-            answer_key_footer: answerKeyFooterValue
-        };
-        try {
-            const response = await fetch('/fetch_episode', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if (!response.ok) {
-                return;
-            }
-            const pdfBuffer = await response.arrayBuffer();
-            const pdfBlob = new Blob([pdfBuffer], { type: 'application/pdf' });
-            currentPdfUrl = URL.createObjectURL(pdfBlob);
-            currentFitMode = null;
-            const preview = document.getElementById('episode-pdf-preview');
-            const frame = document.getElementById('episode-pdf-frame');
-            if (preview && frame) {
-                preview.hidden = false;
-                const container = document.querySelector('.container');
-                if (container) {
-                    container.classList.add('has-preview');
-                }
-                updatePdfPreview();
-            }
-        } catch (err) {
-            // Fetch failures should not affect UX.
-        }
-    }
-
-    async function fetchEpisodeByNumber(episodeNumber) {
-        const headerInput = document.getElementById('header_text');
-        const footerInput = document.getElementById('footer_text');
-        const answerKeyFooterInput = document.getElementById('answer_key_footer');
-        const headerValue = (headerInput && headerInput.value.trim()) || (headerInput && headerInput.placeholder) || '';
-        const footerValue = (footerInput && footerInput.value.trim()) || (footerInput && footerInput.placeholder) || '';
-        const answerKeyFooterValue = (answerKeyFooterInput && answerKeyFooterInput.value.trim())
-            || (answerKeyFooterInput && answerKeyFooterInput.placeholder)
-            || '';
-
-        const payload = {
-            episode: episodeNumber,
-            source_dataset: document.getElementById('datasource').value,
-            theme: document.getElementById('theme').value,
-            reading_level: document.getElementById('level').value,
-            model: document.getElementById('model').value,
-            section: document.getElementById('section').value,
-            header: headerValue,
-            footer: footerValue,
-            answer_key_footer: answerKeyFooterValue
-        };
-
-        setGenerateLoading(true);
-        try {
-            const response = await fetch('/fetch_episode', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if (!response.ok) {
-                return;
-            }
-            const pdfBuffer = await response.arrayBuffer();
-            const pdfBlob = new Blob([pdfBuffer], { type: 'application/pdf' });
-            currentPdfUrl = URL.createObjectURL(pdfBlob);
-            currentFitMode = null;
-            const preview = document.getElementById('episode-pdf-preview');
-            const frame = document.getElementById('episode-pdf-frame');
-            if (preview && frame) {
-                preview.hidden = false;
-                const container = document.querySelector('.container');
-                if (container) {
-                    container.classList.add('has-preview');
-                }
-                updatePdfPreview();
-            }
-            updateEpisodes();
-        } catch (err) {
-            // Fetch failures should not affect UX.
-        } finally {
-            setGenerateLoading(false);
-        }
-    }
 
     function setGenerateLoading(isLoading) {
         const button = document.getElementById('generate-btn');
@@ -902,20 +729,6 @@
                 }
                 throw new Error('Generate failed.');
             }
-            const pdfBuffer = await response.arrayBuffer();
-            const pdfBlob = new Blob([pdfBuffer], { type: 'application/pdf' });
-            currentPdfUrl = URL.createObjectURL(pdfBlob);
-            currentFitMode = null;
-            const preview = document.getElementById('episode-pdf-preview');
-            const frame = document.getElementById('episode-pdf-frame');
-            if (preview && frame) {
-                preview.hidden = false;
-                const container = document.querySelector('.container');
-                if (container) {
-                    container.classList.add('has-preview');
-                }
-                updatePdfPreview();
-            }
             updateEpisodes();
         } catch (err) {
             // Optional: surface error state in a future UI block.
@@ -955,7 +768,6 @@
                 container.hidden = true;
                 list.innerHTML = '';
                 updateGenerateButton(false);
-                hidePdfPreview();
                 return;
             }
             container.hidden = false;
@@ -984,11 +796,14 @@
 
                 const worksheetId = (episode && typeof episode === 'object') ? episode.worksheet_id : null;
                 if (worksheetId) {
+                    const worksheetUrl = '/worksheet?id=' + encodeURIComponent(worksheetId);
+                    entry.style.cursor = 'pointer';
+                    entry.addEventListener('click', () => { window.location.href = worksheetUrl; });
+
                     const previewLink = document.createElement('a');
                     previewLink.className = 'episode-preview-link';
-                    previewLink.href = '/worksheet?id=' + encodeURIComponent(worksheetId);
+                    previewLink.href = worksheetUrl;
                     previewLink.textContent = 'View';
-                    previewLink.addEventListener('click', (e) => e.stopPropagation());
                     entry.appendChild(previewLink);
                 }
 
@@ -999,7 +814,6 @@
             container.hidden = true;
             list.innerHTML = '';
             updateGenerateButton(false);
-            hidePdfPreview();
         }
     }
 
@@ -1031,7 +845,6 @@
         const sectionSelect = document.getElementById('section');
         const levelSelect = document.getElementById('level');
         const modelSelect = document.getElementById('model');
-        const episodeList = document.getElementById('episode_list');
         const generateForm = document.querySelector('.panel-form');
 
         if (worksheetParams) {
@@ -1054,11 +867,7 @@
                 if (worksheetParams.section != null) {
                     sectionSelect.value = worksheetParams.section;
                 }
-                updateEpisodes().then(() => {
-                    if (worksheetParams.seed != null) {
-                        fetchEpisodeByNumber(worksheetParams.seed);
-                    }
-                });
+                updateEpisodes();
             });
         } else {
             const saved = loadPreferences();
@@ -1108,22 +917,9 @@
             updateEpisodes();
         });
 
-        if (episodeList) {
-            episodeList.addEventListener('click', (event) => {
-                const item = event.target.closest('.episode-list-item');
-                if (item && episodeList.contains(item)) {
-                    handleEpisodeTap(item);
-                }
-            });
-        }
-
         if (generateForm) {
             generateForm.addEventListener('submit', handleGenerate);
         }
-
-        window.addEventListener('resize', () => {
-            updatePdfPreview();
-        });
     });
 </script>
 
