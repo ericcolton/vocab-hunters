@@ -1,0 +1,12 @@
+body.theme-custom {
+    --bg-color: #1a1a2e;
+    --card-bg: #16213e;
+    --text-color: #eaf0ff;
+    --accent-primary: #e94560;
+    --accent-secondary: #0f3460;
+    --border-glow: 0 0 12px rgba(233, 69, 96, 0.4);
+    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --btn-gradient: linear-gradient(135deg, #e94560, #f5a623, #56c596, #0f9df5, #a855f7);
+    --header-font-weight: 800;
+    --input-bg: #1f2b4d;
+}

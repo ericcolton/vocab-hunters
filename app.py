@@ -1,4 +1,5 @@
 
+import hashlib
 import json
 import logging
 import sys
@@ -16,6 +17,8 @@ if str(scripts_dir) not in sys.path:
     sys.path.append(str(scripts_dir))
 
 from phase2 import run_with_json, Phase2Error, decode_worksheet_id, build_worksheet_id, load_env_defaults
+from phase3 import run_with_json as run_phase3_with_json
+from phase4 import run_phase4_with_json
 from phase5 import run_with_json as run_phase5_with_json
 from Libraries.reference_data import (
     get_reference_data_path,
@@ -23,6 +26,7 @@ from Libraries.reference_data import (
     get_responses_datastore_path,
     load_source_datasets,
     load_themes,
+    lookup_source_dataset,
 )
 
 def build_reading_level_segment(reading_level):
@@ -54,6 +58,25 @@ def build_pdf_filename(source_dataset, theme, section, episode):
         return s.replace(" ", "_").replace("/", "-")
 
     return f"{sanitize(source_abbr)}-{sanitize(theme_abbr)}-S{section}-E{episode}.pdf"
+
+def get_themes_dir():
+    from Libraries.reference_data import get_global_config
+    config, _ = get_global_config()
+    return config.get("themes_dir")
+
+def save_custom_theme_file(custom_text):
+    prefix = "The sentences should take place in a world where "
+    wrapped = prefix + custom_text
+    content_hash = hashlib.sha256(wrapped.encode("utf-8")).hexdigest()
+    file_stem = f"user_specified_{content_hash}"
+    themes_dir = get_themes_dir()
+    if not themes_dir:
+        raise ValueError("themes_dir not configured")
+    theme_path = Path(themes_dir) / f"{file_stem}.txt"
+    if not theme_path.exists():
+        theme_path.parent.mkdir(parents=True, exist_ok=True)
+        theme_path.write_text(wrapped, encoding="utf-8")
+    return file_stem
 
 def build_worksheet_id_from_params(source_dataset, theme, model, reading_level, section, seed):
     _, config_path = load_env_defaults()
@@ -341,6 +364,105 @@ def generate():
     if not all([source_dataset, theme, reading_level, model, section]):
         return jsonify({"error": "Missing required fields."}), 400
 
+    # --- Custom theme branch: bypass Phase 2 entirely ---
+    app_config = get_app_config()
+    theme_entry = None
+    for t in app_config["themes"]:
+        if t["id"] == theme:
+            theme_entry = t
+            break
+
+    if theme_entry and theme_entry.get("key_name") == "user_specified":
+        custom_text = raw_payload.get("custom_theme_text", "").strip()
+        if not custom_text:
+            return jsonify({"error": "Please describe your custom world."}), 400
+
+        try:
+            theme_file_stem = save_custom_theme_file(custom_text)
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 500
+
+        # Build payload for Phase 3 with the custom theme file stem
+        custom_payload = {
+            "source_dataset": source_dataset,
+            "theme": theme_file_stem,
+            "reading_level": {"system": "fp", "level": reading_level},
+            "model": model,
+            "section": section,
+            "seed": 1,
+            "worksheet_id": None,
+        }
+
+        try:
+            phase3_output = run_phase3_with_json(json.dumps(custom_payload, ensure_ascii=False))
+        except SystemExit as exc:
+            return jsonify({"error": str(exc)}), 400
+
+        try:
+            phase4_output = run_phase4_with_json(phase3_output)
+        except SystemExit as exc:
+            return jsonify({"error": str(exc)}), 500
+
+        phase4_data = json.loads(phase4_output)
+
+        # Add presentation_metadata with interpolated variables
+        presentation_metadata = dict(raw_payload.get("presentation_metadata") or {})
+        header_value = raw_payload.get("header") or raw_payload.get("header_text")
+        footer_value = raw_payload.get("footer") or raw_payload.get("footer_text")
+        answer_key_footer_value = raw_payload.get("answer_key_footer")
+
+        if header_value is not None:
+            presentation_metadata["header"] = header_value
+        if footer_value is not None:
+            presentation_metadata["footer"] = footer_value
+        if answer_key_footer_value is not None:
+            presentation_metadata["answer_key_footer"] = answer_key_footer_value
+
+        if presentation_metadata:
+            dataset_entry = lookup_source_dataset(source_dataset)
+            dataset_title = (dataset_entry or {}).get("title", "")
+            dataset_abbr = (dataset_entry or {}).get("title_abbr", "")
+
+            presentation_variables = {
+                "section": section,
+                "reading_system": "fp",
+                "reading_level": reading_level,
+                "model": model,
+                "episode": 1,
+                "worksheet_id": "",
+                "source": dataset_title,
+                "source_abbr": dataset_abbr,
+                "theme": "Create Your Own Theme",
+                "theme_abbr": "Custom",
+            }
+
+            interpolated_metadata = dict(presentation_metadata)
+            for key in ("header", "footer", "answer_key_footer"):
+                if key in interpolated_metadata:
+                    template = interpolated_metadata[key]
+                    if template is None:
+                        continue
+                    text = str(template)
+                    for var_key, value in presentation_variables.items():
+                        placeholder = "{" + var_key + "}"
+                        text = text.replace(placeholder, str(value))
+                    interpolated_metadata[key] = text
+
+            phase4_data["presentation_metadata"] = interpolated_metadata
+
+        # Set worksheet_id to None so Phase 5 falls back to base URL for QR
+        phase4_data["worksheet_id"] = None
+
+        try:
+            pdf_bytes = run_phase5_with_json(json.dumps(phase4_data, ensure_ascii=False))
+        except ValueError as exc:
+            return jsonify({"error": f"Failed to build PDF: {exc}"}), 500
+
+        resp = Response(pdf_bytes, mimetype="application/pdf")
+        resp.headers["Content-Disposition"] = 'inline; filename="custom-worksheet.pdf"'
+        return resp
+
+    # --- Standard theme flow (Phase 2) ---
     try:
         episodes_list = list_cached_episodes(
             source_dataset=source_dataset,

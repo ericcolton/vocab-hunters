@@ -16,5 +16,14 @@
         "css_class": "theme-wof",
         "ui_title": "Dragon Vocab Scrolls",
         "ui_subtitle": "Fly High. Burn Bright. Learn Words."
+    },
+    {
+        "id": 3,
+        "key_name": "user_specified",
+        "title": "Create Your Own Theme",
+        "title_abbr": "Custom",
+        "css_class": "theme-custom",
+        "ui_title": "Your World, Your Words",
+        "ui_subtitle": "Imagine it. Describe it. Learn in it."
     }
 ]
