@@ -1,7 +1,7 @@
 {
     "source_datasets": "/var/data/vocab_hunters/Source_Datasets/vocabulary_datasets",
-    "prompt_path": "~/project/src/Prompts/prompt_optimized_20251130.txt",
-    "themes_dir": "~/project/src/Themes/",
+    "prompt_path": "/opt/render/project/src/Prompts/prompt_optimized_20251130.txt",
+    "themes_dir": "/opt/render/project/src/Themes/",
     "responses_datastore": "/var/data/vocab_hunters/Response_Datastore",
-    "reference_data": "~/project/src/Reference_Data/"
+    "reference_data": "/opt/render/project/src/Reference_Data/"
 }
