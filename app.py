@@ -59,20 +59,14 @@ def build_pdf_filename(source_dataset, theme, section, episode):
 
     return f"{sanitize(source_abbr)}-{sanitize(theme_abbr)}-S{section}-E{episode}.pdf"
 
-def get_themes_dir():
-    from Libraries.reference_data import get_global_config
-    config, _ = get_global_config()
-    return config.get("themes_dir")
-
 def save_custom_theme_file(custom_text):
+    from Libraries.reference_data import get_user_themes_dir
     prefix = "The sentences should take place in a world where "
     wrapped = prefix + custom_text
     content_hash = hashlib.sha256(wrapped.encode("utf-8")).hexdigest()
     file_stem = f"user_specified_{content_hash}"
-    themes_dir = get_themes_dir()
-    if not themes_dir:
-        raise ValueError("themes_dir not configured")
-    theme_path = Path(themes_dir) / f"{file_stem}.txt"
+    user_themes_dir = get_user_themes_dir()
+    theme_path = user_themes_dir / f"{file_stem}.txt"
     if not theme_path.exists():
         theme_path.parent.mkdir(parents=True, exist_ok=True)
         theme_path.write_text(wrapped, encoding="utf-8")

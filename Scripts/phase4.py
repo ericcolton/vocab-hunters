@@ -22,31 +22,20 @@ def get_logger():
 
 def load_default_paths() -> Dict[str, Optional[str]]:
     """
-    Load defaults from HOMEWORK_HERO_CONFIG_PATH, if set.
-    Expected keys: "prompt_path" and "themes_dir".
+    Load defaults from HOMEWORK_HERO_CONFIG_PATH via the reference_data library.
     """
     config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
     if not config_path:
         return {"prompt_path": None, "themes_dir": None}
 
     try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    except (OSError, json.JSONDecodeError) as exc:
-        raise SystemExit(
-            f"Failed to load HOMEWORK_HERO_CONFIG_PATH='{config_path}': {exc}"
-        ) from exc
-
-    if "prompt_path" not in config:
-        raise SystemExit(
-            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'prompt_path'."
-        )
-    if "themes_dir" not in config:
-        raise SystemExit(
-            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'themes_dir'."
-        )
-
-    return {"prompt_path": config.get("prompt_path"), "themes_dir": config.get("themes_dir")}
+        from Libraries.reference_data import get_prompt_path, get_themes_dir
+        return {
+            "prompt_path": str(get_prompt_path()),
+            "themes_dir": str(get_themes_dir()),
+        }
+    except (RuntimeError, ValueError) as exc:
+        raise SystemExit(str(exc)) from exc
 
 
 def parse_args(
@@ -279,6 +268,9 @@ def main() -> None:
     request_json = read_stdin_json()
 
     # 2. Read system prompt file.
+    if not os.path.exists(args.prompt_path):
+        print(f"Error: prompt file not found: {args.prompt_path}", file=sys.stderr)
+        sys.exit(1)
     raw_system_prompt = read_file_text(args.prompt_path)
     system_prompt = flesh_out_system_prompt(raw_system_prompt, request_json)
 
@@ -321,6 +313,9 @@ def run_from_json(
         themes_dir = defaults["themes_dir"]
 
     request_obj = read_request_json(request_json)
+    if not os.path.exists(prompt_path):
+        print(f"Error: prompt file not found: {prompt_path}", file=sys.stderr)
+        sys.exit(1)
     raw_system_prompt = read_file_text(prompt_path)
     system_prompt = flesh_out_system_prompt(raw_system_prompt, request_obj)
     theme_content = load_theme_content(request_obj, themes_dir)

@@ -15,34 +15,45 @@ def get_global_config():
     return config, config_path
 
 
-def get_reference_data_path():
+def get_database_path() -> Path:
     config, config_path = get_global_config()
-    reference_data_path = config.get("reference_data")
-    if not reference_data_path:
-        raise RuntimeError(
-            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'reference_data'."
+    db = config.get("homework_hero_database")
+    if not db:
+        raise ValueError(
+            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'homework_hero_database'. "
+            "Old config format (with 'source_datasets', 'prompt_path', etc.) is no longer supported."
         )
-    return Path(reference_data_path)
+    return Path(db)
 
 
-def get_source_datasets_dir():
-    config, config_path = get_global_config()
-    source_datasets_dir = config.get("source_datasets")
-    if not source_datasets_dir:
-        raise RuntimeError(
-            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'source_datasets'."
-        )
-    return Path(source_datasets_dir)
+def ensure_database_dirs():
+    db = get_database_path()
+    for subdir in ("source_datasets", "themes", "user_themes", "responses_datastore", "reference_data"):
+        (db / subdir).mkdir(parents=True, exist_ok=True)
 
 
-def get_responses_datastore_path():
-    config, config_path = get_global_config()
-    responses_datastore = config.get("responses_datastore")
-    if not responses_datastore:
-        raise RuntimeError(
-            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'responses_datastore'."
-        )
-    return Path(responses_datastore)
+def get_prompt_path() -> Path:
+    return get_database_path() / "prompt.txt"
+
+
+def get_reference_data_path() -> Path:
+    return get_database_path() / "reference_data"
+
+
+def get_source_datasets_dir() -> Path:
+    return get_database_path() / "source_datasets"
+
+
+def get_responses_datastore_path() -> Path:
+    return get_database_path() / "responses_datastore"
+
+
+def get_themes_dir() -> Path:
+    return get_database_path() / "themes"
+
+
+def get_user_themes_dir() -> Path:
+    return get_database_path() / "user_themes"
 
 
 def load_source_datasets():
