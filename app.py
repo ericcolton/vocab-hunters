@@ -16,7 +16,7 @@ scripts_dir = Path(__file__).resolve().parent / "Scripts"
 if str(scripts_dir) not in sys.path:
     sys.path.append(str(scripts_dir))
 
-from phase2 import run_with_json, Phase2Error, decode_worksheet_id, build_worksheet_id, load_env_defaults
+from phase2 import run_with_json, Phase2Error, decode_worksheet_id, build_worksheet_id
 from phase3 import run_with_json as run_phase3_with_json
 from phase4 import run_phase4_with_json
 from phase5 import run_with_json as run_phase5_with_json
@@ -73,9 +73,6 @@ def save_custom_theme_file(custom_text):
     return file_stem
 
 def build_worksheet_id_from_params(source_dataset, theme, model, reading_level, section, seed):
-    _, config_path = load_env_defaults()
-    if not config_path:
-        return None
     request_dict = {
         "source_dataset": source_dataset,
         "theme": theme,
@@ -85,7 +82,7 @@ def build_worksheet_id_from_params(source_dataset, theme, model, reading_level, 
         "seed": seed,
     }
     try:
-        return build_worksheet_id(request_dict, config_path)
+        return build_worksheet_id(request_dict)
     except (SystemExit, Exception):
         return None
 
@@ -190,12 +187,8 @@ def worksheet():
     if not worksheet_id:
         return redirect(url_for('worksheets'))
 
-    _, config_path = load_env_defaults()
-    if not config_path:
-        return redirect(url_for('worksheets'))
-
     try:
-        decoded = decode_worksheet_id(worksheet_id, config_path)
+        decoded = decode_worksheet_id(worksheet_id)
     except Phase2Error:
         return redirect(url_for('worksheets'))
 
@@ -296,12 +289,8 @@ def worksheet_pdf():
     if not worksheet_id:
         return jsonify({"error": "Missing worksheet id"}), 400
 
-    _, config_path = load_env_defaults()
-    if not config_path:
-        return jsonify({"error": "Server configuration error"}), 500
-
     try:
-        decoded = decode_worksheet_id(worksheet_id, config_path)
+        decoded = decode_worksheet_id(worksheet_id)
     except Phase2Error as exc:
         return jsonify({"error": str(exc)}), 400
 

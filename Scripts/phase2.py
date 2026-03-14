@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import json
-import os
 import sys
 import hashlib
 import logging
@@ -11,7 +10,12 @@ from flask import current_app, has_app_context
 from phase3 import run_with_json as run_phase3_with_json
 from phase4 import run_phase4_with_json
 
-from Libraries.reference_data import lookup_source_dataset, lookup_theme
+from Libraries.reference_data import (
+    get_reference_data_path,
+    get_responses_datastore_path,
+    lookup_source_dataset,
+    lookup_theme,
+)
 
 class Phase2Error(Exception):
     def __init__(self, message, exit_code=1):
@@ -43,67 +47,22 @@ def build_reading_level_segment(reading_level):
     return str(reading_level)
 
 
-def load_env_defaults():
-    """
-    If HOMEWORK_HERO_CONFIG_PATH is set, load JSON and return defaults and path.
-    """
-    config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
-    if not config_path:
-        return None, None
-
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    except (OSError, json.JSONDecodeError) as e:
-        raise SystemExit(f"Failed to load HOMEWORK_HERO_CONFIG_PATH='{config_path}': {e}") from e
-
-    default_responses_datastore = config.get("responses_datastore")
-    if default_responses_datastore is None:
-        raise SystemExit(
-            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'responses_datastore'."
-        )
-    
-    return default_responses_datastore, config_path
-
-
-def parse_args(argv=None, default_responses_datastore=None):
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(
         description="Look up cached payloads for a vocab request."
     )
-    parser.add_argument(
-        "-d",
-        "--responses-datastore",
-        default=default_responses_datastore,
-        required=default_responses_datastore is None,
-        help=(
-            "Root directory of the responses datastore. "
-            "Defaults to config['responses_datastore'] when HOMEWORK_HERO_CONFIG_PATH is set."
-        ),
-    )
     return parser.parse_args(argv)
 
-def build_worksheet_id(request, config_path):
+def build_worksheet_id(request):
     """
     Encode source_dataset, theme, reading_level, model, section, and seed into an opaque
     but reversible integer worksheet_id.
-    
-    - Lookups reference data files from config["reference_data"] directory
+
+    - Lookups reference data files from the standardized database path
     - Encodes IDs using bit packing and reversible obfuscation
     - Exits with non-zero code if any lookup fails
     """
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    except (OSError, json.JSONDecodeError) as e:
-        raise SystemExit(f"Failed to load config from '{config_path}': {e}") from e
-
-    reference_data_dir = config.get("reference_data")
-    if not reference_data_dir:
-        raise SystemExit(
-            f"Config at '{config_path}' missing 'reference_data' key."
-        )
-
-    reference_data_dir = Path(reference_data_dir)
+    reference_data_dir = get_reference_data_path()
 
     # Extract required fields from request
     try:
@@ -235,7 +194,7 @@ def build_worksheet_id(request, config_path):
     return hex_str
 
 
-def decode_worksheet_id(worksheet_id_str, config_path):
+def decode_worksheet_id(worksheet_id_str):
     """
     Reverse build_worksheet_id: decode an opaque hex worksheet ID back into
     its component parameters.
@@ -279,18 +238,7 @@ def decode_worksheet_id(worksheet_id_str, config_path):
     theme_idx = (packed >> theme_shift) & ((1 << THEME_BITS) - 1)
     dataset_idx = (packed >> dataset_shift) & ((1 << DATASET_BITS) - 1)
 
-    # Load config to find reference_data directory
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    except (OSError, json.JSONDecodeError) as e:
-        raise Phase2Error(f"Failed to load config from '{config_path}': {e}") from e
-
-    reference_data_dir = config.get("reference_data")
-    if not reference_data_dir:
-        raise Phase2Error(f"Config at '{config_path}' missing 'reference_data' key.")
-
-    reference_data_dir = Path(reference_data_dir)
+    reference_data_dir = get_reference_data_path()
 
     def load_list(filename, field_name):
         ref_path = reference_data_dir / filename
@@ -348,7 +296,7 @@ def decode_worksheet_id(worksheet_id_str, config_path):
     }
 
 
-def process_request(request, responses_datastore, config_path):
+def process_request(request):
     logger = get_logger()
     # Extract required fields from the request
     try:
@@ -362,9 +310,9 @@ def process_request(request, responses_datastore, config_path):
         raise Phase2Error(f"Missing required field in request JSON: {e}") from e
 
     reading_level_segment = build_reading_level_segment(reading_level)
-    worksheet_id = build_worksheet_id(request, config_path)
+    worksheet_id = build_worksheet_id(request)
 
-    datastore_root = Path(responses_datastore)
+    datastore_root = get_responses_datastore_path()
 
     # Build expected cache file path:
     # {responses_datastore}/{source_dataset}/{theme}/{reading_level}/{model}/{section}/{seed}.json
@@ -470,44 +418,29 @@ def process_request(request, responses_datastore, config_path):
         next_request = dict(request)
         next_request["seed"] = seed_int + 1
         try:
-            output_payload["qr_worksheet_id"] = build_worksheet_id(next_request, config_path)
+            output_payload["qr_worksheet_id"] = build_worksheet_id(next_request)
         except SystemExit:
             pass
 
     return output_payload
 
 
-def run_from_json(request_json, responses_datastore=None, config_path=None):
-    default_responses_datastore, default_config_path = load_env_defaults()
-    responses_datastore = responses_datastore or default_responses_datastore
-    config_path = config_path or default_config_path
-    if not responses_datastore or not config_path:
-        raise Phase2Error("responses_datastore and config_path are required.")
-
+def run_from_json(request_json):
     try:
         request = json.loads(request_json)
     except json.JSONDecodeError as e:
         raise Phase2Error(f"Failed to parse request JSON: {e}") from e
 
-    output_payload = process_request(
-        request,
-        responses_datastore=responses_datastore,
-        config_path=config_path,
-    )
+    output_payload = process_request(request)
     return json.dumps(output_payload, ensure_ascii=False, indent=2)
 
 
-def run_with_json(request_json, responses_datastore=None, config_path=None):
-    return run_from_json(
-        request_json,
-        responses_datastore=responses_datastore,
-        config_path=config_path,
-    )
+def run_with_json(request_json):
+    return run_from_json(request_json)
 
 
 def main(argv=None):
-    default_responses_datastore, config_path = load_env_defaults()
-    args = parse_args(argv, default_responses_datastore=default_responses_datastore)
+    parse_args(argv)
 
     # Read JSON request from stdin
     try:
@@ -517,11 +450,7 @@ def main(argv=None):
         sys.exit(1)
 
     try:
-        output_payload = process_request(
-            request,
-            responses_datastore=args.responses_datastore,
-            config_path=config_path,
-        )
+        output_payload = process_request(request)
     except Phase2Error as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(e.exit_code)

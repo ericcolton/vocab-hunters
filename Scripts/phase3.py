@@ -1,42 +1,14 @@
 #!/usr/bin/env python3
 import argparse
-import os
 import hashlib
 import json
 import sys
-from pathlib import Path
 
 from Libraries.datasets import load_dataset
-from Libraries.reference_data import get_global_config
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Build phase 3 request JSON from a source dataset."
-    )
-    # If HOMEWORK_HERO_CONFIG_PATH is set and points to a JSON file,
-    # parse it and use its `source_datasets` key as the default value.
-    default_source_datasets = None
-    config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
-    if config_path:
-        cfg_path = Path(config_path)
-        if not cfg_path.is_file():
-            raise SystemExit(f"HOMEWORK_HERO_CONFIG_PATH points to non-existent file: {cfg_path}")
-        try:
-            with cfg_path.open("r", encoding="utf-8") as cf:
-                cfg = json.load(cf)
-        except json.JSONDecodeError as exc:
-            raise SystemExit(f"Failed to parse JSON config at {cfg_path}: {exc}")
-        default_source_datasets = cfg.get("source_datasets")
-
-    parser.add_argument(
-        "-s",
-        "--source-datasets",
-        required=(default_source_datasets is None),
-        default=default_source_datasets,
-        help=(
-            "Directory containing source dataset JSON files. "
-            "Default may be provided by HOMEWORK_HERO_CONFIG_PATH JSON key 'source_datasets'."
-        ),
     )
     return parser.parse_args()
 
@@ -144,7 +116,7 @@ def build_output(request: dict, section_entries: list) -> dict:
 
 
 def main():
-    args = parse_args()
+    parse_args()
 
     stdin_data = sys.stdin.read()
     if not stdin_data.strip():
@@ -152,13 +124,8 @@ def main():
 
     request = load_request(stdin_data)
 
-    # # Make sure required top-level fields are present
-    # for key in ("source_dir"):
-    #     if key not in request:
-    #         raise SystemExit(f"Missing required key in request: {key}")
-
     source_dataset = request["source_dataset"]
-    dataset = load_dataset(source_dataset, source_dir=args.source_datasets)
+    dataset = load_dataset(source_dataset)
 
     # Determine section number from request (section)
     section_number = request.get("section")
@@ -175,11 +142,7 @@ def main():
 def run_from_json(request_json: str) -> str:
     request = load_request(request_json)
     source_dataset = request["source_dataset"]
-    try:
-        (_, config_path) = get_global_config()
-    except RuntimeError as exc:
-        raise SystemExit(str(exc)) from exc
-    dataset = load_dataset(source_dataset, config_path)
+    dataset = load_dataset(source_dataset)
 
     section_number = request.get("section")
     if section_number is None:
