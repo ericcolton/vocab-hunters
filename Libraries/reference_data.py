@@ -3,26 +3,10 @@ import os
 from pathlib import Path
 
 
-def get_global_config():
-    config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
-    if not config_path:
-        raise RuntimeError("HOMEWORK_HERO_CONFIG_PATH is not set.")
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    except (OSError, json.JSONDecodeError) as e:
-        raise RuntimeError(f"Failed to load HOMEWORK_HERO_CONFIG_PATH='{config_path}': {e}") from e
-    return config, config_path
-
-
 def get_database_path() -> Path:
-    config, config_path = get_global_config()
-    db = config.get("homework_hero_database")
+    db = os.environ.get("VOCAB_HUNTERS_DB_PATH")
     if not db:
-        raise ValueError(
-            f"Config at HOMEWORK_HERO_CONFIG_PATH='{config_path}' missing 'homework_hero_database'. "
-            "Old config format (with 'source_datasets', 'prompt_path', etc.) is no longer supported."
-        )
+        raise RuntimeError("VOCAB_HUNTERS_DB_PATH is not set.")
     return Path(db)
 
 

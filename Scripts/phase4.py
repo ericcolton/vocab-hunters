@@ -22,10 +22,9 @@ def get_logger():
 
 def load_default_paths() -> Dict[str, Optional[str]]:
     """
-    Load defaults from HOMEWORK_HERO_CONFIG_PATH via the reference_data library.
+    Load defaults from VOCAB_HUNTERS_DB_PATH via the reference_data library.
     """
-    config_path = os.environ.get("HOMEWORK_HERO_CONFIG_PATH")
-    if not config_path:
+    if not os.environ.get("VOCAB_HUNTERS_DB_PATH"):
         return {"prompt_path": None, "themes_dir": None}
 
     try:

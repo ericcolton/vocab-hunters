@@ -17,12 +17,12 @@ pip install -r requirements.txt
 
 ### Run Flask Development Server
 ```bash
-HOMEWORK_HERO_CONFIG_PATH=/path/to/config.json flask --app app run --debug
+VOCAB_HUNTERS_DB_PATH=/path/to/database flask --app app run --debug
 ```
 
 ### Run Pipeline via CLI
 ```bash
-HOMEWORK_HERO_CONFIG_PATH=/path/to/config.json \
+VOCAB_HUNTERS_DB_PATH=/path/to/database \
   ./Scripts/phase2.py < request.json | ./Scripts/phase3.py | ./Scripts/phase4.py | ./Scripts/phase5.py > output.pdf
 ```
 
@@ -60,14 +60,13 @@ The web app imports Phase 2 and Phase 5 directly, bypassing the CLI pipeline.
 
 ### Configuration
 
-Set `HOMEWORK_HERO_CONFIG_PATH` environment variable to point to a config JSON file. Config keys:
-- `source_datasets` - Path to vocabulary dataset JSON files
-- `prompt_path` - System prompt for AI generation
-- `themes_dir` - Theme context files directory
-- `responses_datastore` - Cache directory for AI responses
-- `reference_data` - Directory containing `source_datasets.json`, `themes.json`, `models.json`
-
-Example configs in `Config/` directory.
+Set `VOCAB_HUNTERS_DB_PATH` environment variable to point to the homework hero database directory. Expected subdirectories:
+- `source_datasets/` - Vocabulary dataset JSON files
+- `themes/` - Theme context files
+- `user_themes/` - User-created theme files
+- `responses_datastore/` - Cache directory for AI responses
+- `reference_data/` - Directory containing `source_datasets.json`, `themes.json`, `models.json`
+- `prompt.txt` - System prompt for AI generation
 
 ### Response Caching
 
@@ -80,5 +79,5 @@ Content checksums ensure idempotent caching - identical vocabulary content produ
 
 ### Libraries
 
-- `Libraries/reference_data.py` - Config loading and reference data management
+- `Libraries/reference_data.py` - Database path resolution and reference data management
 - `Libraries/datasets.py` - Dataset file loading utilities
