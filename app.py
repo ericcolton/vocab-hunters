@@ -24,6 +24,7 @@ from Libraries.reference_data import (
     get_reference_data_path,
     get_source_datasets_dir,
     get_responses_datastore_path,
+    get_user_themes_dir,
     load_source_datasets,
     load_themes,
     lookup_source_dataset,
@@ -60,7 +61,6 @@ def build_pdf_filename(source_dataset, theme, section, episode):
     return f"{sanitize(source_abbr)}-{sanitize(theme_abbr)}-S{section}-E{episode}.pdf"
 
 def save_custom_theme_file(custom_text):
-    from Libraries.reference_data import get_user_themes_dir
     prefix = "The sentences should take place in a world where "
     wrapped = prefix + custom_text
     content_hash = hashlib.sha256(wrapped.encode("utf-8")).hexdigest()
@@ -382,7 +382,7 @@ def generate():
             return jsonify({"error": str(exc)}), 400
 
         try:
-            phase4_output = run_phase4_with_json(phase3_output)
+            phase4_output = run_phase4_with_json(phase3_output, themes_dir=str(get_user_themes_dir()))
         except SystemExit as exc:
             return jsonify({"error": str(exc)}), 500
 
