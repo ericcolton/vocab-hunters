@@ -1,8 +1,10 @@
 
-import hashlib
 import json
 import logging
+import re
 import sys
+import urllib.request
+from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 
@@ -60,17 +62,42 @@ def build_pdf_filename(source_dataset, theme, section, episode):
 
     return f"{sanitize(source_abbr)}-{sanitize(theme_abbr)}-S{section}-E{episode}.pdf"
 
-def save_custom_theme_file(custom_text):
-    prefix = "The sentences should take place in a world where "
-    wrapped = prefix + custom_text
-    content_hash = hashlib.sha256(wrapped.encode("utf-8")).hexdigest()
-    file_stem = f"user_specified_{content_hash}"
+def _sanitize_theme_name(text: str) -> str:
+    sanitized = re.sub(r'\s+', '_', text.strip())
+    sanitized = re.sub(r'[/\\\x00]', '', sanitized)
+    return sanitized[:255] or 'custom'
+
+
+def record_user_theme_episode(custom_text: str):
+    file_stem = _sanitize_theme_name(custom_text)
     user_themes_dir = get_user_themes_dir()
+    user_themes_dir.mkdir(parents=True, exist_ok=True)
     theme_path = user_themes_dir / f"{file_stem}.txt"
-    if not theme_path.exists():
-        theme_path.parent.mkdir(parents=True, exist_ok=True)
-        theme_path.write_text(wrapped, encoding="utf-8")
-    return file_stem
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    with theme_path.open("a", encoding="utf-8") as f:
+        f.write(timestamp + "\n")
+    episode_count = sum(1 for line in theme_path.read_text(encoding="utf-8").splitlines() if line.strip())
+    theme_content = "The sentences should take place in a world where " + file_stem.replace("_", " ")
+    return file_stem, episode_count, theme_content
+
+
+def send_ntfy_notification(theme_name: str, episode: int):
+    import os as _os
+    topic = _os.environ.get("NTFY_TOPIC")
+    if not topic:
+        app.logger.warning("NTFY_TOPIC not set, skipping notification")
+        return
+    message = f"Theme: {theme_name.replace('_', ' ')}\nEpisode: {episode}"
+    req = urllib.request.Request(
+        f"https://ntfy.sh/{topic}",
+        data=message.encode("utf-8"),
+        method="POST",
+    )
+    req.add_header("Title", "Homework Hero: New custom episode")
+    try:
+        urllib.request.urlopen(req, timeout=5)
+    except Exception as exc:
+        app.logger.warning("Failed to send ntfy notification: %s", exc)
 
 def build_worksheet_id_from_params(source_dataset, theme, model, reading_level, section, seed):
     request_dict = {
@@ -360,10 +387,7 @@ def generate():
         if not custom_text:
             return jsonify({"error": "Please describe your custom world."}), 400
 
-        try:
-            theme_file_stem = save_custom_theme_file(custom_text)
-        except ValueError as exc:
-            return jsonify({"error": str(exc)}), 500
+        theme_file_stem, episode_count, theme_content = record_user_theme_episode(custom_text)
 
         # Build payload for Phase 3 with the custom theme file stem
         custom_payload = {
@@ -372,7 +396,7 @@ def generate():
             "reading_level": {"system": "fp", "level": reading_level},
             "model": model,
             "section": section,
-            "seed": 1,
+            "seed": episode_count,
             "worksheet_id": None,
         }
 
@@ -382,7 +406,7 @@ def generate():
             return jsonify({"error": str(exc)}), 400
 
         try:
-            phase4_output = run_phase4_with_json(phase3_output, themes_dir=str(get_user_themes_dir()))
+            phase4_output = run_phase4_with_json(phase3_output, theme_content=theme_content)
         except SystemExit as exc:
             return jsonify({"error": str(exc)}), 500
 
@@ -411,7 +435,7 @@ def generate():
                 "reading_system": "fp",
                 "reading_level": reading_level,
                 "model": model,
-                "episode": 1,
+                "episode": episode_count,
                 "worksheet_id": "",
                 "source": dataset_title,
                 "source_abbr": dataset_abbr,
@@ -440,6 +464,8 @@ def generate():
             pdf_bytes = run_phase5_with_json(json.dumps(phase4_data, ensure_ascii=False))
         except ValueError as exc:
             return jsonify({"error": f"Failed to build PDF: {exc}"}), 500
+
+        send_ntfy_notification(theme_file_stem, episode_count)
 
         resp = Response(pdf_bytes, mimetype="application/pdf")
         resp.headers["Content-Disposition"] = 'inline; filename="custom-worksheet.pdf"'

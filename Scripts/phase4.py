@@ -303,6 +303,7 @@ def run_from_json(
     request_json: str,
     prompt_path: Optional[str] = None,
     themes_dir: Optional[str] = None,
+    theme_content: Optional[str] = None,
 ) -> str:
     defaults = load_default_paths()
     prompt_path = prompt_path or defaults["prompt_path"]
@@ -317,7 +318,8 @@ def run_from_json(
         sys.exit(1)
     raw_system_prompt = read_file_text(prompt_path)
     system_prompt = flesh_out_system_prompt(raw_system_prompt, request_obj)
-    theme_content = load_theme_content(request_obj, themes_dir)
+    if theme_content is None:
+        theme_content = load_theme_content(request_obj, themes_dir)
     model_input = build_model_input(request_obj, theme_content)
     response_payload = call_openai(
         request=request_obj,
@@ -332,11 +334,13 @@ def run_with_json(
     request_json: str,
     prompt_path: Optional[str] = None,
     themes_dir: Optional[str] = None,
+    theme_content: Optional[str] = None,
 ) -> str:
     return run_from_json(
         request_json,
         prompt_path=prompt_path,
         themes_dir=themes_dir,
+        theme_content=theme_content,
     )
 
 
@@ -344,11 +348,13 @@ def run_phase4_with_json(
     request_json: str,
     prompt_path: Optional[str] = None,
     themes_dir: Optional[str] = None,
+    theme_content: Optional[str] = None,
 ) -> str:
     return run_from_json(
         request_json,
         prompt_path=prompt_path,
         themes_dir=themes_dir,
+        theme_content=theme_content,
     )
 
 

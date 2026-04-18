@@ -457,18 +457,19 @@ def build_pdf(doc_root, output_stream):
     qr_worksheet_id = doc_root.get('qr_worksheet_id') or worksheet_id
 
     # Generate QR code image pointing to the next episode
-    try:
-        base_url = f"http://vocabhunters.com/worksheet?id={qr_worksheet_id}" if qr_worksheet_id is not None else "http://vocabhunters.com/"
-        qr_widget = QrCodeWidget(base_url)
-        b = qr_widget.getBounds()
-        w = b[2] - b[0]
-        h = b[3] - b[1]
-        d = Drawing(w, h)
-        d.add(qr_widget)
-        #png_bytes = renderPM.drawToString(d, fmt="PNG")
-        #presentation_variables["qr_code"] = ImageReader(io.BytesIO(png_bytes))
-        qr_code = d
-    except Exception:
+    if qr_worksheet_id is not None:
+        try:
+            base_url = f"http://vocabhunters.com/worksheet?id={qr_worksheet_id}"
+            qr_widget = QrCodeWidget(base_url)
+            b = qr_widget.getBounds()
+            w = b[2] - b[0]
+            h = b[3] - b[1]
+            d = Drawing(w, h)
+            d.add(qr_widget)
+            qr_code = d
+        except Exception:
+            qr_code = None
+    else:
         qr_code = None
 
     header_format = doc_root["presentation_metadata"]["header"]
