@@ -10,30 +10,43 @@ Homework Hero (vocab-hunters) is a vocabulary worksheet generation system that c
 
 ### Pipeline Phases
 
-1. **Phase 2** (`Scripts/phase2.py`): Request validation, worksheet ID generation via bit-packing, and response cache lookup. Entry point: `run_with_json()`
+1. **Phase 2** (`Scripts/phase2.py`): Request validation, worksheet ID generation via bit-packing, and cache orchestration. On a cache miss, Phase 2 internally calls Phase 3 then Phase 4, writes the result to the cache, and returns Phase 4-shaped JSON. On a cache hit, it reads directly from disk. Entry point: `run_with_json()` / `run_from_json()`
 
-2. **Phase 3** (`Scripts/phase3.py`): Extracts vocabulary words, parts of speech, and definitions from source datasets. Generates content checksums for cache tracking.
+2. **Phase 3** (`Scripts/phase3.py`): Extracts vocabulary words, parts of speech, and definitions from source datasets. Builds a doc-level checksum over the vocabulary content. Called by Phase 2 on cache misses; also called directly by Flask for custom-theme generation.
 
-3. **Phase 4** (`Scripts/phase4.py`): Calls OpenAI API with theme context and reading level interpolation. Caches responses by content checksum.
+3. **Phase 4** (`Scripts/phase4.py`): Calls OpenAI API with theme context and reading level interpolation. Writes the structured response to the cache. Called by Phase 2 on cache misses; also called directly by Flask for custom-theme generation.
 
 4. **Phase 5** (`Scripts/phase5.py`): Generates PDF with word bank, questions, and answer key using ReportLab. Entry point: `run_with_json()`
 
+The **standard CLI flow** is therefore:
+```
+phase2 | phase5
+```
+Phase 2 handles the cache orchestration (calling Phase 3 and Phase 4 internally when needed), so piping `phase2 | phase3 | phase4 | phase5` is not the implemented architecture.
+
 ### Flask App (`app.py`)
 
-The web app imports Phase 2 and Phase 5 directly, bypassing the CLI pipeline.
+The web app imports all four phases. Two distinct generation flows exist:
+
+**Standard theme flow** (`POST /generate`, `POST /fetch_episode`, `GET /worksheet_pdf`): calls Phase 2 (which orchestrates Phase 3 and Phase 4 internally) then Phase 5.
+
+**Custom-theme flow** (`POST /generate` with `theme=user_specified`): bypasses Phase 2 entirely, calling Phase 3 → Phase 4 → Phase 5 directly with a user-supplied theme string. Custom-theme responses are not cached in the standard datastore.
 
 **Routes:**
 - `GET /` - Landing page explaining Homework Hero
 - `GET /worksheets` - Worksheet generator UI
+- `GET /worksheet` - Viewer for a specific worksheet by ID (renders `viewer.html`)
+- `GET /worksheet_pdf` - Generates and streams PDF for a worksheet ID
 - `GET /about` - About page
-- `POST /generate` - Create new worksheet PDF
-- `POST /fetch_episode` - Retrieve cached worksheet
-- `GET /sections/<dataset>` - List available sections
+- `POST /generate` - Create new worksheet PDF (standard or custom-theme)
+- `POST /fetch_episode` - Retrieve a specific cached episode as PDF
+- `GET /sections/<dataset>` - List available sections for a dataset
 - `GET /episodes` - List cached episodes for given parameters
 
 **Templates:**
 - `templates/landing.html` - Landing page
 - `templates/generator.html` - Worksheet generator (theme switching, PDF preview)
+- `templates/viewer.html` - Worksheet viewer (episode navigation, PDF embed)
 - `templates/about.html` - About page
 
 ### Configuration
@@ -48,12 +61,12 @@ Set `VOCAB_HUNTERS_DB_PATH` environment variable to point to the homework hero d
 
 ### Response Caching
 
-Responses are stored in a hierarchical filesystem structure:
+Responses are stored in a hierarchical filesystem structure keyed by request parameters:
 ```
-{responses_datastore}/{dataset}/{reading_level}/{section}/{theme}/{model}/{episode}.json
+{responses_datastore}/{dataset}/{reading_level}/{section}/{theme}/{model}/{seed}.json
 ```
 
-Content checksums ensure idempotent caching - identical vocabulary content produces identical cache keys.
+The cache path is determined by the request fields, not by content checksums. Checksums (stored inside the cached JSON as `doc_checksum` and per-entry `checksum`) validate that the cached content matches the source vocabulary — they do not determine the path. A cached file at a given path is therefore tied to the specific reference-data ordering in effect when it was written; reordering `source_datasets.json`, `themes.json`, or `models.json` can change worksheet IDs but does not invalidate existing cache files (the path uses string key names, not indices).
 
 ### Libraries
 
@@ -77,6 +90,7 @@ Each phase script follows a consistent dual-entry pattern:
 - In CLI context (`main()`), use `raise SystemExit(message)` for fatal user-facing errors
 - In library context (called by Flask or another phase), raise a typed exception (e.g., `Phase2Error`) so callers can catch without killing the process
 - Do not swallow exceptions silently; log at `debug` level before re-raising
+- **Current state**: Phase 3 and Phase 4 still raise `SystemExit` from some library-reachable code paths. Phase 2 defensively catches those `SystemExit` calls and re-raises as `Phase2Error` before they reach Flask. New code should raise typed exceptions; do not extend the `SystemExit` pattern.
 
 ### Logging
 - Use the `get_logger()` pattern to return `current_app.logger` inside a Flask request context, falling back to `logging.getLogger(__name__)` for CLI use
@@ -91,7 +105,7 @@ Each phase script follows a consistent dual-entry pattern:
 
 ## Definition of Done
 
-- Run the full pipeline end-to-end (`phase2 | phase3 | phase4 | phase5`) or the Flask `/generate` route and confirm a PDF is produced without errors
+- Run the full pipeline end-to-end (`phase2 | phase5`) or the Flask `/generate` route and confirm a PDF is produced without errors
 - Open the generated PDF and verify word bank, sentence completion questions, and answer key render correctly with no obvious formatting regressions
 - If Phase 4 (OpenAI) was changed, verify cached responses still load and new responses are written to the correct filesystem path
 - Summarize changed files and any risks to the phase-to-phase JSON contract or cache structure
@@ -109,7 +123,7 @@ Phase5's PDF layout uses tightly coupled pixel math — font sizes, margins, wor
 Phase4 uses `client.responses.parse()` with `text_format=JsonOutputFormat` (structured output). This API and structured output mode are only available on newer OpenAI models. Adding a model to `models.json` that doesn't support the Responses API will fail at runtime with a cryptic SDK error.
 
 ### Do not overwrite cached payloads without preserving the full request metadata
-The cache is keyed by content checksum and is meant to be idempotent — the same vocabulary input always produces the same cache path. If you manually write or patch a cached file, the `doc_checksum` and per-entry `checksum` fields inside must remain consistent with the source data, or phase4's checksum validation will reject it on the next run.
+The cache path is keyed by request parameters (`dataset/reading_level/section/theme/model/seed.json`). The same parameter combination always maps to the same path, making generation idempotent by default. If you manually write or patch a cached file, the `doc_checksum` and per-entry `checksum` fields inside must remain consistent with the source vocabulary data, or phase4's checksum validation will reject the file on the next run.
 
 ## Security and Safety
 
