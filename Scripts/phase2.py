@@ -315,7 +315,7 @@ def process_request(request):
     datastore_root = get_responses_datastore_path()
 
     # Build expected cache file path:
-    # {responses_datastore}/{source_dataset}/{theme}/{reading_level}/{model}/{section}/{seed}.json
+    # {responses_datastore}/{source_dataset}/{reading_level}/{section}/{theme}/{model}/{seed}.json
     cache_path = (
         datastore_root
         / str(source_dataset)
