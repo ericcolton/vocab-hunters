@@ -3,8 +3,10 @@ import argparse
 import hashlib
 import json
 import sys
+from pathlib import Path
+from typing import Optional
 
-from Libraries.datasets import load_dataset
+from Libraries.datasets import DatasetError, load_dataset
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -125,7 +127,10 @@ def main():
     request = load_request(stdin_data)
 
     source_dataset = request["source_dataset"]
-    dataset = load_dataset(source_dataset)
+    try:
+        dataset = load_dataset(source_dataset)
+    except DatasetError as exc:
+        raise SystemExit(str(exc)) from exc
 
     # Determine section number from request (section)
     section_number = request.get("section")
@@ -139,10 +144,10 @@ def main():
     json.dump(output, sys.stdout, ensure_ascii=False, indent=2)
 
 
-def run_from_json(request_json: str) -> str:
+def run_from_json(request_json: str, datasets_dir: Optional[Path] = None) -> str:
     request = load_request(request_json)
     source_dataset = request["source_dataset"]
-    dataset = load_dataset(source_dataset)
+    dataset = load_dataset(source_dataset, datasets_dir=datasets_dir)
 
     section_number = request.get("section")
     if section_number is None:
@@ -154,8 +159,8 @@ def run_from_json(request_json: str) -> str:
     return json.dumps(output, ensure_ascii=False, indent=2)
 
 
-def run_with_json(request_json: str):
-    return run_from_json(request_json)
+def run_with_json(request_json: str, datasets_dir: Optional[Path] = None):
+    return run_from_json(request_json, datasets_dir=datasets_dir)
 
 
 if __name__ == "__main__":

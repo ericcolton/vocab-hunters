@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Worksheets - Homework Hero</title>
+    <style>
+        :root {
+            --bg-color: #0a0a12;
+            --card-bg: #161625;
+            --text-color: #ffffff;
+            --accent-primary: #ff007f;
+            --accent-secondary: #00f3ff;
+            --border-glow: 0 0 15px rgba(255, 0, 127, 0.6);
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --btn-gradient: linear-gradient(90deg, #ff007f, #6600ff);
+            --input-bg: #222233;
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            display: flex; justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container { width: 100%; max-width: 720px; padding: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+
+        h1 {
+            font-size: 2.2rem; margin: 0;
+            text-transform: uppercase; letter-spacing: 2px;
+            font-weight: 800;
+            background: var(--btn-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle { font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem; }
+
+        .control-panel {
+            background-color: var(--card-bg);
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative; overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-panel::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: var(--btn-gradient);
+            box-shadow: var(--border-glow);
+        }
+
+        .group-title { font-size: 1.05rem; font-weight: 700; margin: 0 0 0.2rem; }
+        .group-meta { font-size: 0.8rem; opacity: 0.6; margin-bottom: 0.8rem; }
+
+        .episode-links { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .episode-links a {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 34px; height: 34px; padding: 0 0.5rem;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-color);
+            font-size: 0.85rem; font-weight: 600;
+            text-decoration: none;
+        }
+        .episode-links a:hover { border-color: var(--accent-primary); background: rgba(255,255,255,0.12); }
+
+        .empty-state { text-align: center; opacity: 0.8; font-size: 0.95rem; line-height: 1.6; }
+        .empty-state a { color: var(--accent-secondary); font-weight: bold; text-decoration: none; }
+        .empty-state a:hover { text-decoration: underline; }
+
+        h2.section-heading {
+            font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;
+            margin: 2rem 0 1rem; opacity: 0.9; text-align: center;
+        }
+
+        .dataset-row { font-size: 0.95rem; margin: 0.4rem 0; display: flex; justify-content: space-between; }
+        .dataset-row .meta { opacity: 0.6; font-size: 0.85rem; }
+
+        .upload-form label { display: block; font-size: 0.85rem; opacity: 0.8; margin: 0.8rem 0 0.3rem; }
+        .upload-form input[type="text"] {
+            width: 100%; padding: 0.6rem;
+            background: var(--input-bg);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+        .upload-form input[type="file"] { font-size: 0.85rem; margin-top: 0.2rem; color: var(--text-color); }
+        .upload-form .overwrite-row { margin-top: 0.8rem; font-size: 0.85rem; opacity: 0.8; }
+        .upload-btn {
+            margin-top: 1rem; padding: 0.6rem 1.4rem;
+            background: var(--btn-gradient);
+            border: none; border-radius: 8px;
+            color: #fff; font-size: 0.9rem; font-weight: 700;
+            cursor: pointer;
+        }
+        .upload-btn:hover { filter: brightness(1.15); }
+
+        .error-box {
+            background: rgba(255, 0, 64, 0.15);
+            border: 1px solid rgba(255, 0, 64, 0.5);
+            border-radius: 8px;
+            padding: 0.7rem; margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+        .message-box {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            border-radius: 8px;
+            padding: 0.7rem; margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .footer { margin-top: 2rem; text-align: center; font-size: 0.8rem; opacity: 0.5; }
+        .footer a { color: var(--accent-secondary); text-decoration: none; font-weight: bold; }
+        .footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>My Worksheets</h1>
+        <p class="subtitle">Worksheets generated with your saved themes and vocabulary sets.</p>
+    </header>
+
+    {% if groups %}
+        {% for group in groups %}
+        <div class="control-panel">
+            <div class="group-title">{{ group.theme_title }}</div>
+            <div class="group-meta">
+                {{ group.dataset_title }} · Section {{ group.section }} · Level {{ group.reading_level }} · {{ group.model }}
+            </div>
+            <div class="episode-links">
+                {% for ep in group.episodes %}
+                <a href="{{ ep.url }}" title="Episode {{ ep.episode }}">{{ ep.episode }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="control-panel">
+            <div class="empty-state">
+                Nothing saved yet.<br>
+                <a href="/worksheets">Create a worksheet</a> with a custom theme and it will show up here.
+            </div>
+        </div>
+    {% endif %}
+
+    <h2 class="section-heading">My Vocabulary Sets</h2>
+
+    <div class="control-panel">
+        {% if dataset_error %}<div class="error-box">{{ dataset_error }}</div>{% endif %}
+        {% if dataset_saved %}<div class="message-box">Vocabulary set uploaded.</div>{% endif %}
+
+        {% if datasets %}
+            {% for ds in datasets %}
+            <div class="dataset-row">
+                <span>{{ ds.title }}</span>
+                <span class="meta">{{ ds.section_count }} section{{ 's' if ds.section_count != 1 }}</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">No vocabulary sets uploaded yet.</div>
+        {% endif %}
+
+        <form class="upload-form" method="post" action="/my/datasets" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label for="dataset-title">Title (optional — defaults to the file name)</label>
+            <input type="text" id="dataset-title" name="title" maxlength="120">
+            <label for="dataset-file">Dataset JSON file</label>
+            <input type="file" id="dataset-file" name="dataset_file" accept="application/json,.json" required>
+            <div class="overwrite-row">
+                <label><input type="checkbox" name="overwrite" value="1"> Replace if a set with this name exists</label>
+            </div>
+            <button type="submit" class="upload-btn">Upload Vocabulary Set</button>
+        </form>
+    </div>
+
+    <div class="footer">
+        <a href="/">Home</a> · <a href="/worksheets">Create Worksheet</a> · {% include "_authnav.html" %}
+    </div>
+</div>
+
+</body>
+</html>

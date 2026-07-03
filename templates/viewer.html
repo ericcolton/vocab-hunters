@@ -377,7 +377,7 @@
             <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
             <span class="btn-text">Print</span>
         </button>
-        <a href="/worksheet_pdf?id={{ viewer.worksheet_id }}" download="{{ viewer.pdf_filename }}" class="bar-btn">
+        <a href="{{ viewer.pdf_url }}" download="{{ viewer.pdf_filename }}" class="bar-btn">
             <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
             <span class="btn-text">Download</span>
         </a>
@@ -386,8 +386,8 @@
 
 <!-- Main Area -->
 <div class="main-area">
-    {% if viewer.prev_worksheet_id %}
-    <a href="/worksheet?id={{ viewer.prev_worksheet_id }}" class="nav-arrow" title="Previous episode">
+    {% if viewer.prev_url %}
+    <a href="{{ viewer.prev_url }}" class="nav-arrow" title="Previous episode">
         <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
     </a>
     {% else %}
@@ -397,11 +397,11 @@
     {% endif %}
 
     <div class="pdf-container">
-        <iframe id="pdf-frame" {% if viewer.episode_exists %}src="/worksheet_pdf?id={{ viewer.worksheet_id }}"{% endif %} title="Worksheet PDF"></iframe>
+        <iframe id="pdf-frame" {% if viewer.episode_exists %}src="{{ viewer.pdf_url }}"{% endif %} title="Worksheet PDF"></iframe>
     </div>
 
-    {% if viewer.next_worksheet_id %}
-    <a href="/worksheet?id={{ viewer.next_worksheet_id }}" class="nav-arrow" title="Next episode">
+    {% if viewer.next_url %}
+    <a href="{{ viewer.next_url }}" class="nav-arrow" title="Next episode">
         <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
     </a>
     {% elif viewer.next_is_generate %}
@@ -433,7 +433,7 @@
             {% if ep.episode == current_seed %}
                 <span class="page-btn active">{{ ep.episode }}</span>
             {% else %}
-                <a href="/worksheet?id={{ ep.worksheet_id }}" class="page-btn">{{ ep.episode }}</a>
+                <a href="{{ ep.url }}" class="page-btn">{{ ep.episode }}</a>
             {% endif %}
         {% endfor %}
     {% else %}
@@ -464,7 +464,7 @@
             {% if ep.episode == current_seed %}
                 <span class="page-btn active">{{ ep.episode }}</span>
             {% else %}
-                <a href="/worksheet?id={{ ep.worksheet_id }}" class="page-btn">{{ ep.episode }}</a>
+                <a href="{{ ep.url }}" class="page-btn">{{ ep.episode }}</a>
             {% endif %}
             {% set prev_idx.val = idx %}
         {% endfor %}
@@ -580,16 +580,42 @@
         worksheetId: viewerData.worksheet_id,
         episode: viewerData.params.seed,
         episodes: viewerData.episodes,
-        prevWorksheetId: viewerData.prev_worksheet_id,
-        nextWorksheetId: viewerData.next_worksheet_id,
+        prevEp: null,
+        nextEp: null,
         nextIsGenerate: viewerData.next_is_generate,
         nextGenerateEpisode: viewerData.next_generate_episode,
     };
 
+    // ── Mode-aware URL builders ──
+    // Global worksheets are addressed by packed worksheet IDs; user-owned
+    // worksheets (mode 'user') by explicit params on the /my/* routes.
+    const isUserMode = viewerData.mode === 'user';
+
+    function myParams(episode) {
+        return new URLSearchParams({
+            source_dataset: viewerData.params.source_dataset,
+            theme: viewerData.params.theme,
+            reading_level: viewerData.params.reading_level,
+            section: String(viewerData.params.section),
+            model: viewerData.params.model,
+            episode: String(episode),
+        });
+    }
+
+    function episodePageUrl(ep) {
+        if (isUserMode) return '/my/worksheet?' + myParams(ep.episode).toString();
+        return '/worksheet?id=' + encodeURIComponent(ep.worksheet_id);
+    }
+
+    function currentPdfUrl() {
+        if (isUserMode) return '/my/worksheet_pdf?' + myParams(pageState.episode).toString();
+        return '/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId);
+    }
+
     // ── UI Update Functions ──
     function updateIframe() {
         const frame = document.getElementById('pdf-frame');
-        if (frame) frame.src = '/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId);
+        if (frame) frame.src = currentPdfUrl();
     }
 
     function updateHeader() {
@@ -621,13 +647,13 @@
     function updateDownloadLink() {
         const link = document.querySelector('.top-bar-right .bar-btn');
         if (link) {
-            link.href = '/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId);
+            link.href = currentPdfUrl();
             link.download = buildPdfFilename(pageState.episode);
         }
     }
 
     function handlePrint() {
-        const url = '/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId);
+        const url = currentPdfUrl();
 
         // Remove any previous print frame
         const existing = document.getElementById('print-frame');
@@ -664,9 +690,9 @@
 
         // Rebuild prev arrow
         let newPrev;
-        if (pageState.prevWorksheetId) {
+        if (pageState.prevEp) {
             newPrev = document.createElement('a');
-            newPrev.href = '/worksheet?id=' + encodeURIComponent(pageState.prevWorksheetId);
+            newPrev.href = episodePageUrl(pageState.prevEp);
             newPrev.className = 'nav-arrow';
             newPrev.title = 'Previous episode';
         } else {
@@ -678,9 +704,9 @@
 
         // Rebuild next arrow
         let newNext;
-        if (pageState.nextWorksheetId) {
+        if (pageState.nextEp) {
             newNext = document.createElement('a');
-            newNext.href = '/worksheet?id=' + encodeURIComponent(pageState.nextWorksheetId);
+            newNext.href = episodePageUrl(pageState.nextEp);
             newNext.className = 'nav-arrow';
             newNext.title = 'Next episode';
         } else if (pageState.nextIsGenerate) {
@@ -711,7 +737,7 @@
                 if (ep.episode === current) {
                     html += '<span class="page-btn active">' + ep.episode + '</span>';
                 } else {
-                    html += '<a href="/worksheet?id=' + encodeURIComponent(ep.worksheet_id) + '" class="page-btn">' + ep.episode + '</a>';
+                    html += '<a href="' + episodePageUrl(ep) + '" class="page-btn">' + ep.episode + '</a>';
                 }
             }
         } else {
@@ -732,7 +758,7 @@
                 if (ep.episode === current) {
                     html += '<span class="page-btn active">' + ep.episode + '</span>';
                 } else {
-                    html += '<a href="/worksheet?id=' + encodeURIComponent(ep.worksheet_id) + '" class="page-btn">' + ep.episode + '</a>';
+                    html += '<a href="' + episodePageUrl(ep) + '" class="page-btn">' + ep.episode + '</a>';
                 }
                 prevIdx = idx;
             }
@@ -776,11 +802,11 @@
             await fetchAndUpdateEpisodes();
 
             const newEpEntry = pageState.episodes.find(ep => ep.episode === newEpisode);
-            if (!newEpEntry || !newEpEntry.worksheet_id) throw new Error('New episode not found in list');
-            const newId = newEpEntry.worksheet_id;
+            if (!newEpEntry) throw new Error('New episode not found in list');
+            if (!isUserMode && !newEpEntry.worksheet_id) throw new Error('New episode not found in list');
 
             // Advance state to the new episode and recompute nav locally
-            pageState.worksheetId = newId;
+            pageState.worksheetId = newEpEntry.worksheet_id || null;
             pageState.episode = newEpisode;
             recomputeNavState();
 
@@ -792,7 +818,7 @@
             updatePaginationBar();
 
             // Update browser URL without full navigation
-            history.pushState(null, '', '/worksheet?id=' + encodeURIComponent(newId));
+            history.pushState(null, '', episodePageUrl(newEpEntry));
 
             hideLoadingModal();
         } catch (err) {
@@ -806,14 +832,14 @@
     function recomputeNavState() {
         const episodes = pageState.episodes;
         const currentIdx = episodes.findIndex(ep => ep.episode === pageState.episode);
-        pageState.prevWorksheetId = currentIdx > 0 ? episodes[currentIdx - 1].worksheet_id : null;
+        pageState.prevEp = currentIdx > 0 ? episodes[currentIdx - 1] : null;
 
         if (currentIdx >= 0 && currentIdx < episodes.length - 1) {
-            pageState.nextWorksheetId = episodes[currentIdx + 1].worksheet_id;
+            pageState.nextEp = episodes[currentIdx + 1];
             pageState.nextIsGenerate = false;
             pageState.nextGenerateEpisode = null;
         } else {
-            pageState.nextWorksheetId = null;
+            pageState.nextEp = null;
             const lastEp = episodes.length > 0 ? episodes[episodes.length - 1].episode : 0;
             if (lastEp < MAX_SEED) {
                 pageState.nextIsGenerate = true;
@@ -834,7 +860,7 @@
             model: viewerData.params.model,
             section: String(viewerData.params.section),
         });
-        const epResponse = await fetch('/episodes?' + epParams.toString());
+        const epResponse = await fetch((isUserMode ? '/my/episodes?' : '/episodes?') + epParams.toString());
         if (!epResponse.ok) throw new Error('Failed to fetch episodes');
         const epData = await epResponse.json();
         pageState.episodes = epData.episodes || [];
@@ -846,7 +872,7 @@
         showLoadingModal();
         try {
             // Trigger generation via worksheet_pdf (generates any specific episode)
-            const pdfResponse = await fetch('/worksheet_pdf?id=' + encodeURIComponent(pageState.worksheetId));
+            const pdfResponse = await fetch(currentPdfUrl());
             if (!pdfResponse.ok) throw new Error('PDF generation failed');
 
             // Load the PDF into the iframe using a blob URL

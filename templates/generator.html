@@ -429,6 +429,13 @@
                             {% for theme in config.themes %}
                             <option value="{{ theme.id }}">{{ theme.title }}</option>
                             {% endfor %}
+                            {% if config.user_themes %}
+                            <optgroup label="My Themes">
+                                {% for theme in config.user_themes %}
+                                <option value="{{ theme.id }}">{{ theme.title }}</option>
+                                {% endfor %}
+                            </optgroup>
+                            {% endif %}
                         </select>
                     </div>
                 </div>
@@ -446,6 +453,13 @@
                             {% for source in config.data_sources %}
                             <option value="{{ source.id }}">{{ source.title }}</option>
                             {% endfor %}
+                            {% if config.user_datasets %}
+                            <optgroup label="My Vocabulary Sets">
+                                {% for source in config.user_datasets %}
+                                <option value="{{ source.id }}">{{ source.title }}</option>
+                                {% endfor %}
+                            </optgroup>
+                            {% endif %}
                         </select>
                     </div>
                 </div>
@@ -533,7 +547,7 @@
     </div>
 
     <div class="footer">
-        <a href="/">Home</a> · <a href="/about">About</a>
+        <a href="/">Home</a> · <a href="/about">About</a> · {% include "_authnav.html" %}
     </div>
 </div>
 
@@ -546,6 +560,14 @@
             "title": "{{ theme.ui_title }}",
             "subtitle": "{{ theme.ui_subtitle }}",
             "css_class": "{{ theme.css_class }}"
+        },
+        {% endfor %}
+        {% for theme in config.user_themes or [] %}
+        "{{ theme.id }}": {
+            "key_name": {{ theme.key_name | tojson }},
+            "title": {{ theme.title | tojson }},
+            "subtitle": "Your custom theme",
+            "css_class": "theme-custom"
         },
         {% endfor %}
     };
@@ -647,6 +669,14 @@
     function isCustomTheme() {
         const selectedId = document.getElementById('theme').value;
         return themeConfig[selectedId] && themeConfig[selectedId].key_name === 'user_specified';
+    }
+
+    function isUserTheme() {
+        return document.getElementById('theme').value.startsWith('u--');
+    }
+
+    function isUserDataset() {
+        return document.getElementById('datasource').value.startsWith('u--');
     }
 
     function changeTheme() {
@@ -778,6 +808,12 @@
                 }
                 throw new Error('Generate failed.');
             }
+            // Logged-in user content: server points at the persisted copy
+            const myWorksheetUrl = response.headers.get('X-My-Worksheet-Url');
+            if (myWorksheetUrl && myWorksheetUrl.startsWith('/my/worksheet?')) {
+                window.location.href = myWorksheetUrl;
+                return;
+            }
             const worksheetId = response.headers.get('X-Worksheet-Id');
             if (worksheetId) {
                 window.location.href = '/worksheet?id=' + encodeURIComponent(worksheetId);
@@ -806,8 +842,8 @@
         if (!container || !list) {
             return;
         }
-        // Hide episodes for custom theme (no caching)
-        if (isCustomTheme()) {
+        // Hide episodes for custom/user content (browsed via /my/worksheets instead)
+        if (isCustomTheme() || isUserTheme() || isUserDataset()) {
             container.hidden = true;
             list.innerHTML = '';
             updateGenerateButton(false);

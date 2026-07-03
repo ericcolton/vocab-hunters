@@ -1,6 +1,21 @@
 import json
 import os
+import re
 from pathlib import Path
+
+_KEY_COMPONENT_RE = re.compile(r"^[A-Za-z0-9_\-]{1,255}$")
+
+
+def validate_key_component(value, field: str) -> str:
+    """Validate a request field that will be used as a filesystem path component.
+
+    Returns the value as a string. Raises ValueError for anything that could
+    escape the datastore root (path separators, dots, empty values, etc.).
+    """
+    text = str(value)
+    if not _KEY_COMPONENT_RE.match(text):
+        raise ValueError(f"Invalid value for {field}.")
+    return text
 
 
 def get_database_path() -> Path:

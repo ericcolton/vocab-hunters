@@ -32,32 +32,62 @@ The web app imports all four phases. Two distinct generation flows exist:
 
 **Custom-theme flow** (`POST /generate` with `theme=user_specified`): bypasses Phase 2 entirely, calling Phase 3 → Phase 4 → Phase 5 directly with a user-supplied theme string. Custom-theme responses are not cached in the standard datastore.
 
-**Routes:**
+**Routes (public):**
 - `GET /` - Landing page explaining Homework Hero
 - `GET /worksheets` - Worksheet generator UI
 - `GET /worksheet` - Viewer for a specific worksheet by ID (renders `viewer.html`)
 - `GET /worksheet_pdf` - Generates and streams PDF for a worksheet ID
 - `GET /about` - About page
-- `POST /generate` - Create new worksheet PDF (standard or custom-theme)
+- `POST /generate` - Create new worksheet PDF (standard, custom-theme, or per-user)
 - `POST /fetch_episode` - Retrieve a specific cached episode as PDF
-- `GET /sections/<dataset>` - List available sections for a dataset
+- `GET /sections/<dataset>` - List available sections for a dataset (global or `u--` user dataset)
 - `GET /episodes` - List cached episodes for given parameters
+
+**Routes (auth, in `auth.py` blueprint):**
+- `GET/POST /register`, `GET/POST /login`, `POST /logout`, `GET/POST /account`
+
+**Routes (login required, per-user content):**
+- `GET /my/worksheets` - Saved themes, uploaded vocabulary sets, cached worksheets
+- `GET /my/worksheet` - Viewer for a user worksheet (param-addressed, no packed ID)
+- `GET /my/worksheet_pdf` - Streams a cached user worksheet (404 on cache miss; never generates)
+- `GET /my/episodes`, `GET /my/themes`, `GET/POST /my/datasets`
 
 **Templates:**
 - `templates/landing.html` - Landing page
 - `templates/generator.html` - Worksheet generator (theme switching, PDF preview)
-- `templates/viewer.html` - Worksheet viewer (episode navigation, PDF embed)
+- `templates/viewer.html` - Worksheet viewer (episode navigation, PDF embed; serves both global and `/my/` modes via `viewer.mode`)
 - `templates/about.html` - About page
+- `templates/login.html`, `register.html`, `account.html`, `my_worksheets.html` - Auth and per-user pages
+- `templates/_authnav.html` - Login/logout nav partial included in page footers
+
+### Authentication and Per-User Content
+
+Authentication is additive: every pre-existing route works anonymously exactly as before; logging in unlocks persistence.
+
+- **Identity**: `auth.py` blueprint; users stored in SQLite at `{VOCAB_HUNTERS_DB_PATH}/auth.sqlite3` (stdlib `sqlite3`, WAL mode, `PRAGMA user_version` migrations). Passwords hashed with Werkzeug PBKDF2-SHA256 (600k iterations; scrypt unavailable on some Python 3.9 builds).
+- **Sessions**: Flask signed-cookie sessions. `session` holds only `user_id` and `sgen` (a copy of the user's `session_generation`; bumping the column on password change invalidates all other sessions). `SECRET_KEY` env var is required (or `HOMEWORK_HERO_DEV=1` for local dev).
+- **CSRF**: HTML form POSTs carry a per-session token; JSON fetch POSTs rely on `SameSite=Lax` + the JSON content-type preflight requirement (documented in `auth.py`).
+- **Per-user storage** (`Libraries/user_data.py`): each user gets `{db}/users/{user_id}/` with `user_themes/`, `source_datasets/`, and `responses_datastore/` mirroring the global layout. User-owned items surface in the UI/API with a `u--` key prefix so they can never collide with global key_names. `user_id` always comes from the session, never from request input.
+- **Per-user generation** (`Libraries/user_pipeline.py`): `generate_user_worksheet()` mirrors Phase 2's cache orchestration but roots the cache in the user's datastore and calls Phase 3 → Phase 4 directly. User content is not representable in the bit-packed worksheet ID, so payloads keep `worksheet_id=None` and are addressed by explicit params on `/my/*` routes.
+- **Custom themes**: logged-in users' custom themes are saved to their own tree and their worksheets are cached/replayable; the anonymous custom flow (global `user_themes/{stem}.txt`, uncached) is unchanged.
 
 ### Configuration
 
 Set `VOCAB_HUNTERS_DB_PATH` environment variable to point to the homework hero database directory. Expected subdirectories:
 - `source_datasets/` - Vocabulary dataset JSON files
 - `themes/` - Theme context files
-- `user_themes/` - User-created theme files
+- `user_themes/` - Anonymous custom-theme files (legacy flow)
 - `responses_datastore/` - Cache directory for AI responses
 - `reference_data/` - Directory containing `source_datasets.json`, `themes.json`, `models.json`
+- `users/` - Per-user content trees (`users/{user_id}/...`), created on demand
+- `auth.sqlite3` - SQLite identity database, created on first startup
 - `prompt.txt` - System prompt for AI generation
+
+Other environment variables:
+- `SECRET_KEY` (required in production) - session cookie signing key; generate with `python3 -c "import secrets; print(secrets.token_hex(32))"`
+- `HOMEWORK_HERO_DEV=1` - local-dev escape hatch when `SECRET_KEY` is unset
+- `SESSION_COOKIE_SECURE=0` - allow session cookies over plain HTTP for local dev (defaults to secure-only)
+- `OPENAI_API_KEY` - required for Phase 4 generation; `NTFY_TOPIC` - optional notifications
 
 ### Response Caching
 
@@ -109,7 +139,7 @@ Each phase script follows a consistent dual-entry pattern:
 - Open the generated PDF and verify word bank, sentence completion questions, and answer key render correctly with no obvious formatting regressions
 - If Phase 4 (OpenAI) was changed, verify cached responses still load and new responses are written to the correct filesystem path
 - Summarize changed files and any risks to the phase-to-phase JSON contract or cache structure
-- **Note: no automated test suite exists** — consider adding one (pytest with mocked OpenAI responses and a fixture dataset would cover the core pipeline)
+- Run `pytest tests/` (see `requirements-dev.txt`) — covers auth, per-user content, and dataset upload with mocked Phase 4/5; extend it when touching those areas. The generation pipeline itself is still untested.
 
 ## Known Traps
 
@@ -132,13 +162,13 @@ The cache path is keyed by request parameters (`dataset/reading_level/section/th
 - `VOCAB_HUNTERS_DB_PATH` and its contents (especially `responses_datastore/`) should stay outside the repo; cached AI responses may contain copyrighted or sensitive source material
 
 ### Path traversal via request parameters
-Cache paths are constructed directly from request fields (`source_dataset`, `theme`, `model`, `section`, `seed`). If these values come from untrusted input, a crafted value (e.g., `../../etc`) could escape the datastore root. Validate or sanitize these fields before using them as path components.
+Cache paths are constructed directly from request fields (`source_dataset`, `theme`, `model`, `section`, `seed`). All web routes validate these through `validate_key_component()` (`Libraries/reference_data.py`, allowlist `[A-Za-z0-9_-]`) before any path construction — apply it to every new route that turns request input into a path component.
 
 ### Prompt injection via theme files
 Theme file contents are passed verbatim to the OpenAI API as part of the user input. A malicious or malformed theme file (particularly in `user_themes/`) could manipulate model output. Treat user-supplied theme files as untrusted content.
 
-### Flask app has no authentication
-The `/generate` and `/fetch_episode` routes are unauthenticated. The app is designed for local or trusted-network use. Do not expose it publicly without adding an auth layer.
+### Authentication boundaries
+Anonymous routes (`/generate`, `/fetch_episode`, etc.) remain open by design; they only touch global content. Anything user-owned must go through `/my/*` routes guarded by `login_required`, with the user id taken from the session — never accept a user id from request input. `u--`-prefixed keys from anonymous requests must be rejected (the `/generate` handler returns 401).
 
 ### Keep generated user files out of source control
 User-created themes (`user_themes/`) and cached responses (`responses_datastore/`) should not be versioned unless intentionally shared. Ensure `.gitignore` excludes these directories.

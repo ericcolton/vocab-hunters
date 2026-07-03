@@ -10,6 +10,8 @@ from flask import current_app, has_app_context
 from phase3 import run_with_json as run_phase3_with_json
 from phase4 import run_phase4_with_json
 
+from Libraries.datasets import DatasetError
+
 from Libraries.reference_data import (
     get_reference_data_path,
     get_responses_datastore_path,
@@ -346,7 +348,7 @@ def process_request(request):
                 json.dumps(phase_3_input, ensure_ascii=False)
             )
             logger.debug("Exiting run_phase3_with_json()")
-        except SystemExit as e:
+        except (SystemExit, DatasetError) as e:
             raise Phase2Error(str(e)) from e
         try:
             logger.debug("Entering run_phase4_with_json()")
