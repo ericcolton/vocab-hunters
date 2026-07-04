@@ -47,6 +47,7 @@ PASSWORD_MAX_LENGTH = 200
 MAX_FAILED_LOGINS = 10
 LOCKOUT_MINUTES = 15
 LOGIN_ERROR = "Invalid email or password."
+MAX_REGISTRATIONS_PER_IP_PER_HOUR = 5
 
 # Werkzeug's default (scrypt) is unavailable on Python builds whose OpenSSL
 # lacks scrypt (the project targets 3.9). PBKDF2-SHA256 at 600k iterations is
@@ -75,6 +76,15 @@ _MIGRATIONS = [
         locked_until       TEXT,
         created_at         TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
     );
+    """,
+    # migration 2 — IP-based registration rate limiting
+    """
+    CREATE TABLE ip_reg_attempts (
+        id           INTEGER PRIMARY KEY,
+        ip           TEXT NOT NULL,
+        attempted_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
+    );
+    CREATE INDEX ip_reg_attempts_lookup ON ip_reg_attempts(ip, attempted_at);
     """,
 ]
 
@@ -211,6 +221,33 @@ def _log_in_user(row: sqlite3.Row) -> None:
     session.permanent = True
 
 
+def _get_client_ip() -> str:
+    # Render (and most reverse proxies) prepend the real client IP to X-Forwarded-For.
+    xff = request.headers.get("X-Forwarded-For")
+    if xff:
+        return xff.split(",")[0].strip()
+    return request.remote_addr or "unknown"
+
+
+def _check_and_record_registration(db: sqlite3.Connection, ip: str) -> bool:
+    """Insert a registration attempt for ip. Return True if the rate limit is exceeded."""
+    window_start = _iso(_utcnow() - timedelta(hours=1))
+    db.execute(
+        "DELETE FROM ip_reg_attempts WHERE ip = ? AND attempted_at < ?",
+        (ip, window_start),
+    )
+    count = db.execute(
+        "SELECT COUNT(*) FROM ip_reg_attempts WHERE ip = ? AND attempted_at >= ?",
+        (ip, window_start),
+    ).fetchone()[0]
+    if count >= MAX_REGISTRATIONS_PER_IP_PER_HOUR:
+        db.commit()
+        return True
+    db.execute("INSERT INTO ip_reg_attempts (ip) VALUES (?)", (ip,))
+    db.commit()
+    return False
+
+
 def _validate_registration(email: str, password: str) -> Optional[str]:
     if not email or len(email) > EMAIL_MAX_LENGTH or not EMAIL_RE.match(email):
         return "Please enter a valid email address."
@@ -229,13 +266,22 @@ def register():
     if not validate_csrf():
         return render_template("register.html", error="Invalid form token. Please try again.", email=""), 400
 
+    db = get_auth_db()
+    ip = _get_client_ip()
+    if _check_and_record_registration(db, ip):
+        get_logger().debug("Registration rate-limited ip=%s", ip)
+        return render_template(
+            "register.html",
+            error="Too many registration attempts. Please try again later.",
+            email="",
+        ), 429
+
     email = (request.form.get("email") or "").strip()
     password = request.form.get("password") or ""
     error = _validate_registration(email, password)
     if error:
         return render_template("register.html", error=error, email=email), 400
 
-    db = get_auth_db()
     try:
         cursor = db.execute(
             "INSERT INTO users (email, password_hash) VALUES (?, ?)",

@@ -95,3 +95,17 @@ def app_module(tmp_path_factory):
 @pytest.fixture()
 def client(app_module):
     return app_module.app.test_client()
+
+
+@pytest.fixture(autouse=True)
+def _clear_ip_reg_attempts(app_module):
+    """Wipe per-IP registration counters before each test so the shared
+    session-scoped DB doesn't accumulate 127.0.0.1 attempts across tests."""
+    import sqlite3 as _sqlite3
+
+    db_path = Path(os.environ["VOCAB_HUNTERS_DB_PATH"]) / "auth.sqlite3"
+    if db_path.exists():
+        conn = _sqlite3.connect(str(db_path))
+        conn.execute("DELETE FROM ip_reg_attempts")
+        conn.commit()
+        conn.close()

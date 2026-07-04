@@ -184,6 +184,20 @@ def test_path_component_validation(client):
     assert resp.status_code == 400
 
 
+def test_registration_rate_limit(client, app_module, monkeypatch):
+    import auth
+
+    monkeypatch.setattr(auth, "MAX_REGISTRATIONS_PER_IP_PER_HOUR", 3)
+
+    for i in range(3):
+        resp = _register(client, f"ratelimit{i}@example.com")
+        assert resp.status_code == 302, f"attempt {i} should succeed"
+
+    resp = _register(client, "ratelimit_over@example.com")
+    assert resp.status_code == 429
+    assert b"Too many registration attempts" in resp.data
+
+
 def test_anonymous_pages_still_render(client):
     for path in ("/", "/worksheets", "/about"):
         resp = client.get(path)
