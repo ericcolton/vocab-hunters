@@ -16,13 +16,13 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.DEBUG)
 app.logger.setLevel(logging.DEBUG)
 
-_secret_key = os.environ.get("SECRET_KEY")
+_secret_key = os.environ.get("VOCAB_HUNTERS_SECRET_KEY")
 if not _secret_key:
     if os.environ.get("HOMEWORK_HERO_DEV") == "1":
         _secret_key = "dev-only-insecure-secret"
     else:
         raise RuntimeError(
-            "SECRET_KEY environment variable is required "
+            "VOCAB_HUNTERS_SECRET_KEY environment variable is required "
             "(set HOMEWORK_HERO_DEV=1 for local development)."
         )
 app.config.update(

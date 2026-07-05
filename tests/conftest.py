@@ -83,7 +83,7 @@ def app_module(tmp_path_factory):
     db_root = tmp_path_factory.mktemp("vocab_hunters_db")
     _seed_database_dir(db_root)
     os.environ["VOCAB_HUNTERS_DB_PATH"] = str(db_root)
-    os.environ["SECRET_KEY"] = "test-secret-key"
+    os.environ["VOCAB_HUNTERS_SECRET_KEY"] = "test-secret-key"
     os.environ["SESSION_COOKIE_SECURE"] = "0"
 
     import app as app_module_
