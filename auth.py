@@ -18,6 +18,7 @@ import logging
 import re
 import secrets
 import sqlite3
+import time
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 from pathlib import Path
@@ -64,28 +65,37 @@ def hash_password(password: str) -> str:
 # does not reveal whether an account exists.
 _DUMMY_HASH = hash_password("hh-dummy-not-a-password")
 
+# Each migration is a list of individual statements, applied with conn.execute()
+# rather than conn.executescript() — executescript implicitly commits any
+# pending transaction before it runs, which would silently defeat the
+# BEGIN IMMEDIATE lock taken in init_auth_db() and let concurrent workers race
+# on CREATE TABLE.
 _MIGRATIONS = [
     # migration 1
-    """
-    CREATE TABLE users (
-        id                 INTEGER PRIMARY KEY,
-        email              TEXT NOT NULL UNIQUE COLLATE NOCASE,
-        password_hash      TEXT NOT NULL,
-        session_generation INTEGER NOT NULL DEFAULT 1,
-        failed_login_count INTEGER NOT NULL DEFAULT 0,
-        locked_until       TEXT,
-        created_at         TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
-    );
-    """,
+    [
+        """
+        CREATE TABLE users (
+            id                 INTEGER PRIMARY KEY,
+            email              TEXT NOT NULL UNIQUE COLLATE NOCASE,
+            password_hash      TEXT NOT NULL,
+            session_generation INTEGER NOT NULL DEFAULT 1,
+            failed_login_count INTEGER NOT NULL DEFAULT 0,
+            locked_until       TEXT,
+            created_at         TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
+        );
+        """,
+    ],
     # migration 2 — IP-based registration rate limiting
-    """
-    CREATE TABLE ip_reg_attempts (
-        id           INTEGER PRIMARY KEY,
-        ip           TEXT NOT NULL,
-        attempted_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
-    );
-    CREATE INDEX ip_reg_attempts_lookup ON ip_reg_attempts(ip, attempted_at);
-    """,
+    [
+        """
+        CREATE TABLE ip_reg_attempts (
+            id           INTEGER PRIMARY KEY,
+            ip           TEXT NOT NULL,
+            attempted_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
+        );
+        """,
+        "CREATE INDEX ip_reg_attempts_lookup ON ip_reg_attempts(ip, attempted_at);",
+    ],
 ]
 
 
@@ -107,10 +117,29 @@ def get_auth_db_path() -> Path:
 def _connect(path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(str(path), timeout=10)
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA busy_timeout=5000")
+    _ensure_wal_mode(conn)
     conn.execute("PRAGMA foreign_keys=ON")
     return conn
+
+
+def _ensure_wal_mode(conn: sqlite3.Connection) -> None:
+    """Switch the database to WAL once; the mode is stored in the file header,
+    so every later connection (including this check) sees it as a no-op read.
+    SQLite does not invoke the busy-handler while changing journal mode, so
+    busy_timeout does not cover it — if the very first connections against a
+    brand-new file race to make the switch, retry manually instead of letting
+    the OperationalError escape."""
+    if conn.execute("PRAGMA journal_mode").fetchone()[0] == "wal":
+        return
+    for attempt in range(10):
+        try:
+            conn.execute("PRAGMA journal_mode=WAL")
+            return
+        except sqlite3.OperationalError:
+            if attempt == 9:
+                raise
+            time.sleep(0.05)
 
 
 def init_auth_db() -> None:
@@ -123,9 +152,10 @@ def init_auth_db() -> None:
     try:
         conn.execute("BEGIN IMMEDIATE")
         version = conn.execute("PRAGMA user_version").fetchone()[0]
-        for target, script in enumerate(_MIGRATIONS, start=1):
+        for target, statements in enumerate(_MIGRATIONS, start=1):
             if version < target:
-                conn.executescript(script)
+                for statement in statements:
+                    conn.execute(statement)
                 conn.execute(f"PRAGMA user_version = {target}")
                 get_logger().debug("Applied auth migration %d", target)
         conn.commit()
@@ -222,10 +252,10 @@ def _log_in_user(row: sqlite3.Row) -> None:
 
 
 def _get_client_ip() -> str:
-    # Render (and most reverse proxies) prepend the real client IP to X-Forwarded-For.
-    xff = request.headers.get("X-Forwarded-For")
-    if xff:
-        return xff.split(",")[0].strip()
+    # app.py installs ProxyFix(x_for=1), which rewrites remote_addr from the
+    # single trusted X-Forwarded-For hop Render appends. Do not read
+    # X-Forwarded-For directly here: earlier entries in that header are
+    # supplied by the client and trivially spoofable.
     return request.remote_addr or "unknown"
 
 

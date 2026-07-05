@@ -11,8 +11,14 @@ from functools import lru_cache
 from pathlib import Path
 
 from flask import Flask, render_template, request, jsonify, Response, redirect, url_for
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
+# Render sits directly in front of the app as a single reverse-proxy hop, so
+# only the outermost X-Forwarded-For entry it appends is trustworthy; ProxyFix
+# rewrites request.remote_addr to that value and discards earlier,
+# client-controlled entries (see auth._get_client_ip).
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)
 logging.basicConfig(level=logging.DEBUG)
 app.logger.setLevel(logging.DEBUG)
 
