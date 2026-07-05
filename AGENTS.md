@@ -103,6 +103,14 @@ The cache path is determined by the request fields, not by content checksums. Ch
 - `Libraries/reference_data.py` - Database path resolution and reference data management
 - `Libraries/datasets.py` - Dataset file loading utilities
 
+## Development Environment
+
+The project virtual environment is located at `venv/`. Run Python tooling through its executable without requiring shell activation:
+
+```bash
+venv/bin/python -m pytest tests/
+```
+
 ## Coding Conventions
 
 ### Python Style
@@ -139,7 +147,7 @@ Each phase script follows a consistent dual-entry pattern:
 - Open the generated PDF and verify word bank, sentence completion questions, and answer key render correctly with no obvious formatting regressions
 - If Phase 4 (OpenAI) was changed, verify cached responses still load and new responses are written to the correct filesystem path
 - Summarize changed files and any risks to the phase-to-phase JSON contract or cache structure
-- Run `pytest tests/` (see `requirements-dev.txt`) — covers auth, per-user content, and dataset upload with mocked Phase 4/5; extend it when touching those areas. The generation pipeline itself is still untested.
+- Run `venv/bin/python -m pytest tests/` (see `requirements-dev.txt`) — covers auth, per-user content, and dataset upload with mocked Phase 4/5; extend it when touching those areas. The generation pipeline itself is still untested.
 
 ## Known Traps
 
