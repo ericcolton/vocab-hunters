@@ -1,18 +1,44 @@
 
 import json
 import logging
+import os
 import re
 import sys
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from urllib.parse import urlencode
 from functools import lru_cache
 from pathlib import Path
 
 from flask import Flask, render_template, request, jsonify, Response, redirect, url_for
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
+# Render sits directly in front of the app as a single reverse-proxy hop, so
+# only the outermost X-Forwarded-For entry it appends is trustworthy; ProxyFix
+# rewrites request.remote_addr to that value and discards earlier,
+# client-controlled entries (see auth._get_client_ip).
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)
 logging.basicConfig(level=logging.DEBUG)
 app.logger.setLevel(logging.DEBUG)
+
+_secret_key = os.environ.get("VOCAB_HUNTERS_SECRET_KEY")
+if not _secret_key:
+    if os.environ.get("HOMEWORK_HERO_DEV") == "1":
+        _secret_key = "dev-only-insecure-secret"
+    else:
+        raise RuntimeError(
+            "VOCAB_HUNTERS_SECRET_KEY environment variable is required "
+            "(set HOMEWORK_HERO_DEV=1 for local development)."
+        )
+app.config.update(
+    SECRET_KEY=_secret_key,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=os.environ.get("SESSION_COOKIE_SECURE", "1") == "1",
+    PERMANENT_SESSION_LIFETIME=timedelta(days=30),
+    MAX_CONTENT_LENGTH=2 * 1024 * 1024,
+)
 
 scripts_dir = Path(__file__).resolve().parent / "Scripts"
 if str(scripts_dir) not in sys.path:
@@ -24,13 +50,38 @@ from phase4 import run_phase4_with_json
 from phase5 import run_with_json as run_phase5_with_json
 from Libraries.reference_data import (
     get_reference_data_path,
-    get_source_datasets_dir,
     get_responses_datastore_path,
     get_user_themes_dir,
     load_source_datasets,
     load_themes,
     lookup_source_dataset,
+    validate_key_component,
 )
+from auth import auth_bp, current_user, init_auth_db, login_required, validate_csrf
+from Libraries.user_data import (
+    UserDataError,
+    build_theme_content,
+    get_user_source_datasets_dir,
+    get_user_theme,
+    is_user_key,
+    list_user_datasets,
+    list_user_episodes,
+    list_user_themes,
+    list_user_worksheet_groups,
+    make_user_key,
+    save_user_dataset,
+    save_user_theme,
+    strip_user_key,
+)
+from Libraries.user_pipeline import (
+    UserPipelineError,
+    generate_user_worksheet,
+    interpolate_presentation_metadata,
+)
+from Libraries.datasets import DatasetError
+
+app.register_blueprint(auth_bp)
+init_auth_db()
 
 def build_reading_level_segment(reading_level):
     # assume F&P
@@ -98,6 +149,25 @@ def send_ntfy_notification(theme_name: str, episode: int):
         urllib.request.urlopen(req, timeout=5)
     except Exception as exc:
         app.logger.warning("Failed to send ntfy notification: %s", exc)
+
+def _extract_presentation_metadata(raw_payload):
+    """Merge top-level header/footer fields into presentation_metadata."""
+    presentation_metadata = dict(raw_payload.get("presentation_metadata") or {})
+    header_value = raw_payload.get("header")
+    if header_value is None:
+        header_value = raw_payload.get("header_text")
+    footer_value = raw_payload.get("footer")
+    if footer_value is None:
+        footer_value = raw_payload.get("footer_text")
+    answer_key_footer_value = raw_payload.get("answer_key_footer")
+
+    if header_value is not None:
+        presentation_metadata["header"] = header_value
+    if footer_value is not None:
+        presentation_metadata["footer"] = footer_value
+    if answer_key_footer_value is not None:
+        presentation_metadata["answer_key_footer"] = answer_key_footer_value
+    return presentation_metadata
 
 def build_worksheet_id_from_params(source_dataset, theme, model, reading_level, section, seed):
     request_dict = {
@@ -170,11 +240,9 @@ def load_models():
         models[0]["is_default"] = True
     return models
 
-def load_sections_for_dataset(source_dataset):
-    source_datasets_dir = get_source_datasets_dir()
-    dataset_path = source_datasets_dir / f"{source_dataset}.json"
-    with open(dataset_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+def load_sections_for_dataset(source_dataset, datasets_dir=None):
+    from Libraries.datasets import load_dataset
+    data = load_dataset(source_dataset, datasets_dir=datasets_dir)
     sections = data.get("sections", [])
     if not isinstance(sections, list):
         return []
@@ -200,13 +268,25 @@ def get_app_config():
         "levels": list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),  # Generates ['A', 'B', ... 'Z']
     }
 
+def build_view_config():
+    """Global reference config plus the logged-in user's content (if any).
+
+    get_app_config() stays lru_cached and global-only; user data must never
+    land in that cache."""
+    config = dict(get_app_config())
+    user = current_user()
+    if user is not None:
+        config["user_themes"] = list_user_themes(user["id"])
+        config["user_datasets"] = list_user_datasets(user["id"])
+    return config
+
 @app.route('/')
 def landing():
-    return render_template('landing.html', config=get_app_config())
+    return render_template('landing.html', config=build_view_config())
 
 @app.route('/worksheets')
 def worksheets():
-    return render_template('generator.html', config=get_app_config(), worksheet_params=None)
+    return render_template('generator.html', config=build_view_config(), worksheet_params=None)
 
 @app.route('/worksheet')
 def worksheet():
@@ -239,7 +319,7 @@ def worksheet():
         section=params["section"],
     )
 
-    # Enrich episodes with worksheet IDs
+    # Enrich episodes with worksheet IDs and view URLs
     for ep in episodes_list:
         ep["worksheet_id"] = build_worksheet_id_from_params(
             source_dataset=params["source_dataset"],
@@ -249,6 +329,7 @@ def worksheet():
             section=params["section"],
             seed=ep["episode"],
         )
+        ep["url"] = f"/worksheet?id={ep['worksheet_id']}" if ep["worksheet_id"] else None
 
     # Find current position and compute prev/next
     current_seed = params["seed"]
@@ -296,13 +377,17 @@ def worksheet():
     )
 
     viewer = {
+        "mode": "global",
         "worksheet_id": worksheet_id,
         "pdf_filename": pdf_filename,
+        "pdf_url": f"/worksheet_pdf?id={worksheet_id}",
         "params": params,
         "episodes": episodes_list,
         "episode_exists": current_idx is not None,
         "prev_worksheet_id": prev_worksheet_id,
         "next_worksheet_id": next_worksheet_id,
+        "prev_url": f"/worksheet?id={prev_worksheet_id}" if prev_worksheet_id else None,
+        "next_url": f"/worksheet?id={next_worksheet_id}" if next_worksheet_id else None,
         "next_is_generate": next_is_generate,
         "next_generate_episode": next_generate_episode,
         "theme_entry": theme_entry,
@@ -374,6 +459,18 @@ def generate():
     if not all([source_dataset, theme, reading_level, model, section]):
         return jsonify({"error": "Missing required fields."}), 400
 
+    try:
+        for field, value in (
+            ("source_dataset", source_dataset),
+            ("theme", theme),
+            ("reading_level", reading_level),
+            ("model", model),
+            ("section", section),
+        ):
+            validate_key_component(value, field)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+
     # --- Custom theme branch: bypass Phase 2 entirely ---
     app_config = get_app_config()
     theme_entry = None
@@ -381,8 +478,67 @@ def generate():
         if t["id"] == theme:
             theme_entry = t
             break
+    is_custom_request = bool(theme_entry and theme_entry.get("key_name") == "user_specified")
 
-    if theme_entry and theme_entry.get("key_name") == "user_specified":
+    user = current_user()
+    if user is None and (is_user_key(theme) or is_user_key(source_dataset)):
+        return jsonify({"error": "Login required."}), 401
+
+    # --- Logged-in user content: per-user pipeline with private caching ---
+    if user is not None and (is_custom_request or is_user_key(theme) or is_user_key(source_dataset)):
+        theme_key = theme
+        if is_custom_request:
+            custom_text = raw_payload.get("custom_theme_text", "").strip()
+            if not custom_text:
+                return jsonify({"error": "Please describe your custom world."}), 400
+            try:
+                theme_key = make_user_key(save_user_theme(user["id"], custom_text))
+            except UserDataError as exc:
+                return jsonify({"error": str(exc)}), 400
+
+        presentation_metadata = _extract_presentation_metadata(raw_payload)
+
+        try:
+            response_json, seed_used = generate_user_worksheet(
+                user_id=user["id"],
+                source_dataset=source_dataset,
+                theme=theme_key,
+                reading_level=reading_level,
+                model=model,
+                section=section,
+                presentation_metadata=presentation_metadata or None,
+            )
+        except UserPipelineError as exc:
+            return jsonify({"error": str(exc)}), 404 if exc.not_found else 400
+
+        try:
+            pdf_bytes = run_phase5_with_json(response_json)
+        except ValueError as exc:
+            return jsonify({"error": f"Failed to build PDF: {exc}"}), 500
+
+        my_worksheet_url = "/my/worksheet?" + urlencode(
+            {
+                "source_dataset": source_dataset,
+                "theme": theme_key,
+                "reading_level": reading_level,
+                "section": section,
+                "model": model,
+                "episode": seed_used,
+            }
+        )
+        filename = build_pdf_filename(
+            source_dataset=source_dataset,
+            theme=theme_key,
+            section=section,
+            episode=seed_used,
+        )
+        resp = Response(pdf_bytes, mimetype="application/pdf")
+        resp.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+        resp.headers["X-My-Worksheet-Url"] = my_worksheet_url
+        return resp
+
+    # --- Anonymous custom theme: unchanged legacy behavior (uncached) ---
+    if is_custom_request:
         custom_text = raw_payload.get("custom_theme_text", "").strip()
         if not custom_text:
             return jsonify({"error": "Please describe your custom world."}), 400
@@ -402,7 +558,7 @@ def generate():
 
         try:
             phase3_output = run_phase3_with_json(json.dumps(custom_payload, ensure_ascii=False))
-        except SystemExit as exc:
+        except (SystemExit, DatasetError) as exc:
             return jsonify({"error": str(exc)}), 400
 
         try:
@@ -413,17 +569,7 @@ def generate():
         phase4_data = json.loads(phase4_output)
 
         # Add presentation_metadata with interpolated variables
-        presentation_metadata = dict(raw_payload.get("presentation_metadata") or {})
-        header_value = raw_payload.get("header") or raw_payload.get("header_text")
-        footer_value = raw_payload.get("footer") or raw_payload.get("footer_text")
-        answer_key_footer_value = raw_payload.get("answer_key_footer")
-
-        if header_value is not None:
-            presentation_metadata["header"] = header_value
-        if footer_value is not None:
-            presentation_metadata["footer"] = footer_value
-        if answer_key_footer_value is not None:
-            presentation_metadata["answer_key_footer"] = answer_key_footer_value
+        presentation_metadata = _extract_presentation_metadata(raw_payload)
 
         if presentation_metadata:
             dataset_entry = lookup_source_dataset(source_dataset)
@@ -443,19 +589,9 @@ def generate():
                 "theme_abbr": "Custom",
             }
 
-            interpolated_metadata = dict(presentation_metadata)
-            for key in ("header", "footer", "answer_key_footer"):
-                if key in interpolated_metadata:
-                    template = interpolated_metadata[key]
-                    if template is None:
-                        continue
-                    text = str(template)
-                    for var_key, value in presentation_variables.items():
-                        placeholder = "{" + var_key + "}"
-                        text = text.replace(placeholder, str(value))
-                    interpolated_metadata[key] = text
-
-            phase4_data["presentation_metadata"] = interpolated_metadata
+            phase4_data["presentation_metadata"] = interpolate_presentation_metadata(
+                presentation_metadata, presentation_variables
+            )
 
         # Set worksheet_id to None so Phase 5 falls back to base URL for QR
         phase4_data["worksheet_id"] = None
@@ -485,21 +621,7 @@ def generate():
 
     next_episode = episodes_list[-1]["episode"] + 1 if episodes_list else 1
 
-    presentation_metadata = dict(raw_payload.get("presentation_metadata") or {})
-    header_value = raw_payload.get("header")
-    if header_value is None:
-        header_value = raw_payload.get("header_text")
-    footer_value = raw_payload.get("footer")
-    if footer_value is None:
-        footer_value = raw_payload.get("footer_text")
-    answer_key_footer_value = raw_payload.get("answer_key_footer")
-
-    if header_value is not None:
-        presentation_metadata["header"] = header_value
-    if footer_value is not None:
-        presentation_metadata["footer"] = footer_value
-    if answer_key_footer_value is not None:
-        presentation_metadata["answer_key_footer"] = answer_key_footer_value
+    presentation_metadata = _extract_presentation_metadata(raw_payload)
 
     payload = {
         "source_dataset": source_dataset,
@@ -549,7 +671,17 @@ def generate():
 @app.route('/sections/<source_dataset>')
 def sections(source_dataset):
     try:
-        sections = load_sections_for_dataset(source_dataset)
+        validate_key_component(source_dataset, "source_dataset")
+        if is_user_key(source_dataset):
+            user = current_user()
+            if user is None:
+                return jsonify({"error": "Not found."}), 404
+            sections = load_sections_for_dataset(
+                strip_user_key(source_dataset),
+                datasets_dir=get_user_source_datasets_dir(user["id"]),
+            )
+        else:
+            sections = load_sections_for_dataset(source_dataset)
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
     return jsonify({"sections": sections})
@@ -563,6 +695,17 @@ def episodes():
     section = request.args.get("section")
     if not all([source_dataset, theme, reading_level, model, section]):
         return jsonify({"episodes": []})
+    try:
+        for field, value in (
+            ("source_dataset", source_dataset),
+            ("theme", theme),
+            ("reading_level", reading_level),
+            ("model", model),
+            ("section", section),
+        ):
+            validate_key_component(value, field)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
     try:
         episodes_list = list_cached_episodes(
             source_dataset=source_dataset,
@@ -593,6 +736,13 @@ def fetch_episode():
             presentation_metadata[key] = payload.pop(key)
     if presentation_metadata:
         payload["presentation_metadata"] = presentation_metadata
+    try:
+        for field in ("source_dataset", "theme", "reading_level", "model", "section", "episode"):
+            if field not in payload:
+                raise ValueError(f"Missing required field: {field}.")
+            validate_key_component(payload[field], field)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
     payload["seed"] = payload["episode"]
     payload["reading_level"] = {"system": "fp", "level": payload["reading_level"]}
 
@@ -618,6 +768,269 @@ def fetch_episode():
     resp = Response(pdf_bytes, mimetype="application/pdf")
     resp.headers["Content-Disposition"] = f'inline; filename="{filename}"'
     return resp
+
+MY_WORKSHEET_PARAM_FIELDS = ("source_dataset", "theme", "reading_level", "section", "model")
+
+def _validated_my_params(args):
+    """Extract and validate the /my/* identifying params from request args.
+    Raises ValueError on missing/unsafe values."""
+    params = {}
+    for field in MY_WORKSHEET_PARAM_FIELDS:
+        value = args.get(field)
+        if not value:
+            raise ValueError(f"Missing required field: {field}.")
+        params[field] = validate_key_component(value, field)
+    return params
+
+def _my_worksheet_urls(params, episode):
+    query = dict(params)
+    query["episode"] = episode
+    encoded = urlencode(query)
+    return "/my/worksheet?" + encoded, "/my/worksheet_pdf?" + encoded
+
+def _resolve_my_theme_entry(user_id, theme):
+    """A synthetic theme entry (css_class/ui_title) for user-owned themes,
+    falling back to the global entry or the default theme."""
+    app_config = get_app_config()
+    if is_user_key(theme):
+        try:
+            record = get_user_theme(user_id, strip_user_key(theme))
+        except UserDataError:
+            record = None
+        title = (record or {}).get("title") or theme
+        return {
+            "css_class": "",
+            "ui_title": title,
+            "ui_subtitle": "Your custom theme",
+            "title_abbr": "Custom",
+        }
+    for t in app_config["themes"]:
+        if t["id"] == theme:
+            return t
+    return app_config["themes"][0] if app_config["themes"] else None
+
+def _my_episode_entries(user, params):
+    reading_level_segment = build_reading_level_segment(params["reading_level"])
+    episodes_list = list_user_episodes(
+        user["id"],
+        params["source_dataset"],
+        reading_level_segment,
+        params["section"],
+        params["theme"],
+        params["model"],
+    )
+    for ep in episodes_list:
+        ep["url"], ep["pdf_url"] = _my_worksheet_urls(params, ep["episode"])
+        ep["worksheet_id"] = None
+    return episodes_list
+
+@app.route('/my/worksheets')
+@login_required
+def my_worksheets():
+    user = current_user()
+    themes = list_user_themes(user["id"])
+    theme_titles = {t["id"]: t["title"] for t in themes}
+    for t in get_app_config()["themes"]:
+        theme_titles.setdefault(t["id"], t["title"])
+    dataset_titles = {d["id"]: d["title"] for d in get_app_config()["data_sources"]}
+
+    groups = []
+    for group in list_user_worksheet_groups(user["id"]):
+        params = {
+            "source_dataset": group["source_dataset"],
+            "theme": group["theme"],
+            "reading_level": group["reading_level"],
+            "section": group["section"],
+            "model": group["model"],
+        }
+        episodes = [
+            {"episode": ep, "url": _my_worksheet_urls(params, ep)[0]}
+            for ep in group["episodes"]
+        ]
+        groups.append(
+            {
+                "theme_title": theme_titles.get(group["theme"], group["theme"]),
+                "dataset_title": dataset_titles.get(
+                    group["source_dataset"],
+                    group["source_dataset"].replace("u--", "", 1).replace("_", " "),
+                ),
+                "reading_level": group["reading_level"],
+                "section": group["section"],
+                "model": group["model"],
+                "episodes": episodes,
+            }
+        )
+    return render_template(
+        'my_worksheets.html',
+        config=build_view_config(),
+        themes=themes,
+        groups=groups,
+        datasets=list_user_datasets(user["id"]),
+        dataset_error=request.args.get('dataset_error'),
+        dataset_saved=request.args.get('dataset_saved'),
+    )
+
+@app.route('/my/worksheet')
+@login_required
+def my_worksheet():
+    user = current_user()
+    try:
+        params = _validated_my_params(request.args)
+        episode = int(request.args.get("episode", ""))
+    except ValueError:
+        return redirect(url_for('my_worksheets'))
+
+    episodes_list = _my_episode_entries(user, params)
+    current_idx = None
+    for i, ep in enumerate(episodes_list):
+        if ep["episode"] == episode:
+            current_idx = i
+            break
+    if current_idx is None:
+        return redirect(url_for('my_worksheets'))
+
+    prev_url = episodes_list[current_idx - 1]["url"] if current_idx > 0 else None
+    next_url = None
+    next_is_generate = False
+    next_generate_episode = None
+    if current_idx < len(episodes_list) - 1:
+        next_url = episodes_list[current_idx + 1]["url"]
+    else:
+        next_is_generate = True
+        next_generate_episode = episodes_list[-1]["episode"] + 1
+
+    view_url, pdf_url = _my_worksheet_urls(params, episode)
+    theme_entry = _resolve_my_theme_entry(user["id"], params["theme"])
+    pdf_filename = build_pdf_filename(
+        source_dataset=params["source_dataset"],
+        theme=params["theme"],
+        section=params["section"],
+        episode=episode,
+    )
+
+    viewer = {
+        "mode": "user",
+        "worksheet_id": None,
+        "pdf_filename": pdf_filename,
+        "pdf_url": pdf_url,
+        "params": {
+            "source_dataset": params["source_dataset"],
+            "theme": params["theme"],
+            "model": params["model"],
+            "reading_level": params["reading_level"],
+            "section": params["section"],
+            "seed": episode,
+        },
+        "episodes": episodes_list,
+        "episode_exists": True,
+        "prev_worksheet_id": None,
+        "next_worksheet_id": None,
+        "prev_url": prev_url,
+        "next_url": next_url,
+        "next_is_generate": next_is_generate,
+        "next_generate_episode": next_generate_episode,
+        "theme_entry": theme_entry,
+    }
+    return render_template('viewer.html', viewer=viewer, config=build_view_config())
+
+@app.route('/my/worksheet_pdf')
+@login_required
+def my_worksheet_pdf():
+    user = current_user()
+    try:
+        params = _validated_my_params(request.args)
+        episode = int(request.args.get("episode", ""))
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    presentation_metadata = {
+        "header": "{theme} - Section {section}",
+        "footer": "Page {current_page} of {total_pages}",
+        "answer_key_footer": "Fountas & Pinnell Level {reading_level}",
+    }
+    try:
+        response_json, _ = generate_user_worksheet(
+            user_id=user["id"],
+            source_dataset=params["source_dataset"],
+            theme=params["theme"],
+            reading_level=params["reading_level"],
+            model=params["model"],
+            section=params["section"],
+            seed=episode,
+            presentation_metadata=presentation_metadata,
+            allow_generate=False,
+        )
+    except UserPipelineError as exc:
+        return jsonify({"error": str(exc)}), 404 if exc.not_found else 400
+
+    try:
+        pdf_bytes = run_phase5_with_json(response_json)
+    except ValueError as exc:
+        return jsonify({"error": f"Failed to build PDF: {exc}"}), 500
+
+    filename = build_pdf_filename(
+        source_dataset=params["source_dataset"],
+        theme=params["theme"],
+        section=params["section"],
+        episode=episode,
+    )
+    resp = Response(pdf_bytes, mimetype="application/pdf")
+    resp.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+    return resp
+
+@app.route('/my/episodes')
+@login_required
+def my_episodes():
+    user = current_user()
+    try:
+        params = _validated_my_params(request.args)
+    except ValueError:
+        return jsonify({"episodes": []})
+    return jsonify({"episodes": _my_episode_entries(user, params)})
+
+@app.route('/my/themes')
+@login_required
+def my_themes():
+    user = current_user()
+    return jsonify({"themes": list_user_themes(user["id"])})
+
+@app.route('/my/datasets', methods=['GET', 'POST'])
+@login_required
+def my_datasets():
+    user = current_user()
+    if request.method == 'GET':
+        return jsonify({"datasets": list_user_datasets(user["id"])})
+
+    uploaded = request.files.get("dataset_file")
+    if uploaded is not None:
+        # Classic form upload from /my/worksheets: CSRF-checked, redirects back.
+        if not validate_csrf():
+            return jsonify({"error": "Invalid form token."}), 400
+        title = (request.form.get("title") or "").strip() or Path(uploaded.filename or "").stem
+        overwrite = request.form.get("overwrite") == "1"
+        try:
+            data = json.load(uploaded.stream)
+        except (ValueError, UnicodeDecodeError):
+            return redirect(url_for('my_worksheets', dataset_error="Could not parse the file as JSON."))
+        try:
+            save_user_dataset(user["id"], title, data, overwrite=overwrite)
+        except UserDataError as exc:
+            return redirect(url_for('my_worksheets', dataset_error=str(exc)))
+        return redirect(url_for('my_worksheets', dataset_saved="1"))
+
+    # JSON API upload
+    payload = request.get_json(silent=True)
+    if payload is None:
+        return jsonify({"error": "Expected a JSON body or a dataset_file upload."}), 400
+    title = (payload.get("title") or "").strip()
+    dataset = payload.get("dataset") if "dataset" in payload else payload
+    overwrite = bool(payload.get("overwrite"))
+    try:
+        stem = save_user_dataset(user["id"], title, dataset, overwrite=overwrite)
+    except UserDataError as exc:
+        status = 409 if getattr(exc, "already_exists", False) else 400
+        return jsonify({"error": str(exc)}), status
+    return jsonify({"id": make_user_key(stem), "stem": stem}), 201
 
 @app.route('/about')
 def about():

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Homework Hero</title>
+    <style>
+        :root {
+            --bg-color: #0a0a12;
+            --card-bg: #161625;
+            --text-color: #ffffff;
+            --accent-primary: #ff007f;
+            --accent-secondary: #00f3ff;
+            --border-glow: 0 0 15px rgba(255, 0, 127, 0.6);
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --btn-gradient: linear-gradient(90deg, #ff007f, #6600ff);
+            --input-bg: #222233;
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+        }
+
+        .container { width: 100%; max-width: 420px; padding: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+
+        h1 {
+            font-size: 2.2rem; margin: 0;
+            text-transform: uppercase; letter-spacing: 2px;
+            font-weight: 800;
+            background: var(--btn-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle { font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem; }
+
+        .control-panel {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative; overflow: hidden;
+        }
+
+        .control-panel::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: var(--btn-gradient);
+            box-shadow: var(--border-glow);
+        }
+
+        label { display: block; font-size: 0.85rem; opacity: 0.8; margin: 1rem 0 0.3rem; }
+
+        input[type="email"], input[type="password"] {
+            width: 100%; padding: 0.7rem;
+            background: var(--input-bg);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        input:focus { outline: none; border-color: var(--accent-secondary); }
+
+        .submit-btn {
+            width: 100%; margin-top: 1.5rem; padding: 0.8rem;
+            background: var(--btn-gradient);
+            border: none; border-radius: 8px;
+            color: #fff; font-size: 1rem; font-weight: 700;
+            cursor: pointer; letter-spacing: 1px;
+        }
+        .submit-btn:hover { filter: brightness(1.15); }
+
+        .error-box {
+            background: rgba(255, 0, 64, 0.15);
+            border: 1px solid rgba(255, 0, 64, 0.5);
+            border-radius: 8px;
+            padding: 0.7rem; margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .alt-link { margin-top: 1.2rem; text-align: center; font-size: 0.9rem; opacity: 0.8; }
+        .alt-link a { color: var(--accent-secondary); text-decoration: none; font-weight: bold; }
+        .alt-link a:hover { text-decoration: underline; }
+
+        .footer { margin-top: 2rem; text-align: center; font-size: 0.8rem; opacity: 0.5; }
+        .footer a { color: var(--accent-secondary); text-decoration: none; font-weight: bold; }
+        .footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Sign Up</h1>
+        <p class="subtitle">Save your own themes, worksheets, and vocabulary sets.</p>
+    </header>
+
+    <div class="control-panel">
+        {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
+        <form method="post" action="/register">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ email }}" required autofocus autocomplete="email">
+            <label for="password">Password (at least 8 characters)</label>
+            <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
+            <button type="submit" class="submit-btn">Create Account</button>
+        </form>
+        <div class="alt-link">Already have an account? <a href="/login">Log in</a></div>
+    </div>
+
+    <div class="footer">
+        <a href="/">Home</a> · <a href="/worksheets">Create Worksheet</a>
+    </div>
+</div>
+
+</body>
+</html>

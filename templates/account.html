@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account - Homework Hero</title>
+    <style>
+        :root {
+            --bg-color: #0a0a12;
+            --card-bg: #161625;
+            --text-color: #ffffff;
+            --accent-primary: #ff007f;
+            --accent-secondary: #00f3ff;
+            --border-glow: 0 0 15px rgba(255, 0, 127, 0.6);
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --btn-gradient: linear-gradient(90deg, #ff007f, #6600ff);
+            --input-bg: #222233;
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+        }
+
+        .container { width: 100%; max-width: 480px; padding: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+
+        h1 {
+            font-size: 2.2rem; margin: 0;
+            text-transform: uppercase; letter-spacing: 2px;
+            font-weight: 800;
+            background: var(--btn-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .control-panel {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative; overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-panel::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: var(--btn-gradient);
+            box-shadow: var(--border-glow);
+        }
+
+        h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 1rem; opacity: 0.9; }
+
+        .account-row { font-size: 0.95rem; margin: 0.4rem 0; }
+        .account-row .label { opacity: 0.6; margin-right: 0.5rem; }
+
+        label { display: block; font-size: 0.85rem; opacity: 0.8; margin: 1rem 0 0.3rem; }
+
+        input[type="password"] {
+            width: 100%; padding: 0.7rem;
+            background: var(--input-bg);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        input:focus { outline: none; border-color: var(--accent-secondary); }
+
+        .submit-btn {
+            width: 100%; margin-top: 1.5rem; padding: 0.8rem;
+            background: var(--btn-gradient);
+            border: none; border-radius: 8px;
+            color: #fff; font-size: 1rem; font-weight: 700;
+            cursor: pointer; letter-spacing: 1px;
+        }
+        .submit-btn:hover { filter: brightness(1.15); }
+
+        .error-box {
+            background: rgba(255, 0, 64, 0.15);
+            border: 1px solid rgba(255, 0, 64, 0.5);
+            border-radius: 8px;
+            padding: 0.7rem; margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .message-box {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            border-radius: 8px;
+            padding: 0.7rem; margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .logout-form { text-align: center; margin-top: 0.5rem; }
+        .logout-btn {
+            background: none; border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 8px; padding: 0.5rem 1.2rem;
+            color: var(--text-color); font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .logout-btn:hover { border-color: var(--accent-primary); }
+
+        .footer { margin-top: 2rem; text-align: center; font-size: 0.8rem; opacity: 0.5; }
+        .footer a { color: var(--accent-secondary); text-decoration: none; font-weight: bold; }
+        .footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Account</h1>
+    </header>
+
+    <div class="control-panel">
+        <h2>Profile</h2>
+        <div class="account-row"><span class="label">Email</span> {{ user['email'] }}</div>
+        <div class="account-row"><span class="label">Member since</span> {{ user['created_at'] }}</div>
+    </div>
+
+    <div class="control-panel">
+        <h2>Change Password</h2>
+        {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
+        {% if message %}<div class="message-box">{{ message }}</div>{% endif %}
+        <form method="post" action="/account">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label for="old_password">Current password</label>
+            <input type="password" id="old_password" name="old_password" required autocomplete="current-password">
+            <label for="new_password">New password (at least 8 characters)</label>
+            <input type="password" id="new_password" name="new_password" required minlength="8" autocomplete="new-password">
+            <button type="submit" class="submit-btn">Update Password</button>
+        </form>
+    </div>
+
+    <form method="post" action="/logout" class="logout-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="logout-btn">Log Out</button>
+    </form>
+
+    <div class="footer">
+        <a href="/">Home</a> · <a href="/worksheets">Create Worksheet</a>
+    </div>
+</div>
+
+</body>
+</html>

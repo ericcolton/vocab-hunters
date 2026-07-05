@@ -1,0 +1,20 @@
+<style>
+    .auth-nav form { display: inline; }
+    .auth-nav button {
+        background: none; border: none; padding: 0; font: inherit;
+        color: var(--accent-secondary, #00f3ff); font-weight: bold;
+        cursor: pointer;
+    }
+    .auth-nav button:hover { text-decoration: underline; }
+    .auth-nav .auth-email { opacity: 0.8; }
+</style>
+<span class="auth-nav">
+    {% if current_user %}
+        <span class="auth-email">{{ current_user['email'] }}</span>
+        · <a href="/my/worksheets">My Worksheets</a>
+        · <a href="/account">Account</a>
+        · <form method="post" action="/logout"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Log out</button></form>
+    {% else %}
+        <a href="/login">Log in</a> · <a href="/register">Sign up</a>
+    {% endif %}
+</span>
