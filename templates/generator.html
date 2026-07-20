@@ -820,11 +820,14 @@
                 return;
             }
             // No worksheet ID (custom theme) — download PDF as blob
+            const disposition = response.headers.get('Content-Disposition') || '';
+            const match = disposition.match(/filename="([^"]+)"/);
+            const filename = match ? match[1] : 'custom-worksheet.pdf';
             const blob = await response.blob();
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'custom-worksheet.pdf';
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             a.remove();

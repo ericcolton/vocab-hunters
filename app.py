@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import re
+import secrets
 import sys
 import urllib.request
 from datetime import datetime, timedelta, timezone
@@ -603,8 +604,18 @@ def generate():
 
         send_ntfy_notification(theme_file_stem, episode_count)
 
+        dataset_entry = lookup_source_dataset(source_dataset)
+        source_abbr = (dataset_entry or {}).get("title_abbr") or (dataset_entry or {}).get("key_name") or source_dataset
+        theme_slug = theme_file_stem[:30]
+        date_str = datetime.now(timezone.utc).strftime("%Y%m%d")
+        rand_suffix = secrets.token_hex(2)
+
+        def sanitize(s):
+            return s.replace(" ", "_").replace("/", "-")
+
+        custom_filename = f"{sanitize(source_abbr)}-{sanitize(theme_slug)}-{date_str}-{rand_suffix}.pdf"
         resp = Response(pdf_bytes, mimetype="application/pdf")
-        resp.headers["Content-Disposition"] = 'inline; filename="custom-worksheet.pdf"'
+        resp.headers["Content-Disposition"] = f'inline; filename="{custom_filename}"'
         return resp
 
     # --- Standard theme flow (Phase 2) ---

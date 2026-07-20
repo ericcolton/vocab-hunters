@@ -25,3 +25,8 @@ VOCAB_HUNTERS_DB_PATH=/path/to/database \
 ```
 
 Phase 2 internally calls Phase 3 and Phase 4 on a cache miss, so the standard CLI flow is `phase2 | phase5`. Individual phases can still be run standalone for debugging.
+
+### Date formats
+
+Anytime a date format is used in a filename, it should always use YYYYMMDD format (to maintain chronological sorting)
+
