@@ -139,7 +139,7 @@ Each phase script follows a consistent dual-entry pattern:
 - Use `Optional[str]` / `Dict[str, Any]` from `typing` (project targets Python 3.9)
 
 ### Cleanliness
-- Do not leave commented-out code in committed files; delete it or move the rationale to a commit message
+- Do not leave commented-out code in committed files; ask the user if it can be deleted and do if confimred. Mention it in the commit message
 
 ## Definition of Done
 
