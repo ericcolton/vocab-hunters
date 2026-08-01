@@ -141,6 +141,26 @@ Each phase script follows a consistent dual-entry pattern:
 ### Cleanliness
 - Do not leave commented-out code in committed files; ask the user if it can be deleted and do if confimred. Mention it in the commit message
 
+## Testing Policy
+
+This policy applies to **code changes going forward**. Existing untested code is grandfathered — there is no mandate to retrofit tests onto it.
+
+- New development should be unit-testable wherever it reasonably can be. Introduce `pytest` tests for new code, and modify existing tests when you change behavior they cover.
+- Prefer designing for testability (dependency injection, pure functions, separating I/O from logic) over claiming an exemption. Do not contort code or write vacuous tests just to satisfy the policy.
+- When code genuinely cannot be unit-tested, document why, using greppable markers:
+  - **File level** — when the module (or a meaningful portion of it) can't be unit-tested, add a header comment near the top of the file:
+    ```python
+    # TESTABILITY: Phase 5 renders PDFs via ReportLab; output is binary/visual
+    # and validated manually, not unit-tested.
+    ```
+  - **Function level** — each public-facing function that cannot be tested carries a single concise comment line stating why:
+    ```python
+    def stream_pdf(...):
+        # not-unit-testable: streams a live OpenAI response to the socket
+        ...
+    ```
+- Use the exact prefixes `TESTABILITY:` (file header) and `not-unit-testable:` (function line) so exemptions can be found with a simple grep.
+
 ## Definition of Done
 
 - Run the full pipeline end-to-end (`phase2 | phase5`) or the Flask `/generate` route and confirm a PDF is produced without errors
