@@ -2,10 +2,10 @@
 """Generation pipeline for user-owned content.
 
 Mirrors Phase 2's cache orchestration (Scripts/phase2.py:process_request) but
-roots the cache in the user's private datastore and calls Phase 3 → Phase 4
-directly. User content cannot be represented in the bit-packed global
-worksheet ID, so payloads keep worksheet_id=None and results are addressed by
-the owner-only /my/* routes.
+roots the cache in the user's private datastore and calls Phase 3 then
+sentence generation directly. User content cannot be represented in the
+bit-packed global worksheet ID, so payloads keep worksheet_id=None and results
+are addressed by the owner-only /my/* routes.
 """
 
 import json
@@ -17,6 +17,7 @@ from flask import current_app, has_app_context
 
 from Libraries.datasets import DatasetError, load_dataset
 from Libraries.reference_data import lookup_source_dataset, lookup_theme
+from Libraries.sentence_generation import SentenceGenerationError, generate_sentences
 from Libraries.user_data import (
     UserDataError,
     get_user_cache_dir,
@@ -96,7 +97,7 @@ def _resolve_theme(user_id: int, theme: str, theme_content: Optional[str]) -> Tu
         title = record.get("title") or stem.replace("_", " ")
         return theme_content, {"theme": title, "theme_abbr": "Custom"}
     entry = lookup_theme(theme) or {}
-    # Global theme: leave theme_content to Phase 4's themes_dir resolution.
+    # Global theme: leave theme_content to sentence_generation's themes_dir resolution.
     return theme_content, {
         "theme": entry.get("title", theme),
         "theme_abbr": entry.get("title_abbr", ""),
@@ -118,13 +119,12 @@ def generate_user_worksheet(
     """Generate (or replay from the user's cache) a worksheet payload.
 
     source_dataset/theme are request keys: either global key_names or
-    u--prefixed user keys. Returns (phase4-shaped JSON for Phase 5, seed used).
+    u--prefixed user keys. Returns (generated JSON for Phase 5, seed used).
     """
     logger = get_logger()
 
     # Imported lazily: Scripts/ is appended to sys.path by app.py at startup.
     from phase3 import run_with_json as run_phase3_with_json
-    from phase4 import run_phase4_with_json
 
     reading_level_segment = f"fp_{reading_level}"
     cache_dir = get_user_cache_dir(
@@ -166,16 +166,18 @@ def generate_user_worksheet(
             raise UserPipelineError(str(exc)) from exc
 
         try:
-            logger.debug("Entering run_phase4_with_json() for user_id=%d", user_id)
-            phase4_output = run_phase4_with_json(phase3_output, theme_content=theme_content)
-            logger.debug("Exiting run_phase4_with_json()")
-        except SystemExit as exc:
+            logger.debug("Entering generate_sentences() for user_id=%d", user_id)
+            generated_payload = generate_sentences(
+                json.loads(phase3_output), theme_content=theme_content
+            )
+            logger.debug("Exiting generate_sentences()")
+        except SentenceGenerationError as exc:
             raise UserPipelineError(str(exc)) from exc
 
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         logger.debug("Writing user worksheet cache to %s", cache_path)
         with cache_path.open("w", encoding="utf-8") as f:
-            f.write(phase4_output)
+            f.write(json.dumps(generated_payload, ensure_ascii=False, indent=2))
 
     try:
         with cache_path.open("r", encoding="utf-8") as f:

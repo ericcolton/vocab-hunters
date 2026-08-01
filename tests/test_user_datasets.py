@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import copy
 import io
 import json
 from pathlib import Path
@@ -35,18 +36,22 @@ def _register(client, email, password="password123"):
 
 @pytest.fixture()
 def fake_pipeline(app_module, monkeypatch):
-    calls = {"phase4": 0}
+    calls = {"generate": 0}
 
-    def fake_phase4(phase3_json, **kwargs):
-        calls["phase4"] += 1
-        payload = json.loads(phase3_json)
-        payload["output"] = {"subtitle": "Fake Subtitle"}
-        return json.dumps(payload, ensure_ascii=False)
+    def fake_generate(payload, **kwargs):
+        calls["generate"] += 1
+        generated = copy.deepcopy(payload)
+        generated["output"] = {"subtitle": "Fake Subtitle"}
+        return generated
 
-    import phase4
+    # Each caller binds generate_sentences into its own namespace at import
+    # time, so every binding has to be patched.
+    import phase2
+    from Libraries import user_pipeline
 
-    monkeypatch.setattr(phase4, "run_phase4_with_json", fake_phase4)
-    monkeypatch.setattr(app_module, "run_phase4_with_json", fake_phase4)
+    monkeypatch.setattr(phase2, "generate_sentences", fake_generate)
+    monkeypatch.setattr(user_pipeline, "generate_sentences", fake_generate)
+    monkeypatch.setattr(app_module, "generate_sentences", fake_generate)
     monkeypatch.setattr(app_module, "run_phase5_with_json", lambda payload: b"%PDF-fake")
     return calls
 
@@ -159,10 +164,10 @@ def test_generate_with_user_dataset(client, app_module, fake_pipeline):
     assert f"source_dataset={dataset_id}" in my_url
 
     # Replay from cache: no extra OpenAI call
-    calls_after_generate = fake_pipeline["phase4"]
+    calls_after_generate = fake_pipeline["generate"]
     pdf = client.get(my_url.replace("/my/worksheet?", "/my/worksheet_pdf?"))
     assert pdf.status_code == 200
-    assert fake_pipeline["phase4"] == calls_after_generate
+    assert fake_pipeline["generate"] == calls_after_generate
 
     # User dataset + custom theme text
     resp = client.post(

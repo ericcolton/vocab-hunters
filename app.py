@@ -47,8 +47,8 @@ if str(scripts_dir) not in sys.path:
 
 from phase2 import run_with_json, Phase2Error, decode_worksheet_id, build_worksheet_id
 from phase3 import run_with_json as run_phase3_with_json
-from phase4 import run_phase4_with_json
 from phase5 import run_with_json as run_phase5_with_json
+from Libraries.sentence_generation import SentenceGenerationError, generate_sentences
 from Libraries.reference_data import (
     get_reference_data_path,
     get_responses_datastore_path,
@@ -563,11 +563,11 @@ def generate():
             return jsonify({"error": str(exc)}), 400
 
         try:
-            phase4_output = run_phase4_with_json(phase3_output, theme_content=theme_content)
-        except SystemExit as exc:
+            worksheet_data = generate_sentences(
+                json.loads(phase3_output), theme_content=theme_content
+            )
+        except SentenceGenerationError as exc:
             return jsonify({"error": str(exc)}), 500
-
-        phase4_data = json.loads(phase4_output)
 
         # Add presentation_metadata with interpolated variables
         presentation_metadata = _extract_presentation_metadata(raw_payload)
@@ -590,15 +590,15 @@ def generate():
                 "theme_abbr": "Custom",
             }
 
-            phase4_data["presentation_metadata"] = interpolate_presentation_metadata(
+            worksheet_data["presentation_metadata"] = interpolate_presentation_metadata(
                 presentation_metadata, presentation_variables
             )
 
         # Set worksheet_id to None so Phase 5 falls back to base URL for QR
-        phase4_data["worksheet_id"] = None
+        worksheet_data["worksheet_id"] = None
 
         try:
-            pdf_bytes = run_phase5_with_json(json.dumps(phase4_data, ensure_ascii=False))
+            pdf_bytes = run_phase5_with_json(json.dumps(worksheet_data, ensure_ascii=False))
         except ValueError as exc:
             return jsonify({"error": f"Failed to build PDF: {exc}"}), 500
 
@@ -754,7 +754,13 @@ def fetch_episode():
             validate_key_component(payload[field], field)
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
-    payload["seed"] = payload["episode"]
+    # Coerce to int: validate_key_component only guarantees a path-safe string,
+    # but every other producer of a cached payload writes an integer seed and
+    # Phase 5 does arithmetic on it.
+    try:
+        payload["seed"] = int(payload["episode"])
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid value for episode."}), 400
     payload["reading_level"] = {"system": "fp", "level": payload["reading_level"]}
 
     try:

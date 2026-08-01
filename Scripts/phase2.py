@@ -8,7 +8,6 @@ from pathlib import Path
 
 from flask import current_app, has_app_context
 from phase3 import run_with_json as run_phase3_with_json
-from phase4 import run_phase4_with_json
 
 from Libraries.datasets import DatasetError
 
@@ -18,6 +17,7 @@ from Libraries.reference_data import (
     lookup_source_dataset,
     lookup_theme,
 )
+from Libraries.sentence_generation import SentenceGenerationError, generate_sentences
 
 class Phase2Error(Exception):
     def __init__(self, message, exit_code=1):
@@ -337,11 +337,6 @@ def process_request(request):
         # Build and add worksheet_id
         phase_3_input["worksheet_id"] = worksheet_id
 
-        # try:
-        #     from phase3 import run_with_json as run_phase3_with_json
-        # except Exception as e:
-        #     raise Phase2Error(f"Failed to import phase3 runner: {e}") from e
-
         try:
             logger.debug("Entering run_phase3_with_json()")
             phase_3_stdout_data = run_phase3_with_json(
@@ -351,18 +346,18 @@ def process_request(request):
         except (SystemExit, DatasetError) as e:
             raise Phase2Error(str(e)) from e
         try:
-            logger.debug("Entering run_phase4_with_json()")
-            phase_4_stdout_data = run_phase4_with_json(phase_3_stdout_data)
-            logger.debug("Exiting run_phase4_with_json()")
-        except SystemExit as e:
-            logger.debug("Failed to run run_phase4_with_json() with error: %s", str(e))
+            logger.debug("Entering generate_sentences()")
+            generated_payload = generate_sentences(json.loads(phase_3_stdout_data))
+            logger.debug("Exiting generate_sentences()")
+        except SentenceGenerationError as e:
+            logger.debug("Failed to run generate_sentences() with error: %s", str(e))
             raise Phase2Error(str(e)) from e
-        
-        # Write phase_4_stdout_data to cache_path, creating subdirectories as needed
+
+        # Write the generated payload to cache_path, creating subdirectories as needed
         cache_path.parent.mkdir(parents=True, exist_ok=True)
-        logger.debug("Writing phase4 output to cache_path=%s", cache_path)
+        logger.debug("Writing generated payload to cache_path=%s", cache_path)
         with cache_path.open("w", encoding="utf-8") as f:
-            f.write(phase_4_stdout_data)
+            f.write(json.dumps(generated_payload, ensure_ascii=False, indent=2))
 
     # Load payload from cache file
     try:

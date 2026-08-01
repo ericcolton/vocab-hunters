@@ -4,33 +4,38 @@ This file provides agent-agnostic documentation for the Homework Hero (vocab-hun
 
 ## Project Overview
 
-Homework Hero (vocab-hunters) is a vocabulary worksheet generation system that creates customized PDF learning materials with AI-generated sentence completion tasks. It uses a pipeline architecture where vocabulary data flows through validation, extraction, AI generation, and PDF rendering phases.
+Homework Hero (vocab-hunters) is a vocabulary worksheet generation system that creates customized PDF learning materials with AI-generated sentence completion tasks. It uses a pipeline architecture where vocabulary data flows through validation, extraction, AI generation, and PDF rendering stages.
 
 ## Architecture
 
-### Pipeline Phases
+### Retiring the "phase" scripts
 
-1. **Phase 2** (`Scripts/phase2.py`): Request validation, worksheet ID generation via bit-packing, and cache orchestration. On a cache miss, Phase 2 internally calls Phase 3 then Phase 4, writes the result to the cache, and returns Phase 4-shaped JSON. On a cache hit, it reads directly from disk. Entry point: `run_with_json()` / `run_from_json()`
+The `Scripts/phase*.py` naming is a fossil of the project's original design: standalone CLI programs chained together with stdout/stdin pipes. **The Flask app is the only supported entry point going forward.** Phase scripts are being migrated one at a time into properly named modules under `Libraries/`, with their CLI plumbing (`argparse`, stdin readers, `main()`, `if __name__ == "__main__"`) deleted.
+
+Migrated so far:
+- Phase 4 → `Libraries/sentence_generation.py`
+
+Do not add new CLI entry points, and do not restore the ones that were removed.
+
+### Pipeline Stages
+
+1. **Phase 2** (`Scripts/phase2.py`): Request validation, worksheet ID generation via bit-packing, and cache orchestration. On a cache miss, Phase 2 internally calls Phase 3 then `generate_sentences()`, writes the result to the cache, and returns the generated JSON. On a cache hit, it reads directly from disk. Entry point: `run_with_json()` / `run_from_json()`
 
 2. **Phase 3** (`Scripts/phase3.py`): Extracts vocabulary words, parts of speech, and definitions from source datasets. Builds a doc-level checksum over the vocabulary content. Called by Phase 2 on cache misses; also called directly by Flask for custom-theme generation.
 
-3. **Phase 4** (`Scripts/phase4.py`): Calls OpenAI API with theme context and reading level interpolation. Writes the structured response to the cache. Called by Phase 2 on cache misses; also called directly by Flask for custom-theme generation.
+3. **Sentence generation** (`Libraries/sentence_generation.py`): Calls the OpenAI API with theme context and reading level interpolation, then reconciles the response against the payload by checksum and attaches `output.subtitle` plus per-entry `output.sentence`. Dict in, dict out; it never writes to the cache — callers own persistence. Entry point: `generate_sentences()`. Raises `SentenceGenerationError`.
 
 4. **Phase 5** (`Scripts/phase5.py`): Generates PDF with word bank, questions, and answer key using ReportLab. Entry point: `run_with_json()`
 
-The **standard CLI flow** is therefore:
-```
-phase2 | phase5
-```
-Phase 2 handles the cache orchestration (calling Phase 3 and Phase 4 internally when needed), so piping `phase2 | phase3 | phase4 | phase5` is not the implemented architecture.
+The legacy CLI flow (`phase2 | phase5`) still runs but is **unsupported and being removed**. Phase 4 is already Flask-only; the remaining phases will follow.
 
 ### Flask App (`app.py`)
 
-The web app imports all four phases. Two distinct generation flows exist:
+The web app imports the remaining phase scripts plus `Libraries/sentence_generation.py`. Two distinct generation flows exist:
 
-**Standard theme flow** (`POST /generate`, `POST /fetch_episode`, `GET /worksheet_pdf`): calls Phase 2 (which orchestrates Phase 3 and Phase 4 internally) then Phase 5.
+**Standard theme flow** (`POST /generate`, `POST /fetch_episode`, `GET /worksheet_pdf`): calls Phase 2 (which orchestrates Phase 3 and `generate_sentences()` internally) then Phase 5.
 
-**Custom-theme flow** (`POST /generate` with `theme=user_specified`): bypasses Phase 2 entirely, calling Phase 3 → Phase 4 → Phase 5 directly with a user-supplied theme string. Custom-theme responses are not cached in the standard datastore.
+**Custom-theme flow** (`POST /generate` with `theme=user_specified`): bypasses Phase 2 entirely, calling Phase 3 → `generate_sentences()` → Phase 5 directly with a user-supplied theme string. Custom-theme responses are not cached in the standard datastore.
 
 **Routes (public):**
 - `GET /` - Landing page explaining Homework Hero
@@ -68,7 +73,7 @@ Authentication is additive: every pre-existing route works anonymously exactly a
 - **Sessions**: Flask signed-cookie sessions. `session` holds only `user_id` and `sgen` (a copy of the user's `session_generation`; bumping the column on password change invalidates all other sessions). `VOCAB_HUNTERS_SECRET_KEY` env var is required (or `HOMEWORK_HERO_DEV=1` for local dev).
 - **CSRF**: HTML form POSTs carry a per-session token; JSON fetch POSTs rely on `SameSite=Lax` + the JSON content-type preflight requirement (documented in `auth.py`).
 - **Per-user storage** (`Libraries/user_data.py`): each user gets `{db}/users/{user_id}/` with `user_themes/`, `source_datasets/`, and `responses_datastore/` mirroring the global layout. User-owned items surface in the UI/API with a `u--` key prefix so they can never collide with global key_names. `user_id` always comes from the session, never from request input.
-- **Per-user generation** (`Libraries/user_pipeline.py`): `generate_user_worksheet()` mirrors Phase 2's cache orchestration but roots the cache in the user's datastore and calls Phase 3 → Phase 4 directly. User content is not representable in the bit-packed worksheet ID, so payloads keep `worksheet_id=None` and are addressed by explicit params on `/my/*` routes.
+- **Per-user generation** (`Libraries/user_pipeline.py`): `generate_user_worksheet()` mirrors Phase 2's cache orchestration but roots the cache in the user's datastore and calls Phase 3 → `generate_sentences()` directly. User content is not representable in the bit-packed worksheet ID, so payloads keep `worksheet_id=None` and are addressed by explicit params on `/my/*` routes.
 - **Custom themes**: logged-in users' custom themes are saved to their own tree and their worksheets are cached/replayable; the anonymous custom flow (global `user_themes/{stem}.txt`, uncached) is unchanged.
 
 ### Configuration
@@ -87,7 +92,7 @@ Other environment variables:
 - `VOCAB_HUNTERS_SECRET_KEY` (required in production) - session cookie signing key; generate with `python3 -c "import secrets; print(secrets.token_hex(32))"`
 - `HOMEWORK_HERO_DEV=1` - local-dev escape hatch when `VOCAB_HUNTERS_SECRET_KEY` is unset
 - `SESSION_COOKIE_SECURE=0` - allow session cookies over plain HTTP for local dev (defaults to secure-only)
-- `OPENAI_API_KEY` - required for Phase 4 generation; `NTFY_TOPIC` - optional notifications
+- `OPENAI_API_KEY` - required for sentence generation; `NTFY_TOPIC` - optional notifications
 
 ### Response Caching
 
@@ -102,6 +107,7 @@ The cache path is determined by the request fields, not by content checksums. Ch
 
 - `Libraries/reference_data.py` - Database path resolution and reference data management
 - `Libraries/datasets.py` - Dataset file loading utilities
+- `Libraries/sentence_generation.py` - OpenAI sentence generation (formerly Phase 4)
 
 ## Development Environment
 
@@ -114,24 +120,22 @@ venv/bin/python -m pytest tests/
 ## Coding Conventions
 
 ### Python Style
-- Python 3; all scripts include `#!/usr/bin/env python3`
+- Python 3; the remaining phase scripts include `#!/usr/bin/env python3`. New `Libraries/` modules are plain importable modules — no shebang, not executable.
 - `snake_case` for functions and variables; `UPPER_CASE` for module-level constants
 - Always open files with `encoding="utf-8"`; always serialize JSON with `ensure_ascii=False, indent=2`
-- Prefer `pathlib.Path` over `os.path` for filesystem operations (phase4 currently uses `os.path` — treat that as tech debt)
+- Prefer `pathlib.Path` over `os.path` for filesystem operations
 
-### Phase Script Structure
-Each phase script follows a consistent dual-entry pattern:
-- `main()` — CLI entry point: reads from stdin, writes to stdout, exits non-zero on error
-- `run_with_json()` / `run_from_json()` — library entry point: accepts/returns strings, raises exceptions instead of calling `sys.exit()`
+### Module Structure
+- New and migrated code exposes a single well-named function taking and returning Python objects (dicts), e.g. `generate_sentences()` in `Libraries/sentence_generation.py`. Do not add `main()`, `argparse`, or stdin/stdout plumbing.
+- The surviving phase scripts still follow the old dual-entry pattern (`main()` for CLI, `run_with_json()` / `run_from_json()` taking and returning JSON strings). Treat that as legacy shape to be migrated, not a pattern to copy.
 
 ### Error Handling
-- In CLI context (`main()`), use `raise SystemExit(message)` for fatal user-facing errors
-- In library context (called by Flask or another phase), raise a typed exception (e.g., `Phase2Error`) so callers can catch without killing the process
+- Raise a typed module exception (e.g., `Phase2Error`, `SentenceGenerationError`) so callers can catch without killing the process
 - Do not swallow exceptions silently; log at `debug` level before re-raising
-- **Current state**: Phase 3 and Phase 4 still raise `SystemExit` from some library-reachable code paths. Phase 2 defensively catches those `SystemExit` calls and re-raises as `Phase2Error` before they reach Flask. New code should raise typed exceptions; do not extend the `SystemExit` pattern.
+- **Current state**: Phase 3 still raises `SystemExit` from some library-reachable code paths. Phase 2 defensively catches those `SystemExit` calls and re-raises as `Phase2Error` before they reach Flask. New code must raise typed exceptions; do not extend the `SystemExit` pattern.
 
 ### Logging
-- Use the `get_logger()` pattern to return `current_app.logger` inside a Flask request context, falling back to `logging.getLogger(__name__)` for CLI use
+- Use the `get_logger()` pattern to return `current_app.logger` inside a Flask request context, falling back to `logging.getLogger(__name__)` outside one
 - Log at `debug` level around external calls (OpenAI, cache reads/writes)
 
 ### Type Hints
@@ -163,25 +167,25 @@ This policy applies to **code changes going forward**. Existing untested code is
 
 ## Definition of Done
 
-- Run the full pipeline end-to-end (`phase2 | phase5`) or the Flask `/generate` route and confirm a PDF is produced without errors
+- Exercise the Flask `/generate` route and confirm a PDF is produced without errors
 - Open the generated PDF and verify word bank, sentence completion questions, and answer key render correctly with no obvious formatting regressions
-- If Phase 4 (OpenAI) was changed, verify cached responses still load and new responses are written to the correct filesystem path
-- Summarize changed files and any risks to the phase-to-phase JSON contract or cache structure
-- Run `venv/bin/python -m pytest tests/` (see `requirements-dev.txt`) — covers auth, per-user content, and dataset upload with mocked Phase 4/5; extend it when touching those areas. The generation pipeline itself is still untested.
+- If sentence generation (OpenAI) was changed, verify cached responses still load and new responses are written to the correct filesystem path
+- Summarize changed files and any risks to the stage-to-stage JSON contract or cache structure
+- Run `venv/bin/python -m pytest tests/` (see `requirements-dev.txt`) — covers auth, per-user content, dataset upload (with generation and PDF rendering mocked), and `Libraries/sentence_generation.py`; extend it when touching those areas. Phases 2/3/5 are still untested.
 
 ## Known Traps
 
 ### `SystemExit` in library-callable code silently becomes a Flask 500
-Phase scripts use `raise SystemExit(message)` for CLI errors, but when the same code is called from Flask (via `run_with_json()`), Flask catches `SystemExit` and returns a 500 with no useful message. Always raise a typed exception (e.g., `Phase2Error`) in any code path reachable from the library entry points.
+The remaining phase scripts use `raise SystemExit(message)` for CLI errors, but when the same code is called from Flask (via `run_with_json()`), Flask catches `SystemExit` and returns a 500 with no useful message. Always raise a typed exception (e.g., `Phase2Error`, `SentenceGenerationError`) in any code path reachable from Flask.
 
 ### ReportLab layout changes can cascade across pages
 Phase5's PDF layout uses tightly coupled pixel math — font sizes, margins, word bank height, and per-question line heights all affect vertical flow across pages. Changing any layout constant can shift content onto the wrong page or clip elements. Test with a real PDF and inspect all three pages (questions p1, questions p2, answer key) after any layout change.
 
 ### OpenAI Responses API is not supported by all models
-Phase4 uses `client.responses.parse()` with `text_format=JsonOutputFormat` (structured output). This API and structured output mode are only available on newer OpenAI models. Adding a model to `models.json` that doesn't support the Responses API will fail at runtime with a cryptic SDK error.
+`Libraries/sentence_generation.py` uses `client.responses.parse()` with `text_format=JsonOutputFormat` (structured output). This API and structured output mode are only available on newer OpenAI models. Adding a model to `models.json` that doesn't support the Responses API will fail at runtime with a cryptic SDK error.
 
 ### Do not overwrite cached payloads without preserving the full request metadata
-The cache path is keyed by request parameters (`dataset/reading_level/section/theme/model/seed.json`). The same parameter combination always maps to the same path, making generation idempotent by default. If you manually write or patch a cached file, the `doc_checksum` and per-entry `checksum` fields inside must remain consistent with the source vocabulary data, or phase4's checksum validation will reject the file on the next run.
+The cache path is keyed by request parameters (`dataset/reading_level/section/theme/model/seed.json`). The same parameter combination always maps to the same path, making generation idempotent by default. If you manually write or patch a cached file, the `doc_checksum` and per-entry `checksum` fields inside must remain consistent with the source vocabulary data, or the checksum reconciliation in `Libraries/sentence_generation.py` will reject the file on the next run.
 
 ## Security and Safety
 

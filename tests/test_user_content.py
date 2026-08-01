@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json
+import copy
 from pathlib import Path
 
 import pytest
@@ -26,19 +26,23 @@ def _register(client, email, password="password123"):
 
 @pytest.fixture()
 def fake_pipeline(app_module, monkeypatch):
-    """Stub Phase 4 (OpenAI) and Phase 5 (PDF); count Phase 4 invocations."""
-    calls = {"phase4": 0}
+    """Stub sentence generation (OpenAI) and Phase 5 (PDF); count generations."""
+    calls = {"generate": 0}
 
-    def fake_phase4(phase3_json, **kwargs):
-        calls["phase4"] += 1
-        payload = json.loads(phase3_json)
-        payload["output"] = {"subtitle": "Fake Subtitle"}
-        return json.dumps(payload, ensure_ascii=False)
+    def fake_generate(payload, **kwargs):
+        calls["generate"] += 1
+        generated = copy.deepcopy(payload)
+        generated["output"] = {"subtitle": "Fake Subtitle"}
+        return generated
 
-    import phase4
+    # Each caller binds generate_sentences into its own namespace at import
+    # time, so every binding has to be patched.
+    import phase2
+    from Libraries import user_pipeline
 
-    monkeypatch.setattr(phase4, "run_phase4_with_json", fake_phase4)
-    monkeypatch.setattr(app_module, "run_phase4_with_json", fake_phase4)
+    monkeypatch.setattr(phase2, "generate_sentences", fake_generate)
+    monkeypatch.setattr(user_pipeline, "generate_sentences", fake_generate)
+    monkeypatch.setattr(app_module, "generate_sentences", fake_generate)
     monkeypatch.setattr(app_module, "run_phase5_with_json", lambda payload: b"%PDF-fake")
     return calls
 
@@ -75,14 +79,14 @@ def test_logged_in_custom_theme_persists_and_caches(client, app_module, fake_pip
     )
     assert cache_files == ["1.json", "2.json"]
     assert len(list(users_root.glob("*/user_themes/*.json"))) == 1
-    assert fake_pipeline["phase4"] == 2
+    assert fake_pipeline["generate"] == 2
 
 
 def test_my_routes_list_and_replay_from_cache(client, app_module, fake_pipeline):
     _register(client, "replayer@example.com")
     resp = client.post("/generate", json=GENERATE_PAYLOAD)
     my_url = resp.headers["X-My-Worksheet-Url"]
-    generation_calls = fake_pipeline["phase4"]
+    generation_calls = fake_pipeline["generate"]
 
     page = client.get("/my/worksheets")
     assert page.status_code == 200
@@ -97,7 +101,7 @@ def test_my_routes_list_and_replay_from_cache(client, app_module, fake_pipeline)
     assert pdf.status_code == 200
     assert pdf.data == b"%PDF-fake"
     # Replay must come from the cache, not a new OpenAI call.
-    assert fake_pipeline["phase4"] == generation_calls
+    assert fake_pipeline["generate"] == generation_calls
 
     episodes = client.get(my_url.replace("/my/worksheet?", "/my/episodes?"))
     assert episodes.status_code == 200
