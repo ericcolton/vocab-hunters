@@ -165,3 +165,31 @@ def test_generation_failure_surfaces_as_json_error(client, app_module, monkeypat
     assert resp.status_code == 400
     assert "model exploded" in resp.get_json()["error"]
     assert not list(datastore.rglob("*.json")), "failed generation must not write a cache file"
+
+
+def test_no_theme_generates_and_caches_under_its_own_key(client, fake_pipeline, datastore):
+    payload = dict(GENERATE_PAYLOAD, theme="no_theme")
+
+    resp = client.post("/generate", json=payload)
+    assert resp.status_code == 200
+    assert fake_pipeline["generate"] == 1
+
+    cache_file = datastore.joinpath("testds", "fp_C", "1", "no_theme", "test-model") / "1.json"
+    assert cache_file.is_file(), sorted(str(p) for p in datastore.rglob("*.json"))
+    cached = json.loads(cache_file.read_text(encoding="utf-8"))
+    assert cached["theme"] == "no_theme"
+
+
+def test_no_theme_worksheet_id_round_trips(app_module):
+    import phase2
+
+    request = {
+        "source_dataset": "testds",
+        "theme": "no_theme",
+        "reading_level": {"system": "fp", "level": "C"},
+        "model": "test-model",
+        "section": 1,
+        "seed": 1,
+    }
+    worksheet_id = phase2.build_worksheet_id(request)
+    assert phase2.decode_worksheet_id(worksheet_id)["theme"] == "no_theme"

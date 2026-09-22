@@ -1,0 +1,12 @@
+body.theme-plain {
+    --bg-color: #faf8f3;
+    --card-bg: #ffffff;
+    --text-color: #1f2a44;
+    --accent-primary: #2a7f8e;
+    --accent-secondary: #e0a030;
+    --border-glow: 0 2px 8px rgba(31, 42, 68, 0.12);
+    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --btn-gradient: linear-gradient(180deg, #2a7f8e, #2a7f8e);
+    --header-font-weight: 600;
+    --input-bg: #f0ece2;
+}

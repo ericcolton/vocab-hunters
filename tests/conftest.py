@@ -35,6 +35,14 @@ REFERENCE_DATA = {
             "ui_title": "Create Your Own",
             "ui_subtitle": "",
         },
+        {
+            "key_name": "no_theme",
+            "title": "No Theme",
+            "title_abbr": "Plain",
+            "css_class": "theme-plain",
+            "ui_title": "Everyday Vocab Practice",
+            "ui_subtitle": "Words in context. No distractions.",
+        },
     ],
     "models.json": [
         {"key_name": "test-model", "title": "Test Model", "is_default": True}
