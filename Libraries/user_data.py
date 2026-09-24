@@ -3,7 +3,7 @@
 
 Logged-in users get a private subtree mirroring the global layout:
 
-    {VOCAB_HUNTERS_DB_PATH}/users/{user_id}/
+    {VOCAB_HUNTERS_DB_PATH}/content/users/{user_id}/
         user_themes/{stem}.json
         source_datasets/{stem}.json
         responses_datastore/{dataset}/{reading_level}/{section}/{theme}/{model}/{seed}.json
@@ -22,7 +22,7 @@ from typing import Any, Dict, List, Optional
 
 from flask import current_app, has_app_context
 
-from Libraries.reference_data import get_database_path, validate_key_component
+from Libraries.reference_data import get_content_dir, validate_key_component
 
 USER_KEY_PREFIX = "u--"
 STEM_MAX_LENGTH = 100
@@ -45,7 +45,7 @@ def get_logger() -> logging.Logger:
 
 
 def get_user_root(user_id: int) -> Path:
-    return get_database_path() / "users" / str(int(user_id))
+    return get_content_dir() / "users" / str(int(user_id))
 
 
 def get_user_themes_dir(user_id: int) -> Path:

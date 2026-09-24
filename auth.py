@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Authentication blueprint: SQLite-backed identity, signed-cookie sessions.
 
-Identity data (users, lockout state) lives in {VOCAB_HUNTERS_DB_PATH}/auth.sqlite3.
-Content (themes, worksheets, datasets) stays on the filesystem; see
+Identity data (users, lockout state) lives in
+{VOCAB_HUNTERS_DB_PATH}/vocabhunters.sqlite3. Content (themes, worksheets,
+datasets) stays on the filesystem under {VOCAB_HUNTERS_DB_PATH}/content/; see
 Libraries/user_data.py.
 
 CSRF strategy: HTML form POSTs carry a per-session token (validated with
@@ -37,7 +38,7 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from Libraries.reference_data import get_database_path
+from Libraries.reference_data import get_sqlite_db_path
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -110,10 +111,6 @@ def get_logger() -> logging.Logger:
         return logging.getLogger(__name__)
 
 
-def get_auth_db_path() -> Path:
-    return get_database_path() / "auth.sqlite3"
-
-
 def _connect(path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(str(path), timeout=10)
     conn.row_factory = sqlite3.Row
@@ -146,7 +143,7 @@ def init_auth_db() -> None:
     """Create/upgrade the auth schema. Safe to call from every gunicorn worker:
     BEGIN IMMEDIATE serializes writers, and user_version is rechecked inside
     the transaction."""
-    path = get_auth_db_path()
+    path = get_sqlite_db_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     conn = _connect(path)
     try:
@@ -165,7 +162,7 @@ def init_auth_db() -> None:
 
 def get_auth_db() -> sqlite3.Connection:
     if "auth_db" not in g:
-        g.auth_db = _connect(get_auth_db_path())
+        g.auth_db = _connect(get_sqlite_db_path())
     return g.auth_db
 
 

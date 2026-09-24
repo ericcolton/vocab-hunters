@@ -70,20 +70,21 @@ TEST_DATASET = {
 
 
 def _seed_database_dir(db_root: Path) -> None:
-    reference_dir = db_root / "reference_data"
+    content_dir = db_root / "content"
+    reference_dir = content_dir / "reference_data"
     reference_dir.mkdir(parents=True)
     for filename, payload in REFERENCE_DATA.items():
         with (reference_dir / filename).open("w", encoding="utf-8") as f:
             json.dump(payload, f, ensure_ascii=False, indent=2)
 
-    datasets_dir = db_root / "source_datasets"
+    datasets_dir = content_dir / "source_datasets"
     datasets_dir.mkdir(parents=True)
     with (datasets_dir / "testds.json").open("w", encoding="utf-8") as f:
         json.dump(TEST_DATASET, f, ensure_ascii=False, indent=2)
 
     for subdir in ("themes", "user_themes", "responses_datastore"):
-        (db_root / subdir).mkdir(parents=True)
-    (db_root / "prompt.txt").write_text("Test prompt {reading_level}", encoding="utf-8")
+        (content_dir / subdir).mkdir(parents=True)
+    (content_dir / "prompt.txt").write_text("Test prompt {reading_level}", encoding="utf-8")
 
 
 @pytest.fixture(scope="session")
@@ -111,7 +112,7 @@ def _clear_ip_reg_attempts(app_module):
     session-scoped DB doesn't accumulate 127.0.0.1 attempts across tests."""
     import sqlite3 as _sqlite3
 
-    db_path = Path(os.environ["VOCAB_HUNTERS_DB_PATH"]) / "auth.sqlite3"
+    db_path = Path(os.environ["VOCAB_HUNTERS_DB_PATH"]) / "vocabhunters.sqlite3"
     if db_path.exists():
         conn = _sqlite3.connect(str(db_path))
         conn.execute("DELETE FROM ip_reg_attempts")

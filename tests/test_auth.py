@@ -124,10 +124,10 @@ def test_session_invalidated_when_generation_bumps(client, app_module):
     _register(client, "stale@example.com")
     assert client.get("/account").status_code == 200
 
-    import auth
+    from Libraries.reference_data import get_sqlite_db_path
 
     with app_module.app.app_context():
-        db_path = auth.get_auth_db_path()
+        db_path = get_sqlite_db_path()
     conn = sqlite3.connect(str(db_path))
     conn.execute(
         "UPDATE users SET session_generation = session_generation + 1 WHERE email = ?",

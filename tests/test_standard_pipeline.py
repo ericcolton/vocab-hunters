@@ -49,7 +49,7 @@ def fake_pipeline(app_module, monkeypatch):
 @pytest.fixture()
 def datastore(app_module):
     """The global responses_datastore, emptied so episode numbering starts at 1."""
-    root = Path(os.environ["VOCAB_HUNTERS_DB_PATH"]) / "responses_datastore"
+    root = Path(os.environ["VOCAB_HUNTERS_DB_PATH"]) / "content" / "responses_datastore"
     for path in sorted(root.rglob("*.json")):
         path.unlink()
     return root

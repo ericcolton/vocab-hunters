@@ -69,24 +69,25 @@ The web app imports the remaining phase scripts plus `Libraries/sentence_generat
 
 Authentication is additive: every pre-existing route works anonymously exactly as before; logging in unlocks persistence.
 
-- **Identity**: `auth.py` blueprint; users stored in SQLite at `{VOCAB_HUNTERS_DB_PATH}/auth.sqlite3` (stdlib `sqlite3`, WAL mode, `PRAGMA user_version` migrations). Passwords hashed with Werkzeug PBKDF2-SHA256 (600k iterations; scrypt unavailable on some Python 3.9 builds).
+- **Identity**: `auth.py` blueprint; users stored in SQLite at `{VOCAB_HUNTERS_DB_PATH}/vocabhunters.sqlite3` (stdlib `sqlite3`, WAL mode, `PRAGMA user_version` migrations). Passwords hashed with Werkzeug PBKDF2-SHA256 (600k iterations; scrypt unavailable on some Python 3.9 builds).
 - **Sessions**: Flask signed-cookie sessions. `session` holds only `user_id` and `sgen` (a copy of the user's `session_generation`; bumping the column on password change invalidates all other sessions). `VOCAB_HUNTERS_SECRET_KEY` env var is required (or `HOMEWORK_HERO_DEV=1` for local dev).
 - **CSRF**: HTML form POSTs carry a per-session token; JSON fetch POSTs rely on `SameSite=Lax` + the JSON content-type preflight requirement (documented in `auth.py`).
-- **Per-user storage** (`Libraries/user_data.py`): each user gets `{db}/users/{user_id}/` with `user_themes/`, `source_datasets/`, and `responses_datastore/` mirroring the global layout. User-owned items surface in the UI/API with a `u--` key prefix so they can never collide with global key_names. `user_id` always comes from the session, never from request input.
+- **Per-user storage** (`Libraries/user_data.py`): each user gets `{db}/content/users/{user_id}/` with `user_themes/`, `source_datasets/`, and `responses_datastore/` mirroring the global layout. User-owned items surface in the UI/API with a `u--` key prefix so they can never collide with global key_names. `user_id` always comes from the session, never from request input.
 - **Per-user generation** (`Libraries/user_pipeline.py`): `generate_user_worksheet()` mirrors Phase 2's cache orchestration but roots the cache in the user's datastore and calls Phase 3 → `generate_sentences()` directly. User content is not representable in the bit-packed worksheet ID, so payloads keep `worksheet_id=None` and are addressed by explicit params on `/my/*` routes.
 - **Custom themes**: logged-in users' custom themes are saved to their own tree and their worksheets are cached/replayable; the anonymous custom flow (global `user_themes/{stem}.txt`, uncached) is unchanged.
 
 ### Configuration
 
-Set `VOCAB_HUNTERS_DB_PATH` environment variable to point to the homework hero database directory. Expected subdirectories:
-- `source_datasets/` - Vocabulary dataset JSON files
-- `themes/` - Theme context files
-- `user_themes/` - Anonymous custom-theme files (legacy flow)
-- `responses_datastore/` - Cache directory for AI responses
-- `reference_data/` - Directory containing `source_datasets.json`, `themes.json`, `models.json`
-- `users/` - Per-user content trees (`users/{user_id}/...`), created on demand
-- `auth.sqlite3` - SQLite identity database, created on first startup
-- `prompt.txt` - System prompt for AI generation
+Set `VOCAB_HUNTERS_DB_PATH` environment variable to point to the homework hero database directory. Expected layout:
+- `vocabhunters.sqlite3` - SQLite identity database, created on first startup (see `get_sqlite_db_path()` in `Libraries/reference_data.py`)
+- `content/` - All filesystem-based content, rooted via `get_content_dir()`:
+  - `source_datasets/` - Vocabulary dataset JSON files
+  - `themes/` - Theme context files
+  - `user_themes/` - Anonymous custom-theme files (legacy flow)
+  - `responses_datastore/` - Cache directory for AI responses
+  - `reference_data/` - Directory containing `source_datasets.json`, `themes.json`, `models.json`
+  - `users/` - Per-user content trees (`users/{user_id}/...`), created on demand
+  - `prompt.txt` - System prompt for AI generation
 
 Other environment variables:
 - `VOCAB_HUNTERS_SECRET_KEY` (required in production) - session cookie signing key; generate with `python3 -c "import secrets; print(secrets.token_hex(32))"`

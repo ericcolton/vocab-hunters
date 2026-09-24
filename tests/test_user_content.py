@@ -47,10 +47,10 @@ def fake_pipeline(app_module, monkeypatch):
     return calls
 
 
-def _db_root(app_module):
+def _db_content_root(app_module):
     import os
 
-    return Path(os.environ["VOCAB_HUNTERS_DB_PATH"])
+    return Path(os.environ["VOCAB_HUNTERS_DB_PATH"]) / "content"
 
 
 def test_logged_in_custom_theme_persists_and_caches(client, app_module, fake_pipeline):
@@ -62,14 +62,14 @@ def test_logged_in_custom_theme_persists_and_caches(client, app_module, fake_pip
     assert my_url and my_url.startswith("/my/worksheet?")
     assert "theme=u--" in my_url
 
-    users_root = _db_root(app_module) / "users"
+    users_root = _db_content_root(app_module) / "users"
     theme_files = list(users_root.glob("*/user_themes/*.json"))
     assert len(theme_files) == 1
     cache_files = list(users_root.glob("*/responses_datastore/**/*.json"))
     assert len(cache_files) == 1
     assert cache_files[0].name == "1.json"
     # Logged-in generation must not touch the legacy global user_themes dir.
-    assert list((_db_root(app_module) / "user_themes").glob("*")) == []
+    assert list((_db_content_root(app_module) / "user_themes").glob("*")) == []
 
     # Second generation with the same text -> episode 2, same theme record.
     resp = client.post("/generate", json=GENERATE_PAYLOAD)
@@ -131,7 +131,7 @@ def test_anonymous_custom_theme_unchanged(client, app_module, fake_pipeline):
     assert resp.mimetype == "application/pdf"
     assert resp.headers.get("X-My-Worksheet-Url") is None
 
-    legacy = _db_root(app_module) / "user_themes" / "a_lighthouse_on_the_moon.txt"
+    legacy = _db_content_root(app_module) / "user_themes" / "a_lighthouse_on_the_moon.txt"
     assert legacy.is_file()
 
 

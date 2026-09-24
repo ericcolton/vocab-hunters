@@ -25,34 +25,42 @@ def get_database_path() -> Path:
     return Path(db)
 
 
+def get_sqlite_db_path() -> Path:
+    return get_database_path() / "vocabhunters.sqlite3"
+
+
+def get_content_dir() -> Path:
+    return get_database_path() / "content"
+
+
 def ensure_database_dirs():
-    db = get_database_path()
+    content = get_content_dir()
     for subdir in ("source_datasets", "themes", "user_themes", "responses_datastore", "reference_data"):
-        (db / subdir).mkdir(parents=True, exist_ok=True)
+        (content / subdir).mkdir(parents=True, exist_ok=True)
 
 
 def get_prompt_path() -> Path:
-    return get_database_path() / "prompt.txt"
+    return get_content_dir() / "prompt.txt"
 
 
 def get_reference_data_path() -> Path:
-    return get_database_path() / "reference_data"
+    return get_content_dir() / "reference_data"
 
 
 def get_source_datasets_dir() -> Path:
-    return get_database_path() / "source_datasets"
+    return get_content_dir() / "source_datasets"
 
 
 def get_responses_datastore_path() -> Path:
-    return get_database_path() / "responses_datastore"
+    return get_content_dir() / "responses_datastore"
 
 
 def get_themes_dir() -> Path:
-    return get_database_path() / "themes"
+    return get_content_dir() / "themes"
 
 
 def get_user_themes_dir() -> Path:
-    return get_database_path() / "user_themes"
+    return get_content_dir() / "user_themes"
 
 
 def load_source_datasets():

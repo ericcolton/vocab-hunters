@@ -105,7 +105,7 @@ def test_hostile_title_is_sanitized(client, app_module):
     stem = resp.get_json()["stem"]
     assert "/" not in stem and ".." not in stem
 
-    users_root = Path(os.environ["VOCAB_HUNTERS_DB_PATH"]) / "users"
+    users_root = Path(os.environ["VOCAB_HUNTERS_DB_PATH"]) / "content" / "users"
     saved = list(users_root.glob(f"*/source_datasets/{stem}.json"))
     assert len(saved) == 1
     assert (Path(os.environ["VOCAB_HUNTERS_DB_PATH"]) / "evil.json").exists() is False
