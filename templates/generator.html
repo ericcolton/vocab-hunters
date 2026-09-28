@@ -450,7 +450,7 @@
                 <div class="full-width">
                     <label for="datasource">Source</label>
                     <div class="select-wrapper">
-                        <select id="datasource" name="datasource" onchange="changeSourceDataset()">
+                        <select id="datasource" name="datasource">
                             {% for source in config.data_sources %}
                             <option value="{{ source.id }}">{{ source.title }}</option>
                             {% endfor %}
@@ -840,11 +840,21 @@
         }
     }
 
+    // Overlapping updateEpisodes() calls can resolve out of order; only the
+    // most recent request is allowed to touch the DOM.
+    let episodesRequestId = 0;
+    let episodesAbortController = null;
+
     async function updateEpisodes() {
         const container = document.getElementById('episode-list-container');
         const list = document.getElementById('episode_list');
         if (!container || !list) {
             return;
+        }
+        const requestId = ++episodesRequestId;
+        if (episodesAbortController) {
+            episodesAbortController.abort();
+            episodesAbortController = null;
         }
         // Hide episodes for custom/user content (browsed via /my/worksheets instead)
         if (isCustomTheme() || isUserTheme() || isUserDataset()) {
@@ -867,12 +877,17 @@
             section: section
         });
 
+        const controller = new AbortController();
+        episodesAbortController = controller;
         try {
-            const response = await fetch(`/episodes?${params.toString()}`);
+            const response = await fetch(`/episodes?${params.toString()}`, { signal: controller.signal });
             if (!response.ok) {
                 throw new Error('Failed to fetch episodes.');
             }
             const payload = await response.json();
+            if (requestId !== episodesRequestId) {
+                return;
+            }
             const episodes = payload.episodes || [];
             if (!episodes.length) {
                 container.hidden = true;
@@ -921,30 +936,40 @@
             });
             updateGenerateButton(true);
         } catch (err) {
+            if (requestId !== episodesRequestId) {
+                return;
+            }
             container.hidden = true;
             list.innerHTML = '';
             updateGenerateButton(false);
         }
     }
 
-    async function changeSourceDataset() {
+    // Rebuilds the section options for the selected dataset, restoring
+    // preferredSection when the new dataset offers it, then refreshes episodes once.
+    async function changeSourceDataset(preferredSection) {
         const selectedId = document.getElementById('datasource').value;
+        const sectionSelect = document.getElementById('section');
         try {
             const response = await fetch(`/sections/${encodeURIComponent(selectedId)}`);
             const payload = await response.json();
-            if (!response.ok) {
-                return;
+            if (response.ok) {
+                sectionSelect.innerHTML = '';
+                (payload.sections || []).forEach((num) => {
+                    const option = document.createElement('option');
+                    option.value = num;
+                    option.textContent = num;
+                    sectionSelect.appendChild(option);
+                });
             }
-            const sectionSelect = document.getElementById('section');
-            sectionSelect.innerHTML = '';
-            (payload.sections || []).forEach((num) => {
-                const option = document.createElement('option');
-                option.value = num;
-                option.textContent = num;
-                sectionSelect.appendChild(option);
-            });
         } catch (err) {
             // Keep existing sections if the request fails.
+        }
+        if (preferredSection != null && preferredSection !== '') {
+            const wanted = String(preferredSection);
+            if (Array.from(sectionSelect.options).some((opt) => opt.value === wanted)) {
+                sectionSelect.value = wanted;
+            }
         }
         updateEpisodes();
     }
@@ -973,12 +998,7 @@
                 modelSelect.value = worksheetParams.model;
             }
 
-            changeSourceDataset().then(() => {
-                if (worksheetParams.section != null) {
-                    sectionSelect.value = worksheetParams.section;
-                }
-                updateEpisodes();
-            });
+            changeSourceDataset(worksheetParams.section);
         } else {
             const saved = loadPreferences();
             if (saved) {
@@ -997,12 +1017,7 @@
                 }
             }
 
-            changeSourceDataset().then(() => {
-                if (saved && saved.section) {
-                    sectionSelect.value = saved.section;
-                }
-                updateEpisodes();
-            });
+            changeSourceDataset(saved && saved.section);
         }
 
         themeSelect.addEventListener('change', () => {
@@ -1011,8 +1026,7 @@
             updateEpisodes();
         });
         sourceSelect.addEventListener('change', () => {
-            changeSourceDataset();
-            savePreferences();
+            changeSourceDataset().then(savePreferences);
         });
         levelSelect.addEventListener('change', () => {
             savePreferences();
