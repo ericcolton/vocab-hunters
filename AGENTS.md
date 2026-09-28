@@ -65,6 +65,8 @@ The web app imports the remaining phase scripts plus `Libraries/sentence_generat
 - `templates/login.html`, `register.html`, `account.html`, `my_worksheets.html` - Auth and per-user pages
 - `templates/_authnav.html` - Login/logout nav partial included in page footers
 
+**Page JavaScript** lives in `static/js/` (`generator.js`, `viewer.js`), not inline in templates. Server data reaches a script through a JSON block rendered with `tojson` (e.g. `<script type="application/json" id="generator-data">`), which the script reads with `JSON.parse(...textContent)`. Wire events with `addEventListener` in the script — no inline `onclick`/`onchange` attributes and no Jinja inside JS.
+
 ### Authentication and Per-User Content
 
 Authentication is additive: every pre-existing route works anonymously exactly as before; logging in unlocks persistence.
@@ -117,6 +119,19 @@ The project virtual environment is located at `venv/`. Run Python tooling throug
 ```bash
 venv/bin/python -m pytest tests/
 ```
+
+### Linting
+
+Both linters run in lint-only mode (no auto-formatting of the codebase).
+
+- **Python — Ruff** (config in `pyproject.toml`, pinned in `requirements-dev.txt`):
+  ```bash
+  venv/bin/ruff check .
+  ```
+- **JavaScript — Biome** (config in `biome.json`, covers `static/js/`). Biome is a standalone binary, not a pip/npm dependency; install the version pinned in `biome.json`'s `$schema` URL from the [GitHub releases](https://github.com/biomejs/biome/releases) (e.g. `biome-darwin-arm64`) to `~/.local/bin/biome` and `chmod +x` it. Then:
+  ```bash
+  biome lint
+  ```
 
 ## Coding Conventions
 
@@ -173,6 +188,7 @@ This policy applies to **code changes going forward**. Existing untested code is
 - If sentence generation (OpenAI) was changed, verify cached responses still load and new responses are written to the correct filesystem path
 - Summarize changed files and any risks to the stage-to-stage JSON contract or cache structure
 - Run `venv/bin/python -m pytest tests/` (see `requirements-dev.txt`) — covers auth, per-user content, dataset upload (with generation and PDF rendering mocked), and `Libraries/sentence_generation.py`; extend it when touching those areas. Phases 2/3/5 are still untested.
+- Run `venv/bin/ruff check .` and `biome lint` (see Linting) with no findings
 
 ## Known Traps
 

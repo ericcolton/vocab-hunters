@@ -8,6 +8,7 @@ from typing import Optional
 
 from Libraries.datasets import DatasetError, load_dataset
 
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Build phase 3 request JSON from a source dataset."
@@ -19,7 +20,7 @@ def load_request(stdin_data: str):
     try:
         return json.loads(stdin_data)
     except json.JSONDecodeError as exc:
-        raise SystemExit(f"Failed to parse JSON from stdin: {exc}")
+        raise SystemExit(f"Failed to parse JSON from stdin: {exc}") from exc
 
 
 def find_section(dataset: dict, section_number: int) -> dict:
@@ -56,7 +57,7 @@ def build_output(request: dict, section_entries: list) -> dict:
     worksheet_id = request["worksheet_id"]
     if section is None:
         raise SystemExit("Section number not found in request (section).")
-    
+
     # Build doc_key = source_dataset | reading_level_token | model | theme | seed
     reading_level_token = build_reading_level_token(reading_level)
     doc_key = "|".join(

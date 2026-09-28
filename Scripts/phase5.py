@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Generate a PDF worksheet from a JSON file of vocabulary questions.
@@ -36,24 +35,23 @@ By default the look/feel matches your most recent Section 6 worksheet:
 # in tests/test_phase5_pagination.py.
 
 import argparse
+import hashlib
+import io
 import json
-import os
 import random
 import sys
 from collections import Counter, defaultdict
 from typing import Any, Dict, List, Optional, Tuple
-import hashlib
-import io
+
+from reportlab.graphics import renderPDF
+from reportlab.graphics.barcode.qr import QrCodeWidget
+from reportlab.graphics.shapes import Drawing
 
 # ReportLab
 from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.pdfbase.pdfmetrics import stringWidth
-from reportlab.graphics.barcode.qr import QrCodeWidget
-from reportlab.graphics.shapes import Drawing
-from reportlab.graphics import renderPDF
-from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
 
 # -----------------------------
 # Layout and style constants
@@ -110,8 +108,7 @@ def normalize_ascii(s):
     """Ensure ASCII-safe punctuation (replace smart quotes/emdashes if present)."""
     repl = {
         "\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"',
-        "\u2013": "-", "\u2014": "-", "\u2026": "...", "–": "-", "—": "-",
-        "’": "'", "“": '"', "”": '"',
+        "\u2013": "-", "\u2014": "-", "\u2026": "...",
         "•": "-", "·": "-",
     }
     for k,v in repl.items():
@@ -362,7 +359,7 @@ def draw_questions_footer(c, footer_text):
     """Draw a footer at the bottom of the page based on footer_text."""
     if not footer_text:
         return
-    
+
     c.setFont(TEXT_FONT, TEXT_SIZE - 2)
 
     # center the footer text on the page
@@ -390,7 +387,7 @@ def draw_answers_footer(c, footer_text, seed, qr_code):
     """Draw a footer at the bottom of the page based on footer_text."""
     if not footer_text:
         return
-    
+
     c.setFont(TEXT_FONT, TEXT_SIZE - 2)
 
     if qr_code:
@@ -449,18 +446,18 @@ def build_section(
     answer_key_footer_format: str,
     qr_code: Optional[Drawing],
 ) -> None:
-    
+
     output_subtitle = section["output"]["subtitle"]
     entries = section["data"]
 
     subtitle_with_episode = f"Episode {seed}: " + output_subtitle
-    
+
     rng_seed = _rng_seed_from_worksheet_id(worksheet_id)
     if rng_seed is None:
         rng_seed = seed
     rng = random.Random(rng_seed)
-    shuffled_entries = rng.sample(entries, k=len(entries)) 
-    
+    shuffled_entries = rng.sample(entries, k=len(entries))
+
     questions = []
     for e in shuffled_entries:
         word = normalize_ascii(e["word"])
@@ -569,7 +566,7 @@ def build_section(
 
 def build_pdf(doc_root, output_stream):
     c = canvas.Canvas(output_stream, pagesize=letter)
-        
+
     worksheet_id = doc_root.get('worksheet_id')
     qr_worksheet_id = doc_root.get('qr_worksheet_id') or worksheet_id
 
@@ -603,7 +600,7 @@ def build_pdf(doc_root, output_stream):
 # -----------------------------
 def main():
     parser = argparse.ArgumentParser(description="Generate a PDF vocabulary worksheet from JSON.")
-    args = parser.parse_args()
+    parser.parse_args()
 
     # Read JSON from stdin
     try:

@@ -7,11 +7,12 @@ import secrets
 import sys
 import urllib.request
 from datetime import datetime, timedelta, timezone
-from urllib.parse import urlencode
 from functools import lru_cache
 from pathlib import Path
+from typing import Any, Dict
+from urllib.parse import urlencode
 
-from flask import Flask, render_template, request, jsonify, Response, redirect, url_for
+from flask import Flask, Response, jsonify, redirect, render_template, request, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
@@ -45,10 +46,8 @@ scripts_dir = Path(__file__).resolve().parent / "Scripts"
 if str(scripts_dir) not in sys.path:
     sys.path.append(str(scripts_dir))
 
-from phase2 import run_with_json, Phase2Error, decode_worksheet_id, build_worksheet_id
-from phase3 import run_with_json as run_phase3_with_json
-from phase5 import run_with_json as run_phase5_with_json
-from Libraries.sentence_generation import SentenceGenerationError, generate_sentences
+from auth import auth_bp, current_user, init_auth_db, login_required, validate_csrf
+from Libraries.datasets import DatasetError
 from Libraries.reference_data import (
     get_reference_data_path,
     get_responses_datastore_path,
@@ -58,10 +57,9 @@ from Libraries.reference_data import (
     lookup_source_dataset,
     validate_key_component,
 )
-from auth import auth_bp, current_user, init_auth_db, login_required, validate_csrf
+from Libraries.sentence_generation import SentenceGenerationError, generate_sentences
 from Libraries.user_data import (
     UserDataError,
-    build_theme_content,
     get_user_source_datasets_dir,
     get_user_theme,
     is_user_key,
@@ -79,7 +77,9 @@ from Libraries.user_pipeline import (
     generate_user_worksheet,
     interpolate_presentation_metadata,
 )
-from Libraries.datasets import DatasetError
+from phase2 import Phase2Error, build_worksheet_id, decode_worksheet_id, run_with_json
+from phase3 import run_with_json as run_phase3_with_json
+from phase5 import run_with_json as run_phase5_with_json
 
 app.register_blueprint(auth_bp)
 init_auth_db()
@@ -218,7 +218,7 @@ def list_cached_episodes(source_dataset, theme, reading_level, model, section):
 def load_models():
     reference_data_path = get_reference_data_path()
     models_path = reference_data_path / "models.json"
-    with open(models_path, "r", encoding="utf-8") as f:
+    with open(models_path, encoding="utf-8") as f:
         data = json.load(f)
     if isinstance(data, dict):
         data = [data]
@@ -281,13 +281,38 @@ def build_view_config():
         config["user_datasets"] = list_user_datasets(user["id"])
     return config
 
+def build_theme_config(config: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
+    """Theme-id -> UI fields for generator.js (title/subtitle/body class swaps)."""
+    theme_config = {}
+    for theme in config["themes"]:
+        theme_config[str(theme["id"])] = {
+            "key_name": theme["key_name"],
+            "title": theme["ui_title"],
+            "subtitle": theme["ui_subtitle"],
+            "css_class": theme["css_class"],
+        }
+    for theme in config.get("user_themes") or []:
+        theme_config[str(theme["id"])] = {
+            "key_name": theme["key_name"],
+            "title": theme["title"],
+            "subtitle": "Your custom theme",
+            "css_class": "theme-custom",
+        }
+    return theme_config
+
 @app.route('/')
 def landing():
     return render_template('landing.html', config=build_view_config())
 
 @app.route('/worksheets')
 def worksheets():
-    return render_template('generator.html', config=build_view_config(), worksheet_params=None)
+    config = build_view_config()
+    return render_template(
+        'generator.html',
+        config=config,
+        theme_config=build_theme_config(config),
+        worksheet_params=None,
+    )
 
 @app.route('/worksheet')
 def worksheet():
@@ -648,7 +673,7 @@ def generate():
 
     try:
         response_json = run_with_json(json.dumps(payload, ensure_ascii=False))
-        response_payload = json.loads(response_json)
+        json.loads(response_json)  # reject malformed phase2 output early
     except Phase2Error as exc:
         return jsonify({"error": str(exc)}), 400
     except json.JSONDecodeError as exc:
@@ -765,7 +790,7 @@ def fetch_episode():
 
     try:
         response_json = run_with_json(json.dumps(payload, ensure_ascii=False))
-        response_payload = json.loads(response_json)
+        json.loads(response_json)  # reject malformed phase2 output early
     except Phase2Error as exc:
         return jsonify({"error": str(exc)}), 400
     except json.JSONDecodeError as exc:

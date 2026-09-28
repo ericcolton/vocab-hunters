@@ -18,4 +18,4 @@ def load_dataset(source_dataset: str, datasets_dir: Optional[Path] = None):
         with path.open("r", encoding="utf-8") as f:
             return json.load(f)
     except json.JSONDecodeError as exc:
-        raise DatasetError(f"Failed to parse dataset JSON at {path}: {exc}")
+        raise DatasetError(f"Failed to parse dataset JSON at {path}: {exc}") from exc

@@ -1,0 +1,20 @@
+[tool.ruff]
+target-version = "py39"
+extend-exclude = ["venv"]
+
+[tool.ruff.lint]
+# pycodestyle errors/warnings, Pyflakes, isort, bugbear, pyupgrade
+select = ["E", "W", "F", "I", "B", "UP"]
+ignore = [
+    "E501",   # line length: style is not enforced (lint only, no `ruff format`)
+    "UP006",  # AGENTS.md: use typing.Dict/List, not builtin generics
+    "UP035",  # same convention (typing imports)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Imports follow the deliberate sys.path setup for Scripts/
+"app.py" = ["E402"]
+
+[tool.ruff.lint.isort]
+# Scripts/ is put on sys.path, so the phase modules import as top-level names
+known-first-party = ["Libraries", "auth", "phase2", "phase3", "phase5"]

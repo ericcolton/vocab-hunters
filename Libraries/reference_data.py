@@ -66,7 +66,7 @@ def get_user_themes_dir() -> Path:
 def load_source_datasets():
     reference_data_path = get_reference_data_path()
     source_datasets_path = reference_data_path / "source_datasets.json"
-    with open(source_datasets_path, "r", encoding="utf-8") as f:
+    with open(source_datasets_path, encoding="utf-8") as f:
         data = json.load(f)
     if isinstance(data, dict):
         data = [data]
@@ -100,7 +100,7 @@ def lookup_source_dataset(key_name):
 def load_themes():
     reference_data_path = get_reference_data_path()
     themes_path = reference_data_path / "themes.json"
-    with open(themes_path, "r", encoding="utf-8") as f:
+    with open(themes_path, encoding="utf-8") as f:
         data = json.load(f)
     if isinstance(data, dict):
         data = [data]

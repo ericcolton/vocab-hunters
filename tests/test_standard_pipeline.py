@@ -36,7 +36,7 @@ def fake_pipeline(app_module, monkeypatch):
         generated = copy.deepcopy(payload)
         generated["output"] = {"subtitle": "Fake Subtitle"}
         for entry in generated.get("data") or []:
-            entry["output"] = {"sentence": "A fake sentence about %s." % entry["word"]}
+            entry["output"] = {"sentence": f"A fake sentence about {entry['word']}."}
         return generated
 
     import phase2

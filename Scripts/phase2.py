@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 import argparse
 import json
-import sys
-import hashlib
 import logging
-from pathlib import Path
+import sys
 
 from flask import current_app, has_app_context
-from phase3 import run_with_json as run_phase3_with_json
 
 from Libraries.datasets import DatasetError
-
 from Libraries.reference_data import (
     get_reference_data_path,
     get_responses_datastore_path,
@@ -18,6 +14,8 @@ from Libraries.reference_data import (
     lookup_theme,
 )
 from Libraries.sentence_generation import SentenceGenerationError, generate_sentences
+from phase3 import run_with_json as run_phase3_with_json
+
 
 class Phase2Error(Exception):
     def __init__(self, message, exit_code=1):
@@ -81,7 +79,7 @@ def build_worksheet_id(request):
     def load_list(filename, field_name):
         ref_path = reference_data_dir / filename
         try:
-            with open(ref_path, "r", encoding="utf-8") as f:
+            with open(ref_path, encoding="utf-8") as f:
                 data = json.load(f)
             if isinstance(data, dict):
                 data = [data]
@@ -245,7 +243,7 @@ def decode_worksheet_id(worksheet_id_str):
     def load_list(filename, field_name):
         ref_path = reference_data_dir / filename
         try:
-            with open(ref_path, "r", encoding="utf-8") as f:
+            with open(ref_path, encoding="utf-8") as f:
                 data = json.load(f)
             if isinstance(data, dict):
                 data = [data]

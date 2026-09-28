@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Periodic backup of the Render-hosted vocab-hunters SQLite database and content tree.
